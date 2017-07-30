@@ -1,0 +1,61 @@
+{
+  "name": "hapi-auth-keycloak",
+  "description": "JSON Web Token based Authentication powered by Keycloak",
+  "keywords": [
+    "hapi",
+    "hapijs",
+    "hapi.js",
+    "auth",
+    "authentication",
+    "scope",
+    "keycloak",
+    "jwt",
+    "jsonwebtoken",
+    "json web token",
+    "plugin"
+  ],
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": {
+    "name": "Felix Heck",
+    "email": "hi@whotheheck.de",
+    "url": "http://whotheheck.de"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/felixheck/hapi-auth-keycloak.git"
+  },
+  "bugs": {
+    "email": "hi@whotheheck.com",
+    "url": "https://github.com/felixheck/hapi-auth-keycloak/issues"
+  },
+  "main": "./src/index.js",
+  "scripts": {
+    "start": "NODE_ENV=test npm test -- -w",
+    "lint": "standard",
+    "test": "NODE_ENV=test nyc --check-coverage --lines 80 ava test/**/*.spec.js --timeout=30s",
+    "coverage": "nyc report --reporter=lcov",
+    "ci.coverage": "nyc report --reporter=text-lcov | coveralls"
+  },
+  "devDependencies": {
+    "ava": "^0.20.0",
+    "coveralls": "^2.13.1",
+    "hapi": "^16.4.3",
+    "nyc": "^11.0.3",
+    "standard": "^10.0.2"
+  },
+  "dependencies": {
+    "boom": "^5.2.0",
+    "joi": "^10.6.0",
+    "keycloak-auth-utils": "^3.2.1",
+    "lodash": "^4.17.4"
+  },
+  "peerDependencies": {
+    "hapi": ">= 13.x.x",
+    "hapi-pino": ">= 1.6.x"
+  },
+  "engines": {
+    "node": ">=6.0.0",
+    "npm": ">=3.8.8"
+  }
+}
