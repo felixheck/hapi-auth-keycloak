@@ -203,7 +203,7 @@ For further information read the [contributing guideline](CONTRIBUTING.md).
 [keycloak-node]: https://keycloak.gitbooks.io/documentation/content/securing_apps/topics/oidc/nodejs-adapter.html
 [hapijs]: https://hapijs.com/
 [avajs]: https://github.com/avajs/ava
-[standard]: https://standardjs.com/
+[standardjs]: https://standardjs.com/
 [npm]: https://github.com/npm/npm
 [yarn]: https://yarnpkg.com
 [jwt]: https://jwt.io/
