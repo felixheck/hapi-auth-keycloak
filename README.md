@@ -105,12 +105,12 @@ server.route([
 ## API
 #### Plugin Options
 
-- `client {Object}`: The configuration of [`keycloak-auth-utils`][keycloak-auth-utils] its [`GrantManager`][keycloak-auth-utils-gm].<br/>
+- `client {Object}`: The configuration of [`keycloak-auth-utils`][keycloak-auth-utils] its [`GrantManager`][keycloak-auth-utils-gm]. The suggested minimum configuration contains `realmUrl`, `clientId` and `secret`.<br/>
 Required.
 
-- `cache {Object|false}`: The configuration of the [hapi.js cache](https://hapijs.com/api#servercacheoptions) powered by [catbox][catbox]. If `false` the cache is disabled. Use an empty object to use the built-in default cache.<br/>
-Optional.<br/>
-Default: `false`.
+- `cache {Object|false}`: The configuration of the [hapi.js cache](https://hapijs.com/api#servercacheoptions) powered by [catbox][catbox].<br/>
+If `false` the cache is disabled. Use an empty object to use the built-in default cache.<br/>
+Optional. Default: `false`.<br/>
 
 #### `server.kjwt.validate(field <string>, done <Function>)`
 Uses internally [`GrantManager.prototype.validateAccessToken()`][keycloak-auth-utils-gm-validate].
