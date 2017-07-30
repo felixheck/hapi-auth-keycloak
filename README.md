@@ -63,7 +63,7 @@ server.register({
     client: {
       // ...
     },
-    cache: true
+    cache: {}
   }
 }, function(err) {
   if (err) {
@@ -163,7 +163,7 @@ server.register({
     client: {
       // ...
     },
-    cache: true
+    cache: {}
   }
 }).then(() => {
   server.auth.strategy('keycloak-jwt', 'keycloak-jwt');
