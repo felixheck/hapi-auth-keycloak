@@ -15,13 +15,13 @@
 ---
 
 ## Introduction
-**hapi-auth-keycloak** is a plugin for [hapi.js](hapijs) which enables to protect your endpoints in a smart but professional manner using [Keycloak](keycloak) as authentication service. It is inspired by the related [express.js middleware](keycloak-node). The plugin validates the passed [`Bearer` token](bearer) online with help of the [Keycloak](keycloak) server and optionally caches successfully validated tokens and the related user data using [`catbox`](catbox). The caching enables a fast processing although the user data don't get changed until the token expires. It plays well with the [hapi.js](hapijs)-integrated [authentication feature](hapi-route-options). Besides the authentication strategy it is possible to validate tokens by yourself, e.g. to authenticate incoming websocket or queue messages.
+**hapi-auth-keycloak** is a plugin for [hapi.js](hapijs] which enables to protect your endpoints in a smart but professional manner using [Keycloak][keycloak] as authentication service. It is inspired by the related [express.js middleware][keycloak-node]. The plugin validates the passed [`Bearer` token][bearer] online with help of the [Keycloak][keycloak] server and optionally caches successfully validated tokens and the related user data using [`catbox`][catbox]. The caching enables a fast processing although the user data don't get changed until the token expires. It plays well with the [hapi.js][hapijs]-integrated [authentication feature][hapi-route-options]. Besides the authentication strategy it is possible to validate tokens by yourself, e.g. to authenticate incoming websocket or queue messages.
 
 This plugin is implemented in ECMAScript 6 without any transpilers like `babel`.<br/>
-Additionally [`standard`](standardjs) and [`ava`](avajs) are used to grant a high quality implementation.<br/>
+Additionally [`standard`][standardjs] and [`ava`][avajs] are used to grant a high quality implementation.<br/>
 
 ## Installation
-For installation use the [Node Package Manager](npm):
+For installation use the [Node Package Manager][npm]:
 ```
 $ npm install --save hapi-auth-keycloak
 ```
@@ -31,7 +31,7 @@ or clone the repository:
 $ git clone https://github.com/felixheck/hapi-auth-keycloak
 ```
 
-Alternatively use the [Yarn Package Manager](yarn):
+Alternatively use the [Yarn Package Manager][yarn]:
 ```
 $ yarn add hapi-auth-keycloak
 ```
@@ -75,7 +75,7 @@ server.register({
 ```
 
 #### Route Configuration & Scope
-Define your routes and add `keycloak-jwt` when necessary. It is possible to define the necessary scope like documented by the [express.js middleware](keycloak-node):
+Define your routes and add `keycloak-jwt` when necessary. It is possible to define the necessary scope like documented by the [express.js middleware][keycloak-node]:
 
 - To secure a resource with an application role for the current app, use the role name (e.g. `editor`).
 - To secure a resource with an application role for a different app, prefix the role name (e.g. `other-app:creator`)
@@ -105,15 +105,15 @@ server.route([
 ## API
 #### Plugin Options
 
-- `client {Object}`: The configuration of [`keycloak-auth-utils`](keycloak-auth-utils) its [`GrantManager`](keycloak-auth-utils-gm).<br/>
+- `client {Object}`: The configuration of [`keycloak-auth-utils`][keycloak-auth-utils] its [`GrantManager`][keycloak-auth-utils-gm].<br/>
 Required.
 
-- `cache {Object|false}`: The configuration of the [hapi.js cache](https://hapijs.com/api#servercacheoptions) powered by [catbox](catbox). If `false` the cache is disabled. Use an empty object to use the built-in default cache.<br/>
+- `cache {Object|false}`: The configuration of the [hapi.js cache](https://hapijs.com/api#servercacheoptions) powered by [catbox][catbox]. If `false` the cache is disabled. Use an empty object to use the built-in default cache.<br/>
 Optional.<br/>
 Default: `false`.
 
 #### `server.kjwt.validate(field <string>, done <Function>)`
-Uses internally [`GrantManager.prototype.validateAccessToken()`](keycloak-auth-utils-gm-validate).
+Uses internally [`GrantManager.prototype.validateAccessToken()`][keycloak-auth-utils-gm-validate].
 
 - `field {string}`: The `Bearer` field, including the scheme itself.<br/>
 Example: `bearer 12345.abcde.67890`.<br/>
