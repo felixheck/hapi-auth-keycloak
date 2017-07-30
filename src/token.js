@@ -17,12 +17,13 @@ function token (field) {
    * @private
    *
    * Extract bearer token out of header.
+   * https://tools.ietf.org/html/rfc7519
    *
    * @param {string} header The header to be scanned
    * @returns {string} The extracted header
    */
   function extractToken (header) {
-    return /^(?:bearer) ([A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*)$/i.exec(header)
+    return /^(?:bearer) ([a-zA-Z0-9\-_]+?\.[a-zA-Z0-9\-_]+?\.([a-zA-Z0-9\-_]+)?)$/i.exec(header)
   }
 
   /**
