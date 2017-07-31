@@ -72,11 +72,11 @@ function token (field) {
    * Get necessary user information out of token content.
    *
    * @param {Object} content The token its content
-   * @param {Array.<?string>} fields The necessary fields
+   * @param {Array.<?string>} [fields] The necessary fields
    * @returns {Object} The collection of requested user info
    */
-  function getUserInfo (content, fields) {
-    return _.pick(content, _.uniq(['sub', ...fields]))
+  function getUserInfo (content, fields = []) {
+    return _.pick(content, ['sub', ...fields])
   }
 
   /**

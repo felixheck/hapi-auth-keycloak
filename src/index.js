@@ -12,7 +12,7 @@ const pkg = require('../package.json')
  */
 const internals = {
   manager: undefined,
-  userInfoFields: []
+  userInfoFields: undefined
 }
 
 /**
