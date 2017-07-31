@@ -4,29 +4,15 @@ const token = require('./token')
 const { error, fakeReply, verify } = require('./utils')
 const pkg = require('../package.json')
 
-let manager
-
 /**
- * @function
- * @public
+ * @type Object
+ * @private
  *
- * Get user information based on token with help of Keycloak.
- * If all validations and requests are successful, save the
- * token and its user data in memory cache.
- *
- * @param {string} token The token to be validated
- * @param {Function} reply The callback handler
+ * Internally used properties
  */
-function handleKeycloakUserInfo (tkn, reply) {
-  manager.userInfo(tkn.get()).then((userInfo) => {
-    const { scope, expiresIn } = tkn.getData()
-    const userData = { credentials: Object.assign({ scope }, userInfo) }
-
-    cache.set(tkn.get(), userData, expiresIn)
-    reply.continue(userData)
-  }).catch((err) => {
-    reply(error('unauthorized', err))
-  })
+const internals = {
+  manager: undefined,
+  userInfoFields: []
 }
 
 /**
@@ -41,8 +27,16 @@ function handleKeycloakUserInfo (tkn, reply) {
 function handleKeycloakValidation (tkn, reply) {
   const invalidate = (err) => reply(error('unauthorized', err, error.msg.invalid))
 
-  manager.validateAccessToken(tkn.get()).then((res) => {
-    res ? handleKeycloakUserInfo(tkn, reply) : invalidate()
+  internals.manager.validateAccessToken(tkn.get()).then((res) => {
+    if (!res) {
+      return invalidate()
+    }
+
+    const { expiresIn, ...credentials } = tkn.getData(internals.userInfoFields)
+    const userData = { credentials }
+
+    cache.set(tkn.get(), userData, expiresIn)
+    return reply.continue(userData)
   }).catch(invalidate)
 }
 
@@ -108,8 +102,10 @@ function strategy (server) {
  */
 function plugin (server, opts, next) {
   opts = verify(opts)
-  manager = new GrantManager(opts)
   cache.init(server, opts.cache)
+
+  internals.manager = new GrantManager(opts.client)
+  internals.userInfoFields = opts.userInfo
 
   server.auth.scheme('keycloak-jwt', strategy)
   server.decorate('server', 'kjwt', { validate })
