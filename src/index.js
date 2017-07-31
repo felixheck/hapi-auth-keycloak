@@ -18,7 +18,7 @@ let manager
  * @param {Function} reply The callback handler
  */
 function handleKeycloakUserInfo (tkn, reply) {
-  manager.userInfo(tkn.get(), reply).then((userInfo) => {
+  manager.userInfo(tkn.get()).then((userInfo) => {
     const { scope, expiresIn } = tkn.getData()
     const userData = { credentials: Object.assign({ scope }, userInfo) }
 
