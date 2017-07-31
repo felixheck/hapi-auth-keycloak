@@ -1,6 +1,10 @@
 const hapi = require('hapi')
+const _ = require('lodash')
+const { GrantManager } = require('keycloak-auth-utils')
 const authKeycloak = require('../src')
 const fixtures = require('./_fixtures')
+
+const GrantManagerClone = {}
 
 /**
  * @type Object
@@ -11,6 +15,27 @@ const fixtures = require('./_fixtures')
 const defaults = {
   client: fixtures.config,
   cache: false
+}
+
+/**
+ * @type Object.<Function>
+ * @public
+ *
+ * Provide several functions to clone, reset and
+ * stub methods of `GrantManager`.
+ */
+const prototypes = {
+  clone () {
+    GrantManagerClone.prototype = _.cloneDeep(GrantManager.prototype)
+  },
+  reset () {
+    GrantManager.prototype = GrantManagerClone.prototype
+  },
+  stub (name, value, type = 'resolve') {
+    GrantManager.prototype[name] = function () {
+      return Promise[type](value)
+    }
+  }
 }
 
 /**
@@ -108,5 +133,6 @@ function getServer (options, done) {
 
 module.exports = {
   getServer,
-  registerPlugin
+  registerPlugin,
+  prototypes
 }

@@ -1,21 +1,17 @@
 const test = require('ava')
-const _ = require('lodash')
-const { GrantManager } = require('keycloak-auth-utils')
-const manager = require('../src/manager')
 const cache = require('../src/cache')
 const helpers = require('./_helpers')
 const fixtures = require('./_fixtures')
 
-const GrantManagerClone = {}
+const { prototypes } = helpers
 
 test.beforeEach(() => {
-  GrantManagerClone.prototype = _.cloneDeep(GrantManager.prototype)
+  prototypes.clone()
 })
 
 test.afterEach('reset instances and prototypes', () => {
   cache.reset()
-  manager.reset()
-  GrantManager.prototype = GrantManagerClone.prototype
+  prototypes.reset()
 })
 
 test.cb.serial('throw error if plugin gets registered twice', (t) => {
@@ -26,13 +22,8 @@ test.cb.serial('throw error if plugin gets registered twice', (t) => {
 })
 
 test.cb.serial('authentication does succeed', (t) => {
-  GrantManager.prototype.validateAccessToken = function (tkn, cb) {
-    cb(null, fixtures.validation)
-  }
-
-  GrantManager.prototype.userInfo = function (tkn, cb) {
-    cb(null, fixtures.userInfo)
-  }
+  prototypes.stub('validateAccessToken', fixtures.validation)
+  prototypes.stub('userInfo', fixtures.userInfo)
 
   helpers.getServer(undefined, (server) => {
     server.inject({
@@ -50,13 +41,8 @@ test.cb.serial('authentication does succeed', (t) => {
 })
 
 test.cb.serial('authentication does succeed – cached', (t) => {
-  GrantManager.prototype.validateAccessToken = function (tkn, cb) {
-    cb(null, fixtures.validation)
-  }
-
-  GrantManager.prototype.userInfo = function (tkn, cb) {
-    cb(null, fixtures.userInfo)
-  }
+  prototypes.stub('validateAccessToken', fixtures.validation)
+  prototypes.stub('userInfo', fixtures.userInfo)
 
   const mockReq = {
     method: 'GET',
@@ -81,13 +67,8 @@ test.cb.serial('authentication does succeed – cached', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid roles', (t) => {
-  GrantManager.prototype.validateAccessToken = function (tkn, cb) {
-    cb(null, fixtures.validation)
-  }
-
-  GrantManager.prototype.userInfo = function (tkn, cb) {
-    cb(null, fixtures.userInfo)
-  }
+  prototypes.stub('validateAccessToken', fixtures.validation)
+  prototypes.stub('userInfo', fixtures.userInfo)
 
   helpers.getServer(undefined, (server) => {
     server.inject({
@@ -105,9 +86,7 @@ test.cb.serial('authentication does fail – invalid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid token', (t) => {
-  GrantManager.prototype.validateAccessToken = function (tkn, cb) {
-    cb(null, false)
-  }
+  prototypes.stub('validateAccessToken', false)
 
   helpers.getServer(undefined, (server) => {
     server.inject({
@@ -137,6 +116,79 @@ test.cb.serial('authentication does fail – invalid header', (t) => {
       t.truthy(res)
       t.is(res.statusCode, 401)
       t.is(res.headers['www-authenticate'], 'Bearer error="Missing or invalid authorization header"')
+      t.end()
+    })
+  })
+})
+
+test.cb.serial('server method validates token', (t) => {
+  prototypes.stub('validateAccessToken', fixtures.validation)
+  prototypes.stub('userInfo', fixtures.userInfo)
+
+  helpers.getServer(undefined, (server) => {
+    server.kjwt.validate(`bearer ${fixtures.jwt.content}`, (err, res) => {
+      t.falsy(err)
+      t.truthy(res)
+      t.truthy(res.credentials)
+      t.end()
+    })
+  })
+})
+
+test.cb.serial('server method invalidates token – userinfo error', (t) => {
+  prototypes.stub('validateAccessToken', fixtures.validation)
+  prototypes.stub('userInfo', new Error('an error'), 'reject')
+
+  helpers.getServer(undefined, (server) => {
+    server.kjwt.validate(`bearer ${fixtures.jwt.content}`, (err, res) => {
+      t.falsy(res)
+      t.truthy(err)
+      t.truthy(err.isBoom)
+      t.is(err.output.statusCode, 401)
+      t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="Error: an error"')
+      t.end()
+    })
+  })
+})
+
+test.cb.serial('server method invalidates token – validation error', (t) => {
+  prototypes.stub('validateAccessToken', new Error('an error'), 'reject')
+
+  helpers.getServer(undefined, (server) => {
+    server.kjwt.validate(`bearer ${fixtures.jwt.content}`, (err, res) => {
+      t.falsy(res)
+      t.truthy(err)
+      t.truthy(err.isBoom)
+      t.is(err.output.statusCode, 401)
+      t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="Error: an error"')
+      t.end()
+    })
+  })
+})
+
+test.cb.serial('server method invalidates token – invalid', (t) => {
+  prototypes.stub('validateAccessToken', false)
+
+  helpers.getServer(undefined, (server) => {
+    server.kjwt.validate(`bearer ${fixtures.jwt.content}`, (err, res) => {
+      t.falsy(res)
+      t.truthy(err)
+      t.truthy(err.isBoom)
+      t.is(err.output.statusCode, 401)
+      t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="Invalid credentials"')
+      t.end()
+    })
+  })
+})
+
+test.cb.serial('server method invalidates token – wrong format', (t) => {
+  helpers.getServer(undefined, (server) => {
+    server.kjwt.validate(fixtures.jwt.content, (err, res) => {
+      t.falsy(res)
+      t.truthy(err)
+      t.truthy(err.isBoom)
+      t.is(err.output.statusCode, 401)
+      t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="Missing or invalid authorization header"')
       t.end()
     })
   })

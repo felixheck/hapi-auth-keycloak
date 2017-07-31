@@ -1,32 +1,49 @@
+const { GrantManager } = require('keycloak-auth-utils')
 const cache = require('./cache')
-const manager = require('./manager')
 const token = require('./token')
 const { error, fakeReply, verify } = require('./utils')
 const pkg = require('../package.json')
+
+let manager
+
+/**
+ * @function
+ * @public
+ *
+ * Get user information based on token with help of Keycloak.
+ * If all validations and requests are successful, save the
+ * token and its user data in memory cache.
+ *
+ * @param {string} token The token to be validated
+ * @param {Function} reply The callback handler
+ */
+function handleKeycloakUserInfo (tkn, reply) {
+  manager.userInfo(tkn.get(), reply).then((userInfo) => {
+    const { scope, expiresIn } = tkn.getData()
+    const userData = { credentials: Object.assign({ scope }, userInfo) }
+
+    cache.set(tkn.get(), userData, expiresIn)
+    reply.continue(userData)
+  }).catch((err) => {
+    reply(error('unauthorized', err))
+  })
+}
 
 /**
  * @function
  * @public
  *
  * Validate a token with help of Keycloak.
- * If all validations and requests are successful,
- * save the token and its user data in memory cache.
  *
  * @param {string} token The token to be validated
  * @param {Function} reply The callback handler
  */
 function handleKeycloakValidation (tkn, reply) {
-  const rawTkn = tkn.get()
+  const invalidate = (err) => reply(error('unauthorized', err, error.msg.invalid))
 
-  manager.validateAccessToken(rawTkn, reply, () => {
-    manager.userInfo(rawTkn, reply, (userInfo) => {
-      const { scope, expiresIn } = tkn.getData()
-      const userData = { credentials: Object.assign({ scope }, userInfo) }
-      cache.set(tkn.get(), userData, expiresIn)
-
-      return reply.continue(userData)
-    })
-  })
+  manager.validateAccessToken(tkn.get()).then((res) => {
+    res ? handleKeycloakUserInfo(tkn, reply) : invalidate()
+  }).catch(invalidate)
 }
 
 /**
@@ -49,11 +66,8 @@ function validate (field, reply) {
   }
 
   cache.get(tkn.get(), (err, cached) => {
-    if (cached && !err) {
-      return reply.continue(cached)
-    }
-
-    return handleKeycloakValidation(tkn, reply)
+    const isCached = cached && !err
+    isCached ? reply.continue(cached) : handleKeycloakValidation(tkn, reply)
   })
 }
 
@@ -94,7 +108,7 @@ function strategy (server) {
  */
 function plugin (server, opts, next) {
   opts = verify(opts)
-  manager.init(opts.client)
+  manager = new GrantManager(opts)
   cache.init(server, opts.cache)
 
   server.auth.scheme('keycloak-jwt', strategy)
