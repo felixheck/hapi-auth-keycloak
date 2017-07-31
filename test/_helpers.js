@@ -1,6 +1,10 @@
 const hapi = require('hapi')
+const _ = require('lodash')
+const { GrantManager } = require('keycloak-auth-utils')
 const authKeycloak = require('../src')
 const fixtures = require('./_fixtures')
+
+const GrantManagerClone = {}
 
 /**
  * @type Object
@@ -11,6 +15,27 @@ const fixtures = require('./_fixtures')
 const defaults = {
   client: fixtures.config,
   cache: false
+}
+
+/**
+ * @type Object.<Function>
+ * @public
+ *
+ * Provide several functions to clone, reset and
+ * stub methods of `GrantManager`.
+ */
+const prototypes = {
+  clone () {
+    GrantManagerClone.prototype = _.cloneDeep(GrantManager.prototype)
+  },
+  reset () {
+    GrantManager.prototype = GrantManagerClone.prototype
+  },
+  stub (name, value, type = 'resolve') {
+    GrantManager.prototype[name] = function () {
+      return Promise[type](value)
+    }
+  }
 }
 
 /**
@@ -36,6 +61,21 @@ function registerRoutes (server) {
     {
       method: 'GET',
       path: '/role',
+      config: {
+        auth: {
+          strategies: ['keycloak-jwt'],
+          access: {
+            scope: ['editor']
+          }
+        },
+        handler (req, reply) {
+          reply({ foo: 42 })
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/role/guest',
       config: {
         auth: {
           strategies: ['keycloak-jwt'],
@@ -84,17 +124,7 @@ function registerPlugin (server, options = defaults, done = () => {}) {
 function getServer (options, done) {
   const server = new hapi.Server()
 
-  server.connection({
-    host: '127.0.0.1',
-    port: 1337
-  })
-
-  process.on('SIGINT', () => {
-    server.stop({ timeout: 10000 }).then((err) => {
-      process.exit((err) ? 1 : 0)
-    })
-  })
-
+  server.connection()
   server.initialize((err) => {
     if (err) throw err
 
@@ -108,5 +138,6 @@ function getServer (options, done) {
 
 module.exports = {
   getServer,
-  registerPlugin
+  registerPlugin,
+  prototypes
 }

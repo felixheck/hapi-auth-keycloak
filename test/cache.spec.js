@@ -1,5 +1,5 @@
 const test = require('ava')
-const helpers = require('./_helpers')
+const { getServer } = require('./_helpers')
 const cache = require('../src/cache')
 
 test.afterEach('reset cache', () => {
@@ -7,7 +7,7 @@ test.afterEach('reset cache', () => {
 })
 
 test.cb.serial('just create one instance – object', (t) => {
-  helpers.getServer(false, (server) => {
+  getServer(false, (server) => {
     const cch1 = cache.init(server, { segment: 'foo' })
     const cch2 = cache.init(server, { segment: 'foo' })
 
@@ -19,7 +19,7 @@ test.cb.serial('just create one instance – object', (t) => {
 })
 
 test.cb.serial('just create one instance – boolean', (t) => {
-  helpers.getServer(false, (server) => {
+  getServer(false, (server) => {
     const cch1 = cache.init(server, false)
     const cch2 = cache.init(server, false)
 
@@ -31,7 +31,7 @@ test.cb.serial('just create one instance – boolean', (t) => {
 })
 
 test.cb.serial('set and get value', (t) => {
-  helpers.getServer(false, (server) => {
+  getServer(false, (server) => {
     cache.init(server, { segment: 'foo' })
     cache.set('bar', 42, 10000)
 
@@ -44,7 +44,7 @@ test.cb.serial('set and get value', (t) => {
 })
 
 test.cb.serial('set and get value – no cache', (t) => {
-  helpers.getServer(false, (server) => {
+  getServer(false, (server) => {
     cache.init(server, false)
     cache.set('bar', 42, 10000)
 
@@ -57,7 +57,7 @@ test.cb.serial('set and get value – no cache', (t) => {
 })
 
 test.cb.serial('set and get value – expired', (t) => {
-  helpers.getServer(false, (server) => {
+  getServer(false, (server) => {
     cache.init(server, { segment: 'foo' })
     cache.set('bar', 42, 100)
 
