@@ -17,7 +17,7 @@
 ## Introduction
 **hapi-auth-keycloak** is a plugin for [hapi.js](hapijs] which enables to protect your endpoints in a smart but professional manner using [Keycloak][keycloak] as authentication service. It is inspired by the related [express.js middleware][keycloak-node]. The plugin validates the passed [`Bearer` token][bearer] online with help of the [Keycloak][keycloak] server and optionally caches successfully validated tokens and the related user data using [`catbox`][catbox]. The caching enables a fast processing although the user data don't get changed until the token expires. It plays well with the [hapi.js][hapijs]-integrated [authentication feature][hapi-route-options]. Besides the authentication strategy it is possible to validate tokens by yourself, e.g. to authenticate incoming websocket or queue messages.
 
-This plugin is implemented in ECMAScript 6 without any transpilers like `babel`.<br/>
+This plugin is implemented in ECMAScript 6 without any transpilers like [`babel`][babel].<br/>
 Additionally [`standard`][standardjs] and [`ava`][avajs] are used to grant a high quality implementation.<br/>
 
 ## Installation
@@ -61,7 +61,9 @@ server.register({
   register: authKeycloak,
   options: {
     client: {
-      // ...
+      realmUrl: 'https://localhost:8080/auth/realms/testme',
+      clientId: 'foobar',
+      secret: '1234-bar-4321-foo'
     },
     cache: {}
   }
@@ -112,18 +114,17 @@ Required.
 If `false` the cache is disabled. Use an empty object to use the built-in default cache.<br/>
 Optional. Default: `false`.<br/>
 
-#### `server.kjwt.validate(field <string>, done <Function>)`
+#### `server.kjwt.validate(field {string}, done {Function})`
 Uses internally [`GrantManager.prototype.validateAccessToken()`][keycloak-auth-utils-gm-validate].
 
-- `field {string}`: The `Bearer` field, including the scheme itself.<br/>
+- `field {string}`: The `Bearer` field, including the scheme (`bearer`) itself.<br/>
 Example: `bearer 12345.abcde.67890`.<br/>
 Required.
 
-- `done {Function}`: The callback handler is passed an `Error` object (if available)  and the `result` (error-first). If the token is invalid, the `result` is `false`. Otherwise it is an object containing all relevant credentials.<br/>
+- `done {Function}`: The callback handler is passed `err {Error}, result {Object|false}` (error-first approach).<br/>If an error occurs, `err` is not `null`.  If the token is invalid, the `result` is `false`. Otherwise it is an object containing all relevant credentials.<br/>
 Required.
 
 ## Example
-#### Code
 
 ``` js
 const Hapi = require('hapi');
@@ -161,7 +162,9 @@ server.register({
   register: authKeycloak,
   options: {
     client: {
-      // ...
+      realmUrl: 'https://localhost:8080/auth/realms/testme',
+      clientId: 'foobar',
+      secret: '1234-bar-4321-foo'
     },
     cache: {}
   }
@@ -204,6 +207,7 @@ For further information read the [contributing guideline](CONTRIBUTING.md).
 [hapijs]: https://hapijs.com/
 [avajs]: https://github.com/avajs/ava
 [standardjs]: https://standardjs.com/
+[babel]: https://babeljs.io/
 [npm]: https://github.com/npm/npm
 [yarn]: https://yarnpkg.com
 [jwt]: https://jwt.io/
