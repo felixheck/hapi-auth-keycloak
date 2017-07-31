@@ -114,12 +114,6 @@ function getServer (options, done) {
     port: 1337
   })
 
-  process.on('SIGINT', () => {
-    server.stop({ timeout: 10000 }).then((err) => {
-      process.exit((err) ? 1 : 0)
-    })
-  })
-
   server.initialize((err) => {
     if (err) throw err
 
