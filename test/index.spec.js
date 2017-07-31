@@ -1,9 +1,7 @@
 const test = require('ava')
 const cache = require('../src/cache')
-const helpers = require('./_helpers')
+const { prototypes, getServer, registerPlugin } = require('./_helpers')
 const fixtures = require('./_fixtures')
-
-const { prototypes } = helpers
 
 test.beforeEach(() => {
   prototypes.clone()
@@ -15,8 +13,8 @@ test.afterEach('reset instances and prototypes', () => {
 })
 
 test.cb.serial('throw error if plugin gets registered twice', (t) => {
-  helpers.getServer(undefined, (server) => {
-    t.throws(() => helpers.registerPlugin(server), Error)
+  getServer(undefined, (server) => {
+    t.throws(() => registerPlugin(server), Error)
     t.end()
   })
 })
@@ -25,7 +23,7 @@ test.cb.serial('authentication does succeed', (t) => {
   prototypes.stub('validateAccessToken', fixtures.validation)
   prototypes.stub('userInfo', fixtures.userInfo)
 
-  helpers.getServer(undefined, (server) => {
+  getServer(undefined, (server) => {
     server.inject({
       method: 'GET',
       url: '/',
@@ -52,7 +50,7 @@ test.cb.serial('authentication does succeed – cached', (t) => {
     }
   }
 
-  helpers.getServer({
+  getServer({
     client: fixtures.config,
     cache: {}
   }, (server) => {
@@ -70,7 +68,7 @@ test.cb.serial('authentication does success – valid roles', (t) => {
   prototypes.stub('validateAccessToken', fixtures.validation)
   prototypes.stub('userInfo', fixtures.userInfo)
 
-  helpers.getServer(undefined, (server) => {
+  getServer(undefined, (server) => {
     server.inject({
       method: 'GET',
       url: '/role',
@@ -89,7 +87,7 @@ test.cb.serial('authentication does fail – invalid roles', (t) => {
   prototypes.stub('validateAccessToken', fixtures.validation)
   prototypes.stub('userInfo', fixtures.userInfo)
 
-  helpers.getServer(undefined, (server) => {
+  getServer(undefined, (server) => {
     server.inject({
       method: 'GET',
       url: '/role/guest',
@@ -107,7 +105,7 @@ test.cb.serial('authentication does fail – invalid roles', (t) => {
 test.cb.serial('authentication does fail – invalid token', (t) => {
   prototypes.stub('validateAccessToken', false)
 
-  helpers.getServer(undefined, (server) => {
+  getServer(undefined, (server) => {
     server.inject({
       method: 'GET',
       url: '/',
@@ -124,7 +122,7 @@ test.cb.serial('authentication does fail – invalid token', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid header', (t) => {
-  helpers.getServer(undefined, (server) => {
+  getServer(undefined, (server) => {
     server.inject({
       method: 'GET',
       url: '/',
@@ -144,7 +142,7 @@ test.cb.serial('server method validates token', (t) => {
   prototypes.stub('validateAccessToken', fixtures.validation)
   prototypes.stub('userInfo', fixtures.userInfo)
 
-  helpers.getServer(undefined, (server) => {
+  getServer(undefined, (server) => {
     server.kjwt.validate(`bearer ${fixtures.jwt.content}`, (err, res) => {
       t.falsy(err)
       t.truthy(res)
@@ -158,7 +156,7 @@ test.cb.serial('server method invalidates token – userinfo error', (t) => {
   prototypes.stub('validateAccessToken', fixtures.validation)
   prototypes.stub('userInfo', new Error('an error'), 'reject')
 
-  helpers.getServer(undefined, (server) => {
+  getServer(undefined, (server) => {
     server.kjwt.validate(`bearer ${fixtures.jwt.content}`, (err, res) => {
       t.falsy(res)
       t.truthy(err)
@@ -173,7 +171,7 @@ test.cb.serial('server method invalidates token – userinfo error', (t) => {
 test.cb.serial('server method invalidates token – validation error', (t) => {
   prototypes.stub('validateAccessToken', new Error('an error'), 'reject')
 
-  helpers.getServer(undefined, (server) => {
+  getServer(undefined, (server) => {
     server.kjwt.validate(`bearer ${fixtures.jwt.content}`, (err, res) => {
       t.falsy(res)
       t.truthy(err)
@@ -188,7 +186,7 @@ test.cb.serial('server method invalidates token – validation error', (t) => {
 test.cb.serial('server method invalidates token – invalid', (t) => {
   prototypes.stub('validateAccessToken', false)
 
-  helpers.getServer(undefined, (server) => {
+  getServer(undefined, (server) => {
     server.kjwt.validate(`bearer ${fixtures.jwt.content}`, (err, res) => {
       t.falsy(res)
       t.truthy(err)
@@ -201,7 +199,7 @@ test.cb.serial('server method invalidates token – invalid', (t) => {
 })
 
 test.cb.serial('server method invalidates token – wrong format', (t) => {
-  helpers.getServer(undefined, (server) => {
+  getServer(undefined, (server) => {
     server.kjwt.validate(fixtures.jwt.content, (err, res) => {
       t.falsy(res)
       t.truthy(err)
