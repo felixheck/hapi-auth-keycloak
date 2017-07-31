@@ -65,6 +65,21 @@ function registerRoutes (server) {
         auth: {
           strategies: ['keycloak-jwt'],
           access: {
+            scope: ['editor']
+          }
+        },
+        handler (req, reply) {
+          reply({ foo: 42 })
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/role/guest',
+      config: {
+        auth: {
+          strategies: ['keycloak-jwt'],
+          access: {
             scope: ['guest']
           }
         },
@@ -109,11 +124,7 @@ function registerPlugin (server, options = defaults, done = () => {}) {
 function getServer (options, done) {
   const server = new hapi.Server()
 
-  server.connection({
-    host: '127.0.0.1',
-    port: 1337
-  })
-
+  server.connection()
   server.initialize((err) => {
     if (err) throw err
 

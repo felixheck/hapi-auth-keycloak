@@ -66,7 +66,7 @@ test.cb.serial('authentication does succeed – cached', (t) => {
   })
 })
 
-test.cb.serial('authentication does fail – invalid roles', (t) => {
+test.cb.serial('authentication does success – valid roles', (t) => {
   prototypes.stub('validateAccessToken', fixtures.validation)
   prototypes.stub('userInfo', fixtures.userInfo)
 
@@ -75,7 +75,26 @@ test.cb.serial('authentication does fail – invalid roles', (t) => {
       method: 'GET',
       url: '/role',
       headers: {
-        authorization: `bearer ${fixtures.jwt.content}`
+        authorization: `bearer ${fixtures.jwt.userData}`
+      }
+    }, (res) => {
+      t.truthy(res)
+      t.is(res.statusCode, 200)
+      t.end()
+    })
+  })
+})
+
+test.cb.serial('authentication does fail – invalid roles', (t) => {
+  prototypes.stub('validateAccessToken', fixtures.validation)
+  prototypes.stub('userInfo', fixtures.userInfo)
+
+  helpers.getServer(undefined, (server) => {
+    server.inject({
+      method: 'GET',
+      url: '/role/guest',
+      headers: {
+        authorization: `bearer ${fixtures.jwt.userData}`
       }
     }, (res) => {
       t.truthy(res)
