@@ -191,43 +191,117 @@ test('throw error if options are invalid – client.clientId', (t) => {
 
 test('throw error if options are invalid – cache', (t) => {
   t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
     cache: null
   }), Error)
 
   t.throws(() => utils.verify({
-    cache: undefined
-  }), Error)
-
-  t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
     cache: NaN
   }), Error)
 
   t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
     cache: ''
   }), Error)
 
   t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
     cache: 'foobar'
   }), Error)
 
   t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
     cache: 42
   }), Error)
 
   t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
     cache: true
   }), Error)
 
   t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
     cache: []
   }), Error)
+})
 
+test('throw error if options are invalid – userInfo', (t) => {
   t.throws(() => utils.verify({
-    cache: new RegExp()
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    cache: null
   }), Error)
 
   t.throws(() => utils.verify({
-    cache: {}
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    cache: NaN
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    cache: ''
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    cache: 'foobar'
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    cache: 42
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    cache: true
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    cache: [42]
   }), Error)
 })
 
@@ -237,6 +311,22 @@ test('throw no error if options are valid', (t) => {
       clientId: 'foobar',
       realmUrl: 'http://foobar.com'
     }
+  }), Error)
+
+  t.notThrows(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    cache: undefined
+  }), Error)
+
+  t.notThrows(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    cache: {}
   }), Error)
 
   t.notThrows(() => utils.verify({
@@ -255,5 +345,29 @@ test('throw no error if options are valid', (t) => {
       realmUrl: fixtures.realmUrl
     },
     cache: false
+  }), Error)
+
+  t.notThrows(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    userInfo: undefined
+  }), Error)
+
+  t.notThrows(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    userInfo: []
+  }), Error)
+
+  t.notThrows(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    userInfo: ['string']
   }), Error)
 })
