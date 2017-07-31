@@ -108,7 +108,7 @@ function strategy (server) {
  */
 function plugin (server, opts, next) {
   opts = verify(opts)
-  manager = new GrantManager(opts)
+  manager = new GrantManager(opts.client)
   cache.init(server, opts.cache)
 
   server.auth.scheme('keycloak-jwt', strategy)
