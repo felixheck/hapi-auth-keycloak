@@ -108,7 +108,7 @@ server.route([
 ## API
 #### Plugin Options
 
-- `client {Object}`: The configuration of [`keycloak-auth-utils`][keycloak-auth-utils] its [`GrantManager`][keycloak-auth-utils-gm]. The suggested minimum configuration contains `realmUrl`, `clientId` and `secret`.<br/>
+- `client {Object}`: The configuration of [`keycloak-auth-utils`][keycloak-auth-utils] its [`GrantManager`][keycloak-auth-utils-gm]. The configuration requires at least `realmUrl`, `clientId` and `secret` –  it may be necessary to reduce `minTimeBetweenJwksRequests`.<br/>
 Required.
 
 - `cache {Object|false}`: The configuration of the [hapi.js cache](https://hapijs.com/api#servercacheoptions) powered by [catbox][catbox].<br/>
