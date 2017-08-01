@@ -84,56 +84,75 @@ test('throw error if options are invalid – client', (t) => {
 })
 
 test('throw error if options are invalid – client.realmUrl', (t) => {
+  t.throws(() => utils.verify(), Error)
+  t.throws(() => utils.verify({}), Error)
+
   t.throws(() => utils.verify({
     client: {
+      clientId: 'foobar',
       realmUrl: null
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
+      clientId: 'foobar',
       realmUrl: undefined
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
+      clientId: 'foobar',
       realmUrl: NaN
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
+      clientId: 'foobar',
+      realmUrl: ''
+    }
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
       realmUrl: 'foobar'
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
+      clientId: 'foobar',
       realmUrl: 42
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
+      clientId: 'foobar',
       realmUrl: true
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
+      clientId: 'foobar',
       realmUrl: []
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
+      clientId: 'foobar',
       realmUrl: new RegExp()
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
+      clientId: 'foobar',
       realmUrl: {}
     }
   }), Error)
@@ -142,48 +161,56 @@ test('throw error if options are invalid – client.realmUrl', (t) => {
 test('throw error if options are invalid – client.clientId', (t) => {
   t.throws(() => utils.verify({
     client: {
+      realmUrl: 'http://foobar.com',
       clientId: null
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
+      realmUrl: 'http://foobar.com',
       clientId: undefined
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
+      realmUrl: 'http://foobar.com',
       clientId: NaN
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
+      realmUrl: 'http://foobar.com',
       clientId: 42
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
+      realmUrl: 'http://foobar.com',
       clientId: true
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
+      realmUrl: 'http://foobar.com',
       clientId: []
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
+      realmUrl: 'http://foobar.com',
       clientId: new RegExp()
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
+      realmUrl: 'http://foobar.com',
       clientId: {}
     }
   }), Error)
@@ -253,7 +280,7 @@ test('throw error if options are invalid – userInfo', (t) => {
       clientId: 'foobar',
       realmUrl: 'http://foobar.com'
     },
-    cache: null
+    userInfo: null
   }), Error)
 
   t.throws(() => utils.verify({
@@ -261,7 +288,7 @@ test('throw error if options are invalid – userInfo', (t) => {
       clientId: 'foobar',
       realmUrl: 'http://foobar.com'
     },
-    cache: NaN
+    userInfo: NaN
   }), Error)
 
   t.throws(() => utils.verify({
@@ -269,7 +296,7 @@ test('throw error if options are invalid – userInfo', (t) => {
       clientId: 'foobar',
       realmUrl: 'http://foobar.com'
     },
-    cache: ''
+    userInfo: ''
   }), Error)
 
   t.throws(() => utils.verify({
@@ -277,7 +304,7 @@ test('throw error if options are invalid – userInfo', (t) => {
       clientId: 'foobar',
       realmUrl: 'http://foobar.com'
     },
-    cache: 'foobar'
+    userInfo: 'foobar'
   }), Error)
 
   t.throws(() => utils.verify({
@@ -285,7 +312,7 @@ test('throw error if options are invalid – userInfo', (t) => {
       clientId: 'foobar',
       realmUrl: 'http://foobar.com'
     },
-    cache: 42
+    userInfo: 42
   }), Error)
 
   t.throws(() => utils.verify({
@@ -293,7 +320,7 @@ test('throw error if options are invalid – userInfo', (t) => {
       clientId: 'foobar',
       realmUrl: 'http://foobar.com'
     },
-    cache: true
+    userInfo: true
   }), Error)
 
   t.throws(() => utils.verify({
@@ -301,7 +328,71 @@ test('throw error if options are invalid – userInfo', (t) => {
       clientId: 'foobar',
       realmUrl: 'http://foobar.com'
     },
-    cache: [42]
+    userInfo: [null]
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    userInfo: [undefined]
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    userInfo: [NaN]
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    userInfo: [42]
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    userInfo: [true]
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    userInfo: ['']
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    userInfo: [{}]
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    userInfo: [[]]
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      clientId: 'foobar',
+      realmUrl: 'http://foobar.com'
+    },
+    userInfo: [new RegExp()]
   }), Error)
 })
 
