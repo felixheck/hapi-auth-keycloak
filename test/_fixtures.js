@@ -9,12 +9,26 @@ const secret = '1234-bar-4321-foo'
  *
  * Client config
  */
-const config = {
+const clientConfig = {
   realmUrl,
   clientId,
   secret
 }
 
+/**
+ * @type Object
+ * @public
+ *
+ * Common attributes
+ */
+const common = Object.assign({}, clientConfig, { token })
+
+/**
+ * @type Object
+ * @public
+ *
+ * Content Parts of JWTs
+ */
 const content = {
   userData: {
     'exp': 5,
@@ -62,75 +76,9 @@ const jwt = {
   userDataScope: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjUsImlhdCI6MSwic3ViIjoiMTIzNDU2Nzg5MCIsIm5hbWUiOiJKb2huIERvZSIsImVtYWlsIjoiam9obi5kb2VAbWFpbC5jb20iLCJhZG1pbiI6dHJ1ZX0.2tfThhgwSbIEq2cZcoHSRwL2-UCanF23BXlyphm5ehs'
 }
 
-/**
- * @type Object
- * @public
- *
- * Succeeded validations response
- */
-const validation = {
-  'jti': '918c5d0e-1924-40e3-9fc6-b5cfd0016e1a',
-  'exp': Date.now() * 1000 + 60000,
-  'nbf': 0,
-  'iat': Date.now() * 1000,
-  'iss': 'https://localhost:8080/auth/realms/testme',
-  'aud': 'testme-app',
-  'sub': '5b220cee-48c2-47b9-8c53-2cac94eed51d',
-  'typ': 'Bearer',
-  'azp': 'testme-app',
-  'auth_time': 0,
-  'session_state':
-    '08f140bb-7801-47c1-9202-3d8a805e359a',
-  'name': 'Foo Bar',
-  'preferred_username': 'foobar',
-  'given_name': 'Foo',
-  'family_name': 'Bar',
-  'email': 'foo.bar@42.com',
-  'acr': '1',
-  'client_session': '8d36c537-1d12-4c47-8032-cfd26d0133b0',
-  'allowed-origins': [],
-  'realm_access': {
-    'roles': ['admin']
-  },
-  'resource_access': {
-    'other-app': {
-      'roles': ['other-app:creator']
-    },
-    'testme-app': {
-      'roles': ['editor']
-    },
-    'account': {
-      'roles': ['manage-account', 'manage-account-links', 'view-profile']
-    }
-  },
-  'client_id': 'testme-app',
-  'username': 'foobar',
-  'active': true
-}
-
-/**
- * @type Object
- * @public
- *
- * Succeeded userInfo response
- */
-const userInfo = {
-  'sub': '5b220cee-48c2-47b9-8c53-2cac94eed51d',
-  'name': 'Foo Bar',
-  'preferred_username': 'foobar',
-  'given_name': 'Foo',
-  'family_name': 'Bar',
-  'email': 'foo.bar@42.com'
-}
-
 module.exports = {
-  token,
-  realmUrl,
-  clientId,
-  secret,
-  config,
+  common,
+  clientConfig,
   content,
-  jwt,
-  validation,
-  userInfo
+  jwt
 }
