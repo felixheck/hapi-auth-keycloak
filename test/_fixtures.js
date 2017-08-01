@@ -1,6 +1,7 @@
 const token = 'abc.def.ghi'
 const realmUrl = 'https://localhost:8080/auth/realms/testme'
 const clientId = 'foobar'
+const secret = '1234-bar-4321-foo'
 
 /**
  * @type Object
@@ -11,7 +12,7 @@ const clientId = 'foobar'
 const config = {
   realmUrl,
   clientId,
-  secret: 'barfoo'
+  secret
 }
 
 const content = {
@@ -126,6 +127,7 @@ module.exports = {
   token,
   realmUrl,
   clientId,
+  secret,
   config,
   content,
   jwt,

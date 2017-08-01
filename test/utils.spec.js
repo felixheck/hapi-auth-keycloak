@@ -89,70 +89,80 @@ test('throw error if options are invalid – client.realmUrl', (t) => {
 
   t.throws(() => utils.verify({
     client: {
-      clientId: 'foobar',
+      clientId: fixtures.clientId,
+      secret: fixtures.secret,
       realmUrl: null
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
-      clientId: 'foobar',
+      clientId: fixtures.clientId,
+      secret: fixtures.secret,
       realmUrl: undefined
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
-      clientId: 'foobar',
+      clientId: fixtures.clientId,
+      secret: fixtures.secret,
       realmUrl: NaN
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
-      clientId: 'foobar',
+      clientId: fixtures.clientId,
+      secret: fixtures.secret,
       realmUrl: ''
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
-      clientId: 'foobar',
+      clientId: fixtures.clientId,
+      secret: fixtures.secret,
       realmUrl: 'foobar'
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
-      clientId: 'foobar',
+      clientId: fixtures.clientId,
+      secret: fixtures.secret,
       realmUrl: 42
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
-      clientId: 'foobar',
+      clientId: fixtures.clientId,
+      secret: fixtures.secret,
       realmUrl: true
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
-      clientId: 'foobar',
+      clientId: fixtures.clientId,
+      secret: fixtures.secret,
       realmUrl: []
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
-      clientId: 'foobar',
+      clientId: fixtures.clientId,
+      secret: fixtures.secret,
       realmUrl: new RegExp()
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
-      clientId: 'foobar',
+      clientId: fixtures.clientId,
+      secret: fixtures.secret,
       realmUrl: {}
     }
   }), Error)
@@ -161,304 +171,304 @@ test('throw error if options are invalid – client.realmUrl', (t) => {
 test('throw error if options are invalid – client.clientId', (t) => {
   t.throws(() => utils.verify({
     client: {
-      realmUrl: 'http://foobar.com',
+      realmUrl: fixtures.realmUrl,
+      secret: fixtures.secret,
       clientId: null
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
-      realmUrl: 'http://foobar.com',
+      realmUrl: fixtures.realmUrl,
+      secret: fixtures.secret,
       clientId: undefined
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
-      realmUrl: 'http://foobar.com',
+      realmUrl: fixtures.realmUrl,
+      secret: fixtures.secret,
       clientId: NaN
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
-      realmUrl: 'http://foobar.com',
+      realmUrl: fixtures.realmUrl,
+      secret: fixtures.secret,
       clientId: 42
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
-      realmUrl: 'http://foobar.com',
+      realmUrl: fixtures.realmUrl,
+      secret: fixtures.secret,
+      clientId: ''
+    }
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      realmUrl: fixtures.realmUrl,
+      secret: fixtures.secret,
       clientId: true
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
-      realmUrl: 'http://foobar.com',
+      realmUrl: fixtures.realmUrl,
+      secret: fixtures.secret,
       clientId: []
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
-      realmUrl: 'http://foobar.com',
+      realmUrl: fixtures.realmUrl,
+      secret: fixtures.secret,
       clientId: new RegExp()
     }
   }), Error)
 
   t.throws(() => utils.verify({
     client: {
-      realmUrl: 'http://foobar.com',
+      realmUrl: fixtures.realmUrl,
+      secret: fixtures.secret,
       clientId: {}
+    }
+  }), Error)
+})
+
+test('throw error if options are invalid – client.secret', (t) => {
+  t.throws(() => utils.verify({
+    client: {
+      realmUrl: fixtures.realmUrl,
+      clientId: fixtures.clientId,
+      secret: null
+    }
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      realmUrl: fixtures.realmUrl,
+      clientId: fixtures.clientId,
+      secret: undefined
+    }
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      realmUrl: fixtures.realmUrl,
+      clientId: fixtures.clientId,
+      secret: NaN
+    }
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      realmUrl: fixtures.realmUrl,
+      clientId: fixtures.clientId,
+      secret: 42
+    }
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      realmUrl: fixtures.realmUrl,
+      clientId: fixtures.clientId,
+      secret: ''
+    }
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      realmUrl: fixtures.realmUrl,
+      clientId: fixtures.clientId,
+      secret: true
+    }
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      realmUrl: fixtures.realmUrl,
+      clientId: fixtures.clientId,
+      secret: []
+    }
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      realmUrl: fixtures.realmUrl,
+      clientId: fixtures.clientId,
+      secret: new RegExp()
+    }
+  }), Error)
+
+  t.throws(() => utils.verify({
+    client: {
+      realmUrl: fixtures.realmUrl,
+      clientId: fixtures.clientId,
+      secret: {}
     }
   }), Error)
 })
 
 test('throw error if options are invalid – cache', (t) => {
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     cache: null
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     cache: NaN
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     cache: ''
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     cache: 'foobar'
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     cache: 42
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     cache: true
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     cache: []
   }), Error)
 })
 
 test('throw error if options are invalid – userInfo', (t) => {
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     userInfo: null
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     userInfo: NaN
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     userInfo: ''
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     userInfo: 'foobar'
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     userInfo: 42
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     userInfo: true
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     userInfo: [null]
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     userInfo: [undefined]
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     userInfo: [NaN]
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     userInfo: [42]
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     userInfo: [true]
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     userInfo: ['']
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     userInfo: [{}]
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     userInfo: [[]]
   }), Error)
 
   t.throws(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     userInfo: [new RegExp()]
   }), Error)
 })
 
 test('throw no error if options are valid', (t) => {
   t.notThrows(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    }
+    client: fixtures.config
   }), Error)
 
   t.notThrows(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     cache: undefined
   }), Error)
 
   t.notThrows(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     cache: {}
   }), Error)
 
   t.notThrows(() => utils.verify({
-    client: {
-      clientId: fixtures.clientId,
-      realmUrl: fixtures.realmUrl
-    },
+    client: fixtures.config,
     cache: {
       segment: 'foobar'
     }
   }), Error)
 
   t.notThrows(() => utils.verify({
-    client: {
-      clientId: fixtures.clientId,
-      realmUrl: fixtures.realmUrl
-    },
+    client: fixtures.config,
     cache: false
   }), Error)
 
   t.notThrows(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     userInfo: undefined
   }), Error)
 
   t.notThrows(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     userInfo: []
   }), Error)
 
   t.notThrows(() => utils.verify({
-    client: {
-      clientId: 'foobar',
-      realmUrl: 'http://foobar.com'
-    },
+    client: fixtures.config,
     userInfo: ['string']
   }), Error)
 })
