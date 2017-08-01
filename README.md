@@ -65,7 +65,8 @@ server.register({
       clientId: 'foobar',
       secret: '1234-bar-4321-foo'
     },
-    cache: {}
+    cache: {},
+    userInfo: ['name', 'email']
   }
 }, function(err) {
   if (err) {
@@ -112,7 +113,10 @@ Required.
 
 - `cache {Object|false}`: The configuration of the [hapi.js cache](https://hapijs.com/api#servercacheoptions) powered by [catbox][catbox].<br/>
 If `false` the cache is disabled. Use an empty object to use the built-in default cache.<br/>
-Optional. Default: `false`.<br/>
+Optional. Default: `false`.
+
+- `userInfo {Array.<?string>}`: List of properties which should be included in the `request.auth.credentials` object besides `scope` and `sub`.<br/>
+Optional. Default: `[]`.<br/>
 
 #### `server.kjwt.validate(field {string}, done {Function})`
 Uses internally [`GrantManager.prototype.validateAccessToken()`][keycloak-auth-utils-gm-validate].
@@ -166,7 +170,8 @@ server.register({
       clientId: 'foobar',
       secret: '1234-bar-4321-foo'
     },
-    cache: {}
+    cache: {},
+    userInfo: ['name', 'email']
   }
 }).then(() => {
   server.auth.strategy('keycloak-jwt', 'keycloak-jwt');

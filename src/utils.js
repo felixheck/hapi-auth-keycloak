@@ -14,7 +14,8 @@ const scheme = joi.object({
   }).unknown(true).required(),
   cache: joi.alternatives().try(joi.object({
     segment: joi.string().default('keycloakJwt')
-  }), joi.boolean().invalid(true)).default(false)
+  }), joi.boolean().invalid(true)).default(false),
+  userInfo: joi.array().items(joi.string().min(1))
 }).unknown(true).required()
 
 /**

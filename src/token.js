@@ -67,6 +67,20 @@ function token (field) {
 
   /**
    * @function
+   * @private
+   *
+   * Get necessary user information out of token content.
+   *
+   * @param {Object} content The token its content
+   * @param {Array.<?string>} [fields] The necessary fields
+   * @returns {Object} The collection of requested user info
+   */
+  function getUserInfo (content, fields = []) {
+    return _.pick(content, ['sub', ...fields])
+  }
+
+  /**
+   * @function
    * @public
    *
    * Extract content out of token.
@@ -88,12 +102,14 @@ function token (field) {
    *
    * @returns {Object} The extracted data
    */
-  function getData () {
+  function getData (userInfoFields) {
     const content = getContent()
 
     return {
-      scope: getScope(content),
-      expiresIn: getExpiration(content)
+      expiresIn: getExpiration(content),
+      credentials: Object.assign({
+        scope: getScope(content)
+      }, getUserInfo(content, userInfoFields))
     }
   }
 

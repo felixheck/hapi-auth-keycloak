@@ -21,14 +21,13 @@ test.cb.serial('throw error if plugin gets registered twice', (t) => {
 
 test.cb.serial('authentication does succeed', (t) => {
   prototypes.stub('validateAccessToken', fixtures.validation)
-  prototypes.stub('userInfo', fixtures.userInfo)
 
   getServer(undefined, (server) => {
     server.inject({
       method: 'GET',
       url: '/',
       headers: {
-        authorization: `bearer ${fixtures.jwt.content}`
+        authorization: `bearer ${fixtures.jwt.userData}`
       }
     }, (res) => {
       t.truthy(res)
@@ -40,13 +39,12 @@ test.cb.serial('authentication does succeed', (t) => {
 
 test.cb.serial('authentication does succeed – cached', (t) => {
   prototypes.stub('validateAccessToken', fixtures.validation)
-  prototypes.stub('userInfo', fixtures.userInfo)
 
   const mockReq = {
     method: 'GET',
     url: '/',
     headers: {
-      authorization: `bearer ${fixtures.jwt.content}`
+      authorization: `bearer ${fixtures.jwt.userData}`
     }
   }
 
@@ -66,7 +64,6 @@ test.cb.serial('authentication does succeed – cached', (t) => {
 
 test.cb.serial('authentication does success – valid roles', (t) => {
   prototypes.stub('validateAccessToken', fixtures.validation)
-  prototypes.stub('userInfo', fixtures.userInfo)
 
   getServer(undefined, (server) => {
     server.inject({
@@ -85,7 +82,6 @@ test.cb.serial('authentication does success – valid roles', (t) => {
 
 test.cb.serial('authentication does fail – invalid roles', (t) => {
   prototypes.stub('validateAccessToken', fixtures.validation)
-  prototypes.stub('userInfo', fixtures.userInfo)
 
   getServer(undefined, (server) => {
     server.inject({
@@ -110,7 +106,7 @@ test.cb.serial('authentication does fail – invalid token', (t) => {
       method: 'GET',
       url: '/',
       headers: {
-        authorization: `bearer ${fixtures.jwt.content}`
+        authorization: `bearer ${fixtures.jwt.userData}`
       }
     }, (res) => {
       t.truthy(res)
@@ -140,29 +136,12 @@ test.cb.serial('authentication does fail – invalid header', (t) => {
 
 test.cb.serial('server method validates token', (t) => {
   prototypes.stub('validateAccessToken', fixtures.validation)
-  prototypes.stub('userInfo', fixtures.userInfo)
 
   getServer(undefined, (server) => {
-    server.kjwt.validate(`bearer ${fixtures.jwt.content}`, (err, res) => {
+    server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, (err, res) => {
       t.falsy(err)
       t.truthy(res)
       t.truthy(res.credentials)
-      t.end()
-    })
-  })
-})
-
-test.cb.serial('server method invalidates token – userinfo error', (t) => {
-  prototypes.stub('validateAccessToken', fixtures.validation)
-  prototypes.stub('userInfo', new Error('an error'), 'reject')
-
-  getServer(undefined, (server) => {
-    server.kjwt.validate(`bearer ${fixtures.jwt.content}`, (err, res) => {
-      t.falsy(res)
-      t.truthy(err)
-      t.truthy(err.isBoom)
-      t.is(err.output.statusCode, 401)
-      t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="Error: an error"')
       t.end()
     })
   })
@@ -172,7 +151,7 @@ test.cb.serial('server method invalidates token – validation error', (t) => {
   prototypes.stub('validateAccessToken', new Error('an error'), 'reject')
 
   getServer(undefined, (server) => {
-    server.kjwt.validate(`bearer ${fixtures.jwt.content}`, (err, res) => {
+    server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, (err, res) => {
       t.falsy(res)
       t.truthy(err)
       t.truthy(err.isBoom)
@@ -187,7 +166,7 @@ test.cb.serial('server method invalidates token – invalid', (t) => {
   prototypes.stub('validateAccessToken', false)
 
   getServer(undefined, (server) => {
-    server.kjwt.validate(`bearer ${fixtures.jwt.content}`, (err, res) => {
+    server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, (err, res) => {
       t.falsy(res)
       t.truthy(err)
       t.truthy(err.isBoom)
@@ -200,7 +179,7 @@ test.cb.serial('server method invalidates token – invalid', (t) => {
 
 test.cb.serial('server method invalidates token – wrong format', (t) => {
   getServer(undefined, (server) => {
-    server.kjwt.validate(fixtures.jwt.content, (err, res) => {
+    server.kjwt.validate(fixtures.jwt.userData, (err, res) => {
       t.falsy(res)
       t.truthy(err)
       t.truthy(err.isBoom)
