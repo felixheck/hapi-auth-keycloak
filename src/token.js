@@ -106,9 +106,10 @@ function token (field) {
     const content = getContent()
 
     return {
-      scope: getScope(content),
       expiresIn: getExpiration(content),
-      ...getUserInfo(content, userInfoFields)
+      credentials: Object.assign({
+        scope: getScope(content)
+      }, getUserInfo(content, userInfoFields))
     }
   }
 

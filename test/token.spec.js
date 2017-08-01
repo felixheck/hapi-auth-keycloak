@@ -63,21 +63,21 @@ test('get user data of token', (t) => {
 
   t.truthy(data)
   t.is(data.expiresIn, 4000)
-  t.is(data.sub, fixtures.content.userData.sub)
-  t.falsy(data.name)
-  t.deepEqual(data.scope.sort(), ['editor', 'other-app:creator', 'realm:admin'])
+  t.is(data.credentials.sub, fixtures.content.userData.sub)
+  t.falsy(data.credentials.name)
+  t.deepEqual(data.credentials.scope.sort(), ['editor', 'other-app:creator', 'realm:admin'])
 })
 
-test('get user data of token', (t) => {
+test('get user data of token – additional fields', (t) => {
   const jwt = `bearer ${fixtures.jwt.userData}`
   const tkn = token(jwt)
   const data = tkn.getData(['name'])
 
   t.truthy(data)
   t.is(data.expiresIn, 4000)
-  t.is(data.sub, fixtures.content.userData.sub)
-  t.is(data.name, fixtures.content.userData.name)
-  t.deepEqual(data.scope.sort(), ['editor', 'other-app:creator', 'realm:admin'])
+  t.is(data.credentials.sub, fixtures.content.userData.sub)
+  t.is(data.credentials.name, fixtures.content.userData.name)
+  t.deepEqual(data.credentials.scope.sort(), ['editor', 'other-app:creator', 'realm:admin'])
 })
 
 test('get user data of token – default expiration', (t) => {
@@ -87,5 +87,5 @@ test('get user data of token – default expiration', (t) => {
 
   t.truthy(data)
   t.is(data.expiresIn, 60000)
-  t.deepEqual(data.scope.sort(), ['editor', 'other-app:creator', 'realm:admin'])
+  t.deepEqual(data.credentials.scope.sort(), ['editor', 'other-app:creator', 'realm:admin'])
 })

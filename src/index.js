@@ -32,7 +32,7 @@ function handleKeycloakValidation (tkn, reply) {
       return invalidate()
     }
 
-    const { expiresIn, ...credentials } = tkn.getData(internals.userInfoFields)
+    const { expiresIn, credentials } = tkn.getData(internals.userInfoFields)
     const userData = { credentials }
 
     cache.set(tkn.get(), userData, expiresIn)
