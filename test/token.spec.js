@@ -87,6 +87,8 @@ test('get user data of token – default expiration', (t) => {
 
   t.truthy(data)
   t.is(data.expiresIn, 60000)
+  t.is(data.credentials.sub, fixtures.content.userData.sub)
+  t.falsy(data.credentials.name)
   t.deepEqual(data.credentials.scope.sort(), ['editor', 'other-app:creator', 'realm:admin'])
 })
 
@@ -97,5 +99,7 @@ test('get user data of token – default scopes', (t) => {
 
   t.truthy(data)
   t.is(data.expiresIn, 4000)
+  t.is(data.credentials.sub, fixtures.content.userData.sub)
+  t.falsy(data.credentials.name)
   t.deepEqual(data.credentials.scope, [])
 })
