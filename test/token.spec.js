@@ -89,3 +89,13 @@ test('get user data of token – default expiration', (t) => {
   t.is(data.expiresIn, 60000)
   t.deepEqual(data.credentials.scope.sort(), ['editor', 'other-app:creator', 'realm:admin'])
 })
+
+test('get user data of token – default scopes', (t) => {
+  const jwt = `bearer ${fixtures.jwt.userDataScope}`
+  const tkn = token(jwt)
+  const data = tkn.getData()
+
+  t.truthy(data)
+  t.is(data.expiresIn, 4000)
+  t.deepEqual(data.credentials.scope, [])
+})
