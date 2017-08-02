@@ -20,7 +20,7 @@ test.cb.serial('throw error if plugin gets registered twice', (t) => {
 })
 
 test.cb.serial('authentication does succeed', (t) => {
-  prototypes.stub('validateAccessToken', fixtures.validation)
+  prototypes.stub('validateAccessToken', fixtures.content.userData)
 
   getServer(undefined, (server) => {
     server.inject({
@@ -38,7 +38,7 @@ test.cb.serial('authentication does succeed', (t) => {
 })
 
 test.cb.serial('authentication does succeed – cached', (t) => {
-  prototypes.stub('validateAccessToken', fixtures.validation)
+  prototypes.stub('validateAccessToken', fixtures.content.userData)
 
   const mockReq = {
     method: 'GET',
@@ -49,7 +49,7 @@ test.cb.serial('authentication does succeed – cached', (t) => {
   }
 
   getServer({
-    client: fixtures.config,
+    client: fixtures.clientConfig,
     cache: {}
   }, (server) => {
     server.inject(mockReq, () => {
@@ -63,7 +63,7 @@ test.cb.serial('authentication does succeed – cached', (t) => {
 })
 
 test.cb.serial('authentication does success – valid roles', (t) => {
-  prototypes.stub('validateAccessToken', fixtures.validation)
+  prototypes.stub('validateAccessToken', fixtures.content.userData)
 
   getServer(undefined, (server) => {
     server.inject({
@@ -81,7 +81,7 @@ test.cb.serial('authentication does success – valid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid roles', (t) => {
-  prototypes.stub('validateAccessToken', fixtures.validation)
+  prototypes.stub('validateAccessToken', fixtures.content.userData)
 
   getServer(undefined, (server) => {
     server.inject({
@@ -123,7 +123,7 @@ test.cb.serial('authentication does fail – invalid header', (t) => {
       method: 'GET',
       url: '/',
       headers: {
-        authorization: fixtures.token
+        authorization: fixtures.common.token
       }
     }, (res) => {
       t.truthy(res)
@@ -135,7 +135,7 @@ test.cb.serial('authentication does fail – invalid header', (t) => {
 })
 
 test.cb.serial('server method validates token', (t) => {
-  prototypes.stub('validateAccessToken', fixtures.validation)
+  prototypes.stub('validateAccessToken', fixtures.content.userData)
 
   getServer(undefined, (server) => {
     server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, (err, res) => {

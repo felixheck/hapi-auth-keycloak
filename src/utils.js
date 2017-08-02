@@ -10,7 +10,8 @@ const joi = require('joi')
 const scheme = joi.object({
   client: joi.object({
     realmUrl: joi.string().uri().required(),
-    clientId: joi.string().required()
+    clientId: joi.string().min(1).required(),
+    secret: joi.string().min(1).required()
   }).unknown(true).required(),
   cache: joi.alternatives().try(joi.object({
     segment: joi.string().default('keycloakJwt')

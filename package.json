@@ -51,8 +51,7 @@
     "lodash": "^4.17.4"
   },
   "peerDependencies": {
-    "hapi": ">= 13.x.x",
-    "hapi-pino": ">= 1.6.x"
+    "hapi": ">= 13.x.x"
   },
   "engines": {
     "node": ">=6.0.0",

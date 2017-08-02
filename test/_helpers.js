@@ -13,8 +13,9 @@ const GrantManagerClone = {}
  * The default plugin configuration
  */
 const defaults = {
-  client: fixtures.config,
-  cache: false
+  client: fixtures.clientConfig,
+  cache: false,
+  userInfo: undefined
 }
 
 /**
