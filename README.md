@@ -108,24 +108,32 @@ server.route([
 ## API
 #### Plugin Options
 
-- `client {Object}`: The configuration of [`keycloak-auth-utils`][keycloak-auth-utils] its [`GrantManager`][keycloak-auth-utils-gm]. The configuration requires at least `realmUrl`, `clientId` and `secret` –  it may be necessary to reduce `minTimeBetweenJwksRequests`.<br/>
-Required.
+- `client {Object}` — The configuration of [`keycloak-auth-utils`][keycloak-auth-utils] its [`GrantManager`][keycloak-auth-utils-gm]. The configuration requires at least:
+  - `realmUrl {string}`: The absolute uri of the Keycloak realm<br/>
+  Example: `https://localhost:8080/auth/realms/testme`
+  - `clientId {string}` The identifier of the Keycloak client<br/>
+  Example: `foobar`
+  - `secret {string}` The related secret of the Keycloak client<br/>
+  Example: `1234-bar-4321-foo`
+  
+  Furthermore it may be necessary to reduce `minTimeBetweenJwksRequests`.<br/>
+  Required.
 
-- `cache {Object|false}`: The configuration of the [hapi.js cache](https://hapijs.com/api#servercacheoptions) powered by [catbox][catbox].<br/>
-If `false` the cache is disabled. Use an empty object to use the built-in default cache.<br/>
+- `cache {Object|false}` — The configuration of the [hapi.js cache](https://hapijs.com/api#servercacheoptions) powered by [catbox][catbox].<br/>
+If `false` the cache is disabled. Use an empty object (`{}`) to use the built-in default cache.<br/>
 Optional. Default: `false`.
 
-- `userInfo {Array.<?string>}`: List of properties which should be included in the `request.auth.credentials` object besides `scope` and `sub`.<br/>
+- `userInfo {Array.<?string>}` — List of properties which should be included in the `request.auth.credentials` object besides `scope` and `sub`.<br/>
 Optional. Default: `[]`.<br/>
 
 #### `server.kjwt.validate(field {string}, done {Function})`
 Uses internally [`GrantManager.prototype.validateAccessToken()`][keycloak-auth-utils-gm-validate].
 
-- `field {string}`: The `Bearer` field, including the scheme (`bearer`) itself.<br/>
+- `field {string}` — The `Bearer` field, including the scheme (`bearer`) itself.<br/>
 Example: `bearer 12345.abcde.67890`.<br/>
 Required.
 
-- `done {Function}`: The callback handler is passed `err {Error}, result {Object|false}` (error-first approach).<br/>If an error occurs, `err` is not `null`.  If the token is invalid, the `result` is `false`. Otherwise it is an object containing all relevant credentials.<br/>
+- `done {Function}` — The callback handler is passed `err {Error}, result {Object|false}` (error-first approach).<br/>If an error occurs, `err` is not `null`.  If the token is invalid, the `result` is `false`. Otherwise it is an object containing all relevant credentials.<br/>
 Required.
 
 ## Example
