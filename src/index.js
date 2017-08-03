@@ -1,4 +1,5 @@
 const axios = require('axios')
+const jwt = require('jsonwebtoken')
 const cache = require('./cache')
 const token = require('./token')
 const { error, fakeReply, verify } = require('./utils')
@@ -12,6 +13,40 @@ const pkg = require('../package.json')
  */
 let options
 
+/**
+ * @function
+ * @private
+ *
+ * Validate the token offline with help of
+ * the related public key. Resolve if the
+ * verification succeeded.
+ *
+ * @param {string} token The token to be validated
+ * @returns {Promise} The error-handled promise
+ */
+function validateOffline (token) {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, options.publicKey, options.verifyOpts, (err, decoded) => {
+      if (err) {
+        reject(err)
+      }
+
+      resolve(decoded)
+    })
+  })
+}
+
+/**
+ * @function
+ * @private
+ *
+ * Validate the token online with help of
+ * the related Keycloak server. Resolve if
+ * the request succeeded and token is valid.
+ *
+ * @param {string} token The token to be validated
+ * @returns {Promise} The error-handled promise
+ */
 function validateOnline (token) {
   return axios.post(`${options.realmUrl}/protocol/openid-connect/token/introspect`, {
     token,
@@ -30,13 +65,17 @@ function validateOnline (token) {
  * @function
  * @public
  *
- * Validate a token with help of Keycloak.
+ * Validate a token either with the help of Keycloak
+ * or a related public key. Store the user data in
+ * cache if enabled.
  *
  * @param {string} token The token to be validated
  * @param {Function} reply The callback handler
  */
 function handleKeycloakValidation (tkn, reply) {
-  validateOnline(tkn.get()).then((res) => {
+  const validateFn = options.secret ? validateOnline : validateOffline
+
+  validateFn(tkn.get()).then(() => {
     const { expiresIn, credentials } = tkn.getData(options.userInfo)
     const userData = { credentials }
 

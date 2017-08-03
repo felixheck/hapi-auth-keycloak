@@ -10,12 +10,15 @@ const joi = require('joi')
 const scheme = joi.object({
   realmUrl: joi.string().uri().required(),
   clientId: joi.string().min(1).required(),
-  secret: joi.string().min(1).required(),
+  secret: joi.string().min(1),
   cache: joi.alternatives().try(joi.object({
     segment: joi.string().default('keycloakJwt')
   }), joi.boolean()).default(false),
   userInfo: joi.array().items(joi.string().min(1))
-}).required()
+})
+.xor('secret', 'publicKey')
+.without('secret', 'verifyOpts')
+.required()
 
 /**
  * @function
