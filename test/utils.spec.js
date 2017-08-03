@@ -19,7 +19,7 @@ test('get boom error with error message', (t) => {
   const mockErr = new Error('barfoo')
   const result = utils.error('badRequest', mockErr, 'foobar')
   t.truthy(result)
-  t.deepEqual(result, boom.badRequest(mockErr.toString(), 'Bearer'))
+  t.deepEqual(result, boom.badRequest(mockErr.message, 'Bearer'))
 })
 
 test('decorate callback function with `continue`', (t) => {

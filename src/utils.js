@@ -48,7 +48,7 @@ function verify (opts) {
  * @returns {Boom} The created `Boom` error
  */
 function error (type, err, msg) {
-  return boom[type](err ? err.toString() : msg, 'Bearer')
+  return boom[type](err ? err.message || err.toString() : msg, 'Bearer')
 }
 
 /**

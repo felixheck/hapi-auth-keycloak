@@ -1,4 +1,4 @@
-const { GrantManager } = require('keycloak-auth-utils')
+const axios = require('axios')
 const cache = require('./cache')
 const token = require('./token')
 const { error, fakeReply, verify } = require('./utils')
@@ -11,8 +11,24 @@ const pkg = require('../package.json')
  * Internally used properties
  */
 const internals = {
-  manager: undefined,
+  clientOptions: undefined,
   userInfoFields: undefined
+}
+
+function validateOnline (token) {
+  const opts = internals.clientOptions
+
+  return axios.post(`${opts.realmUrl}/protocol/openid-connect/token/introspect`, {
+    token,
+    client_secret: opts.secret,
+    client_id: opts.clientId
+  }).then(({ data }) => {
+    if (!data.active) {
+      throw Error(error.msg.invalid)
+    }
+
+    return token
+  })
 }
 
 /**
@@ -25,19 +41,15 @@ const internals = {
  * @param {Function} reply The callback handler
  */
 function handleKeycloakValidation (tkn, reply) {
-  const invalidate = (err) => reply(error('unauthorized', err, error.msg.invalid))
-
-  internals.manager.validateAccessToken(tkn.get()).then((res) => {
-    if (!res) {
-      return invalidate()
-    }
-
+  validateOnline(tkn.get()).then((res) => {
     const { expiresIn, credentials } = tkn.getData(internals.userInfoFields)
     const userData = { credentials }
 
     cache.set(tkn.get(), userData, expiresIn)
     return reply.continue(userData)
-  }).catch(invalidate)
+  }).catch((err) => {
+    reply(error('unauthorized', err, error.msg.invalid))
+  })
 }
 
 /**
@@ -104,7 +116,7 @@ function plugin (server, opts, next) {
   opts = verify(opts)
   cache.init(server, opts.cache)
 
-  internals.manager = new GrantManager(opts.client)
+  internals.clientOptions = opts.client
   internals.userInfoFields = opts.userInfo
 
   server.auth.scheme('keycloak-jwt', strategy)

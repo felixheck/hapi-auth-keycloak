@@ -1,10 +1,7 @@
 const hapi = require('hapi')
-const _ = require('lodash')
-const { GrantManager } = require('keycloak-auth-utils')
+const nock = require('nock')
 const authKeycloak = require('../src')
 const fixtures = require('./_fixtures')
-
-const GrantManagerClone = {}
 
 /**
  * @type Object
@@ -19,24 +16,20 @@ const defaults = {
 }
 
 /**
- * @type Object.<Function>
+ * @function
  * @public
  *
- * Provide several functions to clone, reset and
- * stub methods of `GrantManager`.
+ * Mock introspect request to the Keycloak server.
+ *
+ * @param {number} code The status code to be returned
+ * @param {Object} data The response object to be returned
+ * @param {boolean} isError Whether to reply with an error
  */
-const prototypes = {
-  clone () {
-    GrantManagerClone.prototype = _.cloneDeep(GrantManager.prototype)
-  },
-  reset () {
-    GrantManager.prototype = GrantManagerClone.prototype
-  },
-  stub (name, value, type = 'resolve') {
-    GrantManager.prototype[name] = function () {
-      return Promise[type](value)
-    }
-  }
+function mock (code, data, isError) {
+  const base = nock(fixtures.common.baseUrl)
+    .post(`${fixtures.common.realmPath}${fixtures.common.introspectPath}`)
+
+  isError ? base.replyWithError(data) : base.reply(code, data)
 }
 
 /**
@@ -140,5 +133,5 @@ function getServer (options, done) {
 module.exports = {
   getServer,
   registerPlugin,
-  prototypes
+  mock
 }
