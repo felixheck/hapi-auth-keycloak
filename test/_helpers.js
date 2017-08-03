@@ -1,7 +1,7 @@
 const hapi = require('hapi')
 const nock = require('nock')
 const authKeycloak = require('../src')
-const fixtures = require('./_fixtures')
+const fixtures = require('./fixtures')
 
 /**
  * @type Object

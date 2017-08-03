@@ -2,7 +2,7 @@ const test = require('ava')
 const nock = require('nock')
 const cache = require('../src/cache')
 const helpers = require('./_helpers')
-const fixtures = require('./_fixtures')
+const fixtures = require('./fixtures')
 
 test.afterEach('reset instances and prototypes', () => {
   cache.reset()
