@@ -29,11 +29,7 @@ function validateOffline (token) {
 
   return new Promise((resolve, reject) => {
     jwt.verify(token, publicKey, verifyOpts, (err, decoded) => {
-      if (err) {
-        reject(err)
-      }
-
-      resolve(decoded)
+      err ? reject(err) : resolve(decoded)
     })
   })
 }
@@ -82,7 +78,7 @@ function handleKeycloakValidation (tkn, reply) {
     const userData = { credentials }
 
     cache.set(tkn.get(), userData, expiresIn)
-    return reply.continue(userData)
+    reply.continue(userData)
   }).catch((err) => {
     reply(error('unauthorized', err, error.msg.invalid))
   })
