@@ -8,16 +8,14 @@ const joi = require('joi')
  * The plugin options scheme
  */
 const scheme = joi.object({
-  client: joi.object({
-    realmUrl: joi.string().uri().required(),
-    clientId: joi.string().min(1).required(),
-    secret: joi.string().min(1).required()
-  }).unknown(true).required(),
+  realmUrl: joi.string().uri().required(),
+  clientId: joi.string().min(1).required(),
+  secret: joi.string().min(1).required(),
   cache: joi.alternatives().try(joi.object({
     segment: joi.string().default('keycloakJwt')
-  }), joi.boolean().invalid(true)).default(false),
+  }), joi.boolean()).default(false),
   userInfo: joi.array().items(joi.string().min(1))
-}).unknown(true).required()
+}).required()
 
 /**
  * @function

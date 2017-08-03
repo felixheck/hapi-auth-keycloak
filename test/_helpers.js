@@ -9,10 +9,22 @@ const fixtures = require('./_fixtures')
  *
  * The default plugin configuration
  */
-const defaults = {
-  client: fixtures.clientConfig,
-  cache: false,
+const defaults = Object.assign({
+  cache: undefined,
   userInfo: undefined
+}, fixtures.clientConfig)
+
+/**
+ * @function
+ * @public
+ *
+ * Get overriden valid default options with customs.
+ *
+ * @param {Object} customs The options to be changed
+ * @returns {Object} The customized options
+ */
+function getOptions (customs) {
+  return Object.assign({}, defaults, customs)
 }
 
 /**
@@ -131,6 +143,7 @@ function getServer (options, done) {
 }
 
 module.exports = {
+  getOptions,
   getServer,
   registerPlugin,
   mock

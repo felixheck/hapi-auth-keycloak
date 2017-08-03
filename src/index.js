@@ -8,20 +8,15 @@ const pkg = require('../package.json')
  * @type Object
  * @private
  *
- * Internally used properties
+ * The plugin related options
  */
-const internals = {
-  clientOptions: undefined,
-  userInfoFields: undefined
-}
+let options
 
 function validateOnline (token) {
-  const opts = internals.clientOptions
-
-  return axios.post(`${opts.realmUrl}/protocol/openid-connect/token/introspect`, {
+  return axios.post(`${options.realmUrl}/protocol/openid-connect/token/introspect`, {
     token,
-    client_secret: opts.secret,
-    client_id: opts.clientId
+    client_secret: options.secret,
+    client_id: options.clientId
   }).then(({ data }) => {
     if (!data.active) {
       throw Error(error.msg.invalid)
@@ -42,7 +37,7 @@ function validateOnline (token) {
  */
 function handleKeycloakValidation (tkn, reply) {
   validateOnline(tkn.get()).then((res) => {
-    const { expiresIn, credentials } = tkn.getData(internals.userInfoFields)
+    const { expiresIn, credentials } = tkn.getData(options.userInfo)
     const userData = { credentials }
 
     cache.set(tkn.get(), userData, expiresIn)
@@ -113,11 +108,8 @@ function strategy (server) {
  * @param {Function} next The callback handler
  */
 function plugin (server, opts, next) {
-  opts = verify(opts)
-  cache.init(server, opts.cache)
-
-  internals.clientOptions = opts.client
-  internals.userInfoFields = opts.userInfo
+  options = verify(opts)
+  cache.init(server, options.cache)
 
   server.auth.scheme('keycloak-jwt', strategy)
   server.decorate('server', 'kjwt', { validate })

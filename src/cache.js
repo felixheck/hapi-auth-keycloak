@@ -7,7 +7,7 @@ let instance
  * Initiate a cache singleton
  *
  * @param {Hapi.Server} server The created server instance
- * @param {Object|false} opts The instance its options
+ * @param {Object|boolean} opts The instance its options
  * @returns {Object} The cache instance
  */
 function init (server, opts) {
@@ -15,7 +15,7 @@ function init (server, opts) {
     if (opts === false) {
       instance = false
     } else {
-      instance = server.cache(opts)
+      instance = server.cache(opts === true ? {} : opts)
     }
   }
 
