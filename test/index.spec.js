@@ -1,10 +1,12 @@
 const test = require('ava')
+const nock = require('nock')
 const cache = require('../src/cache')
 const { mock, getServer, registerPlugin } = require('./_helpers')
 const fixtures = require('./_fixtures')
 
 test.afterEach('reset instances and prototypes', () => {
   cache.reset()
+  nock.cleanAll()
 })
 
 test.cb.serial('throw error if plugin gets registered twice', (t) => {
