@@ -48,6 +48,12 @@ const common = Object.assign({}, clientConfig, {
   introspectPath
 })
 
+/**
+ * @type Object
+ * @private
+ *
+ * Base attributes for JWT generation
+ */
 const contentBase = {
   'sub': '1234567890',
   'name': 'John Doe',
