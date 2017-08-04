@@ -46,6 +46,20 @@ function mock (code, data, isError) {
 
 /**
  * @function
+ * @public
+ *
+ * Log the option name with the asserted value.
+ *
+ * @param {string} option The name of the option
+ * @param {*} value The value to be asserted
+ * @returns {string} The aggregated log message
+ */
+function log (option, value) {
+  return `${option}: ${value && value.toString()}`
+}
+
+/**
+ * @function
  * @private
  *
  * Register protected routes.
@@ -144,7 +158,8 @@ function getServer (options, done) {
 
 module.exports = {
   getOptions,
+  mock,
+  log,
   getServer,
-  registerPlugin,
-  mock
+  registerPlugin
 }

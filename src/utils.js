@@ -12,7 +12,10 @@ const scheme = joi.object({
   clientId: joi.string().min(1).required(),
   secret: joi.string().min(1),
   publicKey: joi.string().regex(/^-----BEGIN(?: RSA)? PUBLIC KEY-----[\s\S]*-----END(?: RSA)? PUBLIC KEY-----$/ig, 'PEM'),
-  verifyOpts: joi.object().unknown(true),
+  verifyOpts: joi.object({
+    ignoreExpiration: joi.any().forbidden(),
+    ignoreNotBefore: joi.any().forbidden()
+  }).unknown(true),
   cache: joi.alternatives().try(joi.object({
     segment: joi.string().default('keycloakJwt')
   }), joi.boolean()).default(false),
@@ -20,7 +23,6 @@ const scheme = joi.object({
 })
 .xor('secret', 'publicKey')
 .without('secret', 'verifyOpts')
-.forbidden('verifyOpts.ignoreExpiration', 'verifyOpts.ignoreNotBefore')
 .required()
 
 /**

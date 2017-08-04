@@ -43,7 +43,7 @@ test('throw error if options are empty', (t) => {
   t.throws(() => utils.verify({}), Error)
 })
 
-test('throw error if options are invalid – client.realmUrl', (t) => {
+test('throw error if options are invalid – realmUrl', (t) => {
   const invalids = [
     null,
     undefined,
@@ -63,11 +63,11 @@ test('throw error if options are invalid – client.realmUrl', (t) => {
   invalids.forEach((invalid) => {
     t.throws(() => utils.verify(helpers.getOptions({
       realmUrl: invalid
-    })), Error)
+    })), Error, helpers.log('realmUrl', invalid))
   })
 })
 
-test('throw error if options are invalid – client.clientId', (t) => {
+test('throw error if options are invalid – clientId', (t) => {
   const invalids = [
     null,
     undefined,
@@ -86,11 +86,11 @@ test('throw error if options are invalid – client.clientId', (t) => {
   invalids.forEach((invalid) => {
     t.throws(() => utils.verify(helpers.getOptions({
       clientId: invalid
-    })), Error)
+    })), Error, helpers.log('clientId', invalid))
   })
 })
 
-test('throw error if options are invalid – client.secret', (t) => {
+test('throw error if options are invalid – secret', (t) => {
   const invalids = [
     null,
     undefined,
@@ -109,7 +109,7 @@ test('throw error if options are invalid – client.secret', (t) => {
   invalids.forEach((invalid) => {
     t.throws(() => utils.verify(helpers.getOptions({
       secret: invalid
-    })), Error)
+    })), Error, helpers.log('secret', invalid))
   })
 })
 
@@ -128,7 +128,7 @@ test('throw error if options are invalid – cache', (t) => {
   invalids.forEach((invalid) => {
     t.throws(() => utils.verify(helpers.getOptions({
       cache: invalid
-    })), Error)
+    })), Error, helpers.log('cache', invalid))
   })
 })
 
@@ -160,7 +160,7 @@ test('throw error if options are invalid – userInfo', (t) => {
   invalids.forEach((invalid) => {
     t.throws(() => utils.verify(helpers.getOptions({
       userInfo: invalid
-    })), Error)
+    })), Error, helpers.log('userInfo', invalid))
   })
 })
 
@@ -178,6 +178,8 @@ test('throw no error if options are valid', (t) => {
   t.plan(valids.length)
 
   valids.forEach((valid) => {
-    t.notThrows(() => utils.verify(helpers.getOptions(valid)), Error)
+    t.notThrows(
+      () => utils.verify(helpers.getOptions(valid)),
+      Error, helpers.log('valid', valid))
   })
 })
