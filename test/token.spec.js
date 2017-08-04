@@ -1,6 +1,6 @@
 const test = require('ava')
-const token = require('../src/token')
 const fixtures = require('./fixtures')
+const token = require('../src/token')
 
 test('enable multiple instances', (t) => {
   const tkn1 = token('bearer a.b.c')

@@ -1,6 +1,7 @@
-const test = require('ava')
 const boom = require('boom')
+const test = require('ava')
 const helpers = require('./_helpers')
+const fixtures = require('./fixtures')
 const utils = require('../src/utils')
 
 test('get boom error with default message', (t) => {
@@ -113,12 +114,81 @@ test('throw error if options are invalid – secret', (t) => {
   })
 })
 
+test('throw error if options are invalid – publicKey', (t) => {
+  const invalids = [
+    null,
+    NaN,
+    '',
+    'foobar',
+    fixtures.common.baseUrl,
+    42,
+    true,
+    false,
+    [],
+    new RegExp(),
+    {}
+  ]
+
+  t.plan(invalids.length)
+
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      secret: undefined,
+      publicKey: invalid
+    })), Error, helpers.log('publicKey', invalid))
+  })
+})
+
+test('throw error if options are invalid – verifyOpts', (t) => {
+  const invalids = [
+    null,
+    NaN,
+    '',
+    'foobar',
+    fixtures.common.baseUrl,
+    42,
+    true,
+    false,
+    [],
+    { ignoreExpiration: true },
+    { ignoreNotBefore: true }
+  ]
+
+  t.plan(invalids.length)
+
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      secret: undefined,
+      publicKey: fixtures.common.publicKey,
+      verifyOpts: invalid
+    })), Error, helpers.log('publicKey', invalid))
+  })
+})
+
+test('throw error if options are invalid – publicKey/secret conflict', (t) => {
+  t.throws(() => utils.verify(helpers.getOptions({
+    secret: undefined,
+    publicKey: undefined
+  })), Error, 'publicKey/secret: both undefined')
+
+  t.throws(() => utils.verify(helpers.getOptions({
+    publicKey: fixtures.common.publicKey
+  })), Error, 'publicKey/secret: both defined')
+})
+
+test('throw error if options are invalid – verifyOpts/secret conflict', (t) => {
+  t.throws(() => utils.verify(helpers.getOptions({
+    verifyOpts: {}
+  })), Error, 'verifyOpts/secret: both defined')
+})
+
 test('throw error if options are invalid – cache', (t) => {
   const invalids = [
     null,
     NaN,
     '',
     'foobar',
+    fixtures.common.baseUrl,
     42,
     []
   ]
@@ -138,6 +208,7 @@ test('throw error if options are invalid – userInfo', (t) => {
     NaN,
     '',
     'foobar',
+    fixtures.common.baseUrl,
     42,
     true,
     false,
@@ -181,5 +252,31 @@ test('throw no error if options are valid', (t) => {
     t.notThrows(
       () => utils.verify(helpers.getOptions(valid)),
       Error, helpers.log('valid', valid))
+  })
+})
+
+test('throw no error if options are valid', (t) => {
+  const valids = [
+    {},
+    { verifyOpts: undefined },
+    { verifyOpts: {} },
+    { verifyOpts: { audience: 'foobar' } },
+    { cache: {} },
+    { cache: { segment: 'foobar' } },
+    { cache: true },
+    { cache: false },
+    { userInfo: [] },
+    { userInfo: ['string'] }
+  ]
+
+  t.plan(valids.length)
+
+  valids.forEach((valid) => {
+    t.notThrows(
+      () => utils.verify(helpers.getOptions(Object.assign({
+        secret: undefined,
+        publicKey: fixtures.common.publicKey
+      }, valid))),
+      Error, helpers.log('valid with publicKey', valid))
   })
 })
