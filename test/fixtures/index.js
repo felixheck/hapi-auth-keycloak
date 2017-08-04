@@ -8,6 +8,7 @@ const introspectPath = '/protocol/openid-connect/token/introspect'
 const realmUrl = `${baseUrl}${realmPath}`
 const clientId = 'foobar'
 const secret = '1234-bar-4321-foo'
+const publicKeyBuffer = fs.readFileSync('./test/fixtures/public.pem')
 const publicKey = `-----BEGIN RSA PUBLIC KEY-----
 MIICCgKCAgEAur96MoQa/blg5eJFqmN//V4oQjKaBJl6KEvWSGAVgRm2PsnFKzCJ
 K9aJrUjETS473/x6fAHXyF5QKun6avNxpWs2VzwlO4t8Bi2EpSW2w0led2OzR/MF
@@ -42,6 +43,7 @@ const clientConfig = {
  */
 const common = Object.assign({}, clientConfig, {
   publicKey,
+  publicKeyBuffer,
   baseUrl,
   token,
   realmPath,

@@ -11,7 +11,10 @@ const scheme = joi.object({
   realmUrl: joi.string().uri().required(),
   clientId: joi.string().min(1).required(),
   secret: joi.string().min(1),
-  publicKey: joi.string().regex(/^-----BEGIN(?: RSA)? PUBLIC KEY-----[\s\S]*-----END(?: RSA)? PUBLIC KEY-----$/ig, 'PEM'),
+  publicKey: joi.alternatives().try(
+    joi.string().regex(/^-----BEGIN(?: RSA)? PUBLIC KEY-----[\s\S]*-----END(?: RSA)? PUBLIC KEY-----\s?$/ig, 'PEM'),
+    joi.object().type(Buffer)
+  ),
   verifyOpts: joi.object({
     ignoreExpiration: joi.any().forbidden(),
     ignoreNotBefore: joi.any().forbidden()

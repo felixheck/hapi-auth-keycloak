@@ -235,7 +235,7 @@ test('throw error if options are invalid – userInfo', (t) => {
   })
 })
 
-test('throw no error if options are valid', (t) => {
+test('throw no error if options are valid – secret', (t) => {
   const valids = [
     {},
     { cache: {} },
@@ -251,11 +251,11 @@ test('throw no error if options are valid', (t) => {
   valids.forEach((valid) => {
     t.notThrows(
       () => utils.verify(helpers.getOptions(valid)),
-      Error, helpers.log('valid', valid))
+      Error, helpers.log('valid.secret', valid))
   })
 })
 
-test('throw no error if options are valid', (t) => {
+test('throw no error if options are valid – publicKey/string', (t) => {
   const valids = [
     {},
     { verifyOpts: undefined },
@@ -277,6 +277,58 @@ test('throw no error if options are valid', (t) => {
         secret: undefined,
         publicKey: fixtures.common.publicKey
       }, valid))),
-      Error, helpers.log('valid with publicKey', valid))
+      Error, helpers.log('valid.publicKey.string', valid))
+  })
+})
+
+test('throw no error if options are valid – publicKey/Buffer', (t) => {
+  const valids = [
+    {},
+    { verifyOpts: undefined },
+    { verifyOpts: {} },
+    { verifyOpts: { audience: 'foobar' } },
+    { cache: {} },
+    { cache: { segment: 'foobar' } },
+    { cache: true },
+    { cache: false },
+    { userInfo: [] },
+    { userInfo: ['string'] }
+  ]
+
+  t.plan(valids.length)
+
+  valids.forEach((valid) => {
+    t.notThrows(
+      () => utils.verify(helpers.getOptions(Object.assign({
+        secret: undefined,
+        publicKey: fixtures.common.publicKeyBuffer
+      }, valid))),
+      Error, helpers.log('valid.publicKey.Buffer', valid))
+  })
+})
+
+test('throw no error if options are valid – publicKey/Buffer/string', (t) => {
+  const valids = [
+    {},
+    { verifyOpts: undefined },
+    { verifyOpts: {} },
+    { verifyOpts: { audience: 'foobar' } },
+    { cache: {} },
+    { cache: { segment: 'foobar' } },
+    { cache: true },
+    { cache: false },
+    { userInfo: [] },
+    { userInfo: ['string'] }
+  ]
+
+  t.plan(valids.length)
+
+  valids.forEach((valid) => {
+    t.notThrows(
+      () => utils.verify(helpers.getOptions(Object.assign({
+        secret: undefined,
+        publicKey: fixtures.common.publicKeyBuffer.toString()
+      }, valid))),
+      Error, helpers.log('valid.publicKey.Buffer.string', valid))
   })
 })
