@@ -1,3 +1,6 @@
+const fs = require('fs')
+const jsonwebtoken = require('jsonwebtoken')
+
 const token = 'abc.def.ghi'
 const baseUrl = 'http://localhost:8080'
 const realmPath = '/auth/realms/testme'
@@ -45,6 +48,38 @@ const common = Object.assign({}, clientConfig, {
   introspectPath
 })
 
+const contentBase = {
+  'sub': '1234567890',
+  'name': 'John Doe',
+  'email': 'john.doe@mail.com',
+  'admin': true,
+  'active': true,
+  'realm_access': {
+    'roles': [
+      'admin'
+    ]
+  },
+  'resource_access': {
+    'account': {
+      'roles': [
+        'manage-account',
+        'manage-account-links',
+        'view-profile'
+      ]
+    },
+    'same': {
+      'roles': [
+        'editor'
+      ]
+    },
+    'other-app': {
+      'roles': [
+        'other-app:creator'
+      ]
+    }
+  }
+}
+
 /**
  * @type Object
  * @public
@@ -52,39 +87,14 @@ const common = Object.assign({}, clientConfig, {
  * Content Parts of JWTs
  */
 const content = {
-  userData: {
+  userData: Object.assign({
     'exp': 5,
-    'iat': 1,
-    'sub': '1234567890',
-    'name': 'John Doe',
-    'email': 'john.doe@mail.com',
-    'admin': true,
-    'active': true,
-    'realm_access': {
-      'roles': [
-        'admin'
-      ]
-    },
-    'resource_access': {
-      'account': {
-        'roles': [
-          'manage-account',
-          'manage-account-links',
-          'view-profile'
-        ]
-      },
-      'same': {
-        'roles': [
-          'editor'
-        ]
-      },
-      'other-app': {
-        'roles': [
-          'other-app:creator'
-        ]
-      }
-    }
-  }
+    'iat': 1
+  }, contentBase),
+  userDataNoExp: Object.assign({
+    'exp': (Date.now() / 1000) + 60 * 60,
+    'iat': (Date.now() / 1000) + 60 * 15
+  }, contentBase)
 }
 
 /**
@@ -96,7 +106,11 @@ const content = {
 const jwt = {
   userData: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjUsImFjdGl2ZSI6dHJ1ZSwiaWF0IjoxLCJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZW1haWwiOiJqb2huLmRvZUBtYWlsLmNvbSIsImFkbWluIjp0cnVlLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiYWRtaW4iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX0sInNhbWUiOnsicm9sZXMiOlsiZWRpdG9yIl19LCJvdGhlci1hcHAiOnsicm9sZXMiOlsib3RoZXItYXBwOmNyZWF0b3IiXX19fQ.rjQkSo132lPSVUEsuz42oB5u_lW9zCBpvnOyngDYa_0',
   userDataExp: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3RpdmUiOnRydWUsInN1YiI6IjEyMzQ1Njc4OTAiLCJuYW1lIjoiSm9obiBEb2UiLCJlbWFpbCI6ImpvaG4uZG9lQG1haWwuY29tIiwiYWRtaW4iOnRydWUsInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJhZG1pbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfSwic2FtZSI6eyJyb2xlcyI6WyJlZGl0b3IiXX0sIm90aGVyLWFwcCI6eyJyb2xlcyI6WyJvdGhlci1hcHA6Y3JlYXRvciJdfX19.0_g0X4cOpOEJ37qwRQzBpouQDn2aEyg0-0jnnWECCsk',
-  userDataScope: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3RpdmUiOnRydWUsImV4cCI6NSwiaWF0IjoxLCJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZW1haWwiOiJqb2huLmRvZUBtYWlsLmNvbSIsImFkbWluIjp0cnVlfQ.V7lYgZKjnDJcPtUnIBHA9f-8bn8XXB6uH8bXElH-aOU'
+  userDataScope: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3RpdmUiOnRydWUsImV4cCI6NSwiaWF0IjoxLCJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZW1haWwiOiJqb2huLmRvZUBtYWlsLmNvbSIsImFkbWluIjp0cnVlfQ.V7lYgZKjnDJcPtUnIBHA9f-8bn8XXB6uH8bXElH-aOU',
+  userDataPublicKey: () => jsonwebtoken.sign(content.userDataNoExp, fs.readFileSync('./test/fixtures/private.pem'), {
+    algorithm: 'RS256'
+  }),
+  userDataPublicKeyExp: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjUsImlhdCI6MSwic3ViIjoiMTIzNDU2Nzg5MCIsIm5hbWUiOiJKb2huIERvZSIsImVtYWlsIjoiam9obi5kb2VAbWFpbC5jb20iLCJhZG1pbiI6dHJ1ZSwiYWN0aXZlIjp0cnVlLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiYWRtaW4iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX0sInNhbWUiOnsicm9sZXMiOlsiZWRpdG9yIl19LCJvdGhlci1hcHAiOnsicm9sZXMiOlsib3RoZXItYXBwOmNyZWF0b3IiXX19fQ.IgNqnLBKCox3b6KLewV5U_CLfQ79upmT-xkz5XreQ1Jdv1HcAuWcDYeraFnHU29aeU-JJGa7k3VvdbVSwSbFPkkMvjg_lLnqUUcHtuoPqisdbyty-4VRfZp18JnbAUnxlY4R7d-ZEQKPiXp-WBkHOPo5c8FrqATJ7HI7-MkrrKLBgOCmAFrVXto2lp7xmQOnoTy-31Suoj-0hOaIuP2jDRuIwGGigIgtCxxriE0Lzpt2R_wlEfq-0kmMZrgq9F91x-rB6Vg0nbhdtcv4c61nETHdRSqSIuAQzi9lm1mq9Kg67qU7tzaC3pPLkZRd6hMX6fwittVhm9G9SrXLX4rN6QoArEvglfuNX9sIYgEFoD9vqCx1rRCiyx1m55IGgFRLSn_pjOfTBx5Gb5GPlDcCdsNjW0BXLMSzhuPXDsslFFcBHzSYdOFz6hKEU1CVDYjxalq7wDPzMyCORDSSrgZJn_-oirDFaOe3H3ioZzH2x_lfXfbgga7lc5hkU0ZYZfq-1PUrEuqKKFWtDyPhzwcbX-uCno4HiJOuBlRsnJJFnWI0-GNASHUQD-eO4c9a0c2azG7dhH9lnhsHyA_ptLlIqeoPebkl_E88GXmjbHs3qa6anw1ZWn6sEXdlHAZ1ARt8Gc6r_2oOU8VOusgOnnMQdLYHONfbS0sKFNV65uvd01M'
 }
 
 module.exports = {

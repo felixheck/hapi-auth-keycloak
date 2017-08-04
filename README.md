@@ -108,16 +108,34 @@ server.route([
 ## API
 #### Plugin Options
 
-- `client {Object}` — The configuration of [`keycloak-auth-utils`][keycloak-auth-utils] its [`GrantManager`][keycloak-auth-utils-gm]. The configuration requires at least:
-  - `realmUrl {string}`: The absolute uri of the Keycloak realm<br/>
-  Example: `https://localhost:8080/auth/realms/testme`
-  - `clientId {string}` The identifier of the Keycloak client<br/>
-  Example: `foobar`
-  - `secret {string}` The related secret of the Keycloak client<br/>
-  Example: `1234-bar-4321-foo`
+- `realmUrl {string}`: The absolute uri of the Keycloak realm<br/>
+Required. Example: `https://localhost:8080/auth/realms/testme`<br/>
+
+- `clientId {string}` The identifier of the Keycloak client<br/>
+Required. Example: `foobar`<br/>
+
+
+- `secret {string}` The related secret of the Keycloak client<br/>
+Required (or `publicKey`). Example: `1234-bar-4321-foo`<br/>
+
   
-  Furthermore it may be necessary to reduce `minTimeBetweenJwksRequests`.<br/>
-  Required.
+- `publicKey {string}` The related public key of the Keycloak client<br/>
+Required (or `secret`). Example:
+```
+-----BEGIN RSA PUBLIC KEY-----
+MIICCgKCAgEAur96MoQa/blg5eJFqmN//V4oQjKaBJl6KEvWSGAVgRm2PsnFKzCJ
+K9aJrUjETS473/x6fAHXyF5QKun6avNxpWs2VzwlO4t8Bi2EpSW2w0led2OzR/MF
+CYUX1Bg00OXLmdh0kvemABHXSOL4Zs4nN95rr77JsdG6ntylWmtnZlofySwLjFrX
+B2JFpunl4n7eF7y8vD4Zyycvi+xl+OuMA6qomLQmfIDF0qJh0QMt/xh6CB4ooK5a
+Fy6VHORU5gS6MoSgJ78ZPhqmKayRd6U0rhDOq7bWiVykktTPdB1X/YlMbQHonyqZ
+0z2sh7e7olroUdE1FsDi0SdxV2Zzvff8IIPSGT74gQuaU4buoVUpMjSdXDfJw9m4
+i/mhsZwX1/MUU8Oq1AsBHdgTkNVaVwFc6Z7AqJSGW/mxMKQqspOr+/BAM8pnw5BC
+R/RnZBJfMjAYiSh6rVYuEWUBBLgZWIRNAMyRwS8OtWxADfOBtVwn8fmw8schro9X
+D17VcqTdjlS1Mkr73ZoD1GagWZvuSOaz2P0PhnfapRUF1KkbjjnbyzLpfT8Mgovv
+xBQJDIcRYL5oetXu//V5rNAr0na4zMBkPOi3ArpFp+Z4YKulYmSEG//216rLmzjl
+WKEkH1OK39jddDrMTidlxDKY+THheyQBPZ6pFfbKEM5281glYjkeQpECAwEAAQ==
+-----END RSA PUBLIC KEY-----
+```
 
 - `cache {Object|false}` — The configuration of the [hapi.js cache](https://hapijs.com/api#servercacheoptions) powered by [catbox][catbox].<br/>
 If `false` the cache is disabled. Use an empty object (`{}`) to use the built-in default cache.<br/>
@@ -127,8 +145,6 @@ Optional. Default: `false`.
 Optional. Default: `[]`.<br/>
 
 #### `server.kjwt.validate(field {string}, done {Function})`
-Uses internally [`GrantManager.prototype.validateAccessToken()`][keycloak-auth-utils-gm-validate].
-
 - `field {string}` — The `Bearer` field, including the scheme (`bearer`) itself.<br/>
 Example: `bearer 12345.abcde.67890`.<br/>
 Required.
@@ -227,7 +243,3 @@ For further information read the [contributing guideline](CONTRIBUTING.md).
 [catbox]: https://github.com/hapijs/catbox
 [bearer]: https://tools.ietf.org/html/rfc6750
 [hapi-route-options]: https://hapijs.com/api#route-options
-[keycloak-auth-utils]: http://www.keycloak.org/keycloak-nodejs-auth-utils/
-[keycloak-auth-utils-gm]: http://www.keycloak.org/keycloak-nodejs-auth-utils/grant-manager.js.html
-[keycloak-auth-utils-gm-obtain]: http://www.keycloak.org/keycloak-nodejs-auth-utils/grant-manager.js.html#obtainDirectly
-[keycloak-auth-utils-gm-validate]: http://www.keycloak.org/keycloak-nodejs-auth-utils/grant-manager.js.html#validateAccessToken

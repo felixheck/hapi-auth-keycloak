@@ -25,7 +25,10 @@ let options
  * @returns {Promise} The error-handled promise
  */
 function validateOffline (token) {
-  const { publicKey, verifyOpts = {} } = options
+  const {
+    publicKey,
+    verifyOpts = { algorithms: ['RS256', 'RS384', 'RS512'] }
+  } = options
 
   return new Promise((resolve, reject) => {
     jwt.verify(token, publicKey, verifyOpts, (err, decoded) => {
