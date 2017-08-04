@@ -130,7 +130,7 @@ test.cb.serial('authentication does fail – invalid header', (t) => {
   })
 })
 
-test.cb.serial('server method validates token', (t) => {
+test.cb.serial('server method – authentication does succeed', (t) => {
   helpers.mock(200, fixtures.content.userData)
 
   helpers.getServer(undefined, (server) => {
@@ -143,22 +143,23 @@ test.cb.serial('server method validates token', (t) => {
   })
 })
 
-test.cb.serial('server method invalidates token – validation error', (t) => {
-  helpers.mock(400, 'an error', true)
+test.cb.serial('server method – authentication does succeed – cache', (t) => {
+  helpers.mock(200, fixtures.content.userData)
+  helpers.mock(200, fixtures.content.userData)
 
   helpers.getServer(undefined, (server) => {
-    server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, (err, res) => {
-      t.falsy(res)
-      t.truthy(err)
-      t.truthy(err.isBoom)
-      t.is(err.output.statusCode, 401)
-      t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="an error"')
-      t.end()
+    server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, () => {
+      server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, (err, res) => {
+        t.falsy(err)
+        t.truthy(res)
+        t.truthy(res.credentials)
+        t.end()
+      })
     })
   })
 })
 
-test.cb.serial('server method invalidates token – invalid', (t) => {
+test.cb.serial('server method – authentication does fail – invalid token', (t) => {
   helpers.mock(200, { active: false })
 
   helpers.getServer(undefined, (server) => {
@@ -173,7 +174,7 @@ test.cb.serial('server method invalidates token – invalid', (t) => {
   })
 })
 
-test.cb.serial('server method invalidates token – wrong format', (t) => {
+test.cb.serial('server method – authentication does fail – invalid header', (t) => {
   helpers.getServer(undefined, (server) => {
     server.kjwt.validate(fixtures.jwt.userData, (err, res) => {
       t.falsy(res)
@@ -181,6 +182,21 @@ test.cb.serial('server method invalidates token – wrong format', (t) => {
       t.truthy(err.isBoom)
       t.is(err.output.statusCode, 401)
       t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="Missing or invalid authorization header"')
+      t.end()
+    })
+  })
+})
+
+test.cb.serial('server method – authentication does fail – error', (t) => {
+  helpers.mock(400, 'an error', true)
+
+  helpers.getServer(undefined, (server) => {
+    server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, (err, res) => {
+      t.falsy(res)
+      t.truthy(err)
+      t.truthy(err.isBoom)
+      t.is(err.output.statusCode, 401)
+      t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="an error"')
       t.end()
     })
   })

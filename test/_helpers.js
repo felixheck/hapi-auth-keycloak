@@ -35,9 +35,9 @@ function getOptions (customs) {
  *
  * @param {number} code The status code to be returned
  * @param {Object} data The response object to be returned
- * @param {boolean} isError Whether to reply with an error
+ * @param {boolean} [isError=false] Whether to reply with an error
  */
-function mock (code, data, isError) {
+function mock (code, data, isError = false) {
   const base = nock(fixtures.common.baseUrl)
     .post(`${fixtures.common.realmPath}${fixtures.common.introspectPath}`)
 
