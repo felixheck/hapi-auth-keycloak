@@ -13,7 +13,10 @@ const scheme = joi.object({
   secret: joi.string().min(1),
   publicKey: joi.alternatives().try(
     joi.string().regex(/^-----BEGIN(?: RSA)? PUBLIC KEY-----[\s\S]*-----END(?: RSA)? PUBLIC KEY-----\s?$/ig, 'PEM'),
-    joi.object().type(Buffer)
+    joi.object().type(Buffer),
+    joi.object({
+      kty: joi.string().required()
+    }).unknown(true)
   ),
   minTimeBetweenJwksRequests: joi.number().integer().positive().allow(0).default(0),
   cache: joi.alternatives().try(joi.object({

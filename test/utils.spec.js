@@ -125,7 +125,10 @@ test('throw error if options are invalid – publicKey', (t) => {
     false,
     [],
     new RegExp(),
-    {}
+    {},
+    {
+      foobar: 42
+    }
   ]
 
   t.plan(invalids.length)
@@ -337,5 +340,30 @@ test('throw no error if options are valid – publicKey/Buffer/string', (t) => {
         publicKey: fixtures.common.publicKeyBuffer.toString()
       }, valid))),
       Error, helpers.log('valid.publicKey.Buffer.string', valid))
+  })
+})
+
+test('throw no error if options are valid – publicKey/JWK', (t) => {
+  const valids = [
+    {},
+    { cache: {} },
+    { cache: { segment: 'foobar' } },
+    { cache: true },
+    { cache: false },
+    { userInfo: [] },
+    { userInfo: ['string'] },
+    { minTimeBetweenJwksRequests: 0 },
+    { minTimeBetweenJwksRequests: 42 }
+  ]
+
+  t.plan(valids.length)
+
+  valids.forEach((valid) => {
+    t.notThrows(
+      () => utils.verify(helpers.getOptions(Object.assign({
+        secret: undefined,
+        publicKey: fixtures.common.publicKeyJWK
+      }, valid))),
+      Error, helpers.log('valid.publicKey.JWK', valid))
   })
 })
