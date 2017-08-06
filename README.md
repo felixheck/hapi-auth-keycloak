@@ -15,7 +15,7 @@
 ---
 
 ## Introduction
-**hapi-auth-keycloak** is a plugin for [hapi.js][hapijs] which enables to protect your endpoints in a smart but professional manner using [Keycloak][keycloak] as authentication service. It is inspired by the related [express.js middleware][keycloak-node]. The plugin validates the passed [`Bearer` token][bearer] online with help of the [Keycloak][keycloak] server and optionally caches successfully validated tokens and the related user data using [`catbox`][catbox]. The caching enables a fast processing although the user data don't get changed until the token expires. It plays well with the [hapi.js][hapijs]-integrated [authentication feature][hapi-route-options]. Besides the authentication strategy it is possible to validate tokens by yourself, e.g. to authenticate incoming websocket or queue messages.
+**hapi-auth-keycloak** is a plugin for [hapi.js][hapijs] which enables to protect your endpoints in a smart but professional manner using [Keycloak][keycloak] as authentication service. It is inspired by the related [express.js middleware][keycloak-node]. The plugin validates the passed [`Bearer` token][bearer] offline with a provided public key or online with help of the [Keycloak][keycloak] server. Optionally, the successfully validated tokens and the related user data get cached using [`catbox`][catbox]. The caching enables a fast processing although the user data don't get changed until the token expires. It plays well with the [hapi.js][hapijs]-integrated [authentication feature][hapi-route-options]. Besides the authentication strategy it is possible to validate tokens by yourself, e.g. to authenticate incoming websocket or queue messages.
 
 This plugin is implemented in ECMAScript 6 without any transpilers like [`babel`][babel].<br/>
 Additionally [`standard`][standardjs] and [`ava`][avajs] are used to grant a high quality implementation.<br/>
@@ -60,11 +60,10 @@ Finally register the plugin, set the correct options and the authentication stra
 server.register({
   register: authKeycloak,
   options: {
-    client: {
-      realmUrl: 'https://localhost:8080/auth/realms/testme',
-      clientId: 'foobar',
-      secret: '1234-bar-4321-foo'
-    },
+    realmUrl: 'https://localhost:8080/auth/realms/testme',
+    clientId: 'foobar',
+    secret: '1234-bar-4321-foo',
+    minTimeBetweenJwksRequests: 15,
     cache: {},
     userInfo: ['name', 'email']
   }
@@ -108,37 +107,39 @@ server.route([
 ## API
 #### Plugin Options
 
-- `realmUrl {string}`: The absolute uri of the Keycloak realm<br/>
+--- 
+
+**Hint**: By default, the Keycloak server has built-in two ways to authenticate the client: client ID and client secret, or with a signed JWT. This plugin supports both. Check the description of `secret` and `publicKey` for further information:
+
+| Strategy    | Online | Option      |
+|:------------|:------:|:------------|
+| ID + Secret | x      | `secret`    |
+| Signed JWT  | x      |             |
+| Signed JWT  |        | `publicKey` |
+
+---
+
+
+- `realmUrl {string}`: The absolute uri of the Keycloak realm.<br/>
 Required. Example: `https://localhost:8080/auth/realms/testme`<br/>
 
-- `clientId {string}` The identifier of the Keycloak client<br/>
+- `clientId {string}` The identifier of the Keycloak client/application.<br/>
 Required. Example: `foobar`<br/>
 
-
-- `secret {string}` The related secret of the Keycloak client<br/>
-Required (or `publicKey`). Example: `1234-bar-4321-foo`<br/>
-
+- `secret {string}` The related secret of the Keycloak client/application.<br/>
+Defining this option enables the traditional method described in the OAuth2 specification.<br/>
+Optional. Example: `1234-bar-4321-foo`<br/>
   
-- `publicKey {string}` The related public key of the Keycloak client<br/>
-Required (or `secret`). Example:
-```
------BEGIN RSA PUBLIC KEY-----
-MIICCgKCAgEAur96MoQa/blg5eJFqmN//V4oQjKaBJl6KEvWSGAVgRm2PsnFKzCJ
-K9aJrUjETS473/x6fAHXyF5QKun6avNxpWs2VzwlO4t8Bi2EpSW2w0led2OzR/MF
-CYUX1Bg00OXLmdh0kvemABHXSOL4Zs4nN95rr77JsdG6ntylWmtnZlofySwLjFrX
-B2JFpunl4n7eF7y8vD4Zyycvi+xl+OuMA6qomLQmfIDF0qJh0QMt/xh6CB4ooK5a
-Fy6VHORU5gS6MoSgJ78ZPhqmKayRd6U0rhDOq7bWiVykktTPdB1X/YlMbQHonyqZ
-0z2sh7e7olroUdE1FsDi0SdxV2Zzvff8IIPSGT74gQuaU4buoVUpMjSdXDfJw9m4
-i/mhsZwX1/MUU8Oq1AsBHdgTkNVaVwFc6Z7AqJSGW/mxMKQqspOr+/BAM8pnw5BC
-R/RnZBJfMjAYiSh6rVYuEWUBBLgZWIRNAMyRwS8OtWxADfOBtVwn8fmw8schro9X
-D17VcqTdjlS1Mkr73ZoD1GagWZvuSOaz2P0PhnfapRUF1KkbjjnbyzLpfT8Mgovv
-xBQJDIcRYL5oetXu//V5rNAr0na4zMBkPOi3ArpFp+Z4YKulYmSEG//216rLmzjl
-WKEkH1OK39jddDrMTidlxDKY+THheyQBPZ6pFfbKEM5281glYjkeQpECAwEAAQ==
------END RSA PUBLIC KEY-----
-```
+- `publicKey {string}` The related public key of the Keycloak client/application.<br/>
+Defining this option enables the offline validation using signed JWTs. The public key has to be in [PEM][pem] or [JWK][jwk] format. If you define neither `secret` nor `public` key, the plugin assumes that a signed JWT has to be validated – it retrieves the public key itself from `{realmUrl}/protocol/openid-connect/certs`. The offline strategy its performance is higher but the online strategy is the most flexible one.<br/>
+Optional. 
 
-- `cache {Object|false}` — The configuration of the [hapi.js cache](https://hapijs.com/api#servercacheoptions) powered by [catbox][catbox].<br/>
-If `false` the cache is disabled. Use an empty object (`{}`) to use the built-in default cache.<br/>
+- `minTimeBetweenJwksRequests {number}` – The minimum time between JWK requests in seconds.<br/>
+The value have to be a positive integer.<br/>
+Optional. Default: `0`.
+
+- `cache {Object|boolean}` — The configuration of the [hapi.js cache](https://hapijs.com/api#servercacheoptions) powered by [catbox][catbox].<br/>
+If `false` the cache is disabled. Use `true` or an empty object (`{}`) to use the built-in default cache.<br/>
 Optional. Default: `false`.
 
 - `userInfo {Array.<?string>}` — List of properties which should be included in the `request.auth.credentials` object besides `scope` and `sub`.<br/>
@@ -189,11 +190,10 @@ process.on('SIGINT', () => {
 server.register({
   register: authKeycloak,
   options: {
-    client: {
-      realmUrl: 'https://localhost:8080/auth/realms/testme',
-      clientId: 'foobar',
-      secret: '1234-bar-4321-foo'
-    },
+    realmUrl: 'https://localhost:8080/auth/realms/testme',
+    clientId: 'foobar',
+    secret: '1234-bar-4321-foo',
+    minTimeBetweenJwksRequests: 15,
     cache: {},
     userInfo: ['name', 'email']
   }
@@ -243,3 +243,5 @@ For further information read the [contributing guideline](CONTRIBUTING.md).
 [catbox]: https://github.com/hapijs/catbox
 [bearer]: https://tools.ietf.org/html/rfc6750
 [hapi-route-options]: https://hapijs.com/api#route-options
+[jwk]: https://tools.ietf.org/html/rfc7517
+[pem]: https://tools.ietf.org/html/rfc1421
