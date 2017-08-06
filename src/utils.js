@@ -15,17 +15,13 @@ const scheme = joi.object({
     joi.string().regex(/^-----BEGIN(?: RSA)? PUBLIC KEY-----[\s\S]*-----END(?: RSA)? PUBLIC KEY-----\s?$/ig, 'PEM'),
     joi.object().type(Buffer)
   ),
-  verifyOpts: joi.object({
-    ignoreExpiration: joi.any().forbidden(),
-    ignoreNotBefore: joi.any().forbidden()
-  }).unknown(true),
+  minTimeBetweenJwksRequests: joi.number().integer().positive().allow(0).default(0),
   cache: joi.alternatives().try(joi.object({
     segment: joi.string().default('keycloakJwt')
   }), joi.boolean()).default(false),
   userInfo: joi.array().items(joi.string().min(1))
 })
-.xor('secret', 'publicKey')
-.without('secret', 'verifyOpts')
+.nand('secret', 'publicKey')
 .required()
 
 /**

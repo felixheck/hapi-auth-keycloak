@@ -94,7 +94,6 @@ test('throw error if options are invalid – clientId', (t) => {
 test('throw error if options are invalid – secret', (t) => {
   const invalids = [
     null,
-    undefined,
     NaN,
     '',
     42,
@@ -139,47 +138,10 @@ test('throw error if options are invalid – publicKey', (t) => {
   })
 })
 
-test('throw error if options are invalid – verifyOpts', (t) => {
-  const invalids = [
-    null,
-    NaN,
-    '',
-    'foobar',
-    fixtures.common.baseUrl,
-    42,
-    true,
-    false,
-    [],
-    { ignoreExpiration: true },
-    { ignoreNotBefore: true }
-  ]
-
-  t.plan(invalids.length)
-
-  invalids.forEach((invalid) => {
-    t.throws(() => utils.verify(helpers.getOptions({
-      secret: undefined,
-      publicKey: fixtures.common.publicKey,
-      verifyOpts: invalid
-    })), Error, helpers.log('publicKey', invalid))
-  })
-})
-
 test('throw error if options are invalid – publicKey/secret conflict', (t) => {
-  t.throws(() => utils.verify(helpers.getOptions({
-    secret: undefined,
-    publicKey: undefined
-  })), Error, 'publicKey/secret: both undefined')
-
   t.throws(() => utils.verify(helpers.getOptions({
     publicKey: fixtures.common.publicKey
   })), Error, 'publicKey/secret: both defined')
-})
-
-test('throw error if options are invalid – verifyOpts/secret conflict', (t) => {
-  t.throws(() => utils.verify(helpers.getOptions({
-    verifyOpts: {}
-  })), Error, 'verifyOpts/secret: both defined')
 })
 
 test('throw error if options are invalid – cache', (t) => {
@@ -235,9 +197,34 @@ test('throw error if options are invalid – userInfo', (t) => {
   })
 })
 
+test('throw error if options are invalid – minTimeBetweenJwksRequests', (t) => {
+  const invalids = [
+    null,
+    NaN,
+    '',
+    'foobar',
+    fixtures.common.baseUrl,
+    -42,
+    4.2,
+    true,
+    false,
+    new RegExp(),
+    {}
+  ]
+
+  t.plan(invalids.length)
+
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      userInfo: invalid
+    })), Error, helpers.log('minTimeBetweenJwksRequests', invalid))
+  })
+})
+
 test('throw no error if options are valid – secret', (t) => {
   const valids = [
     {},
+    { secret: undefined },
     { cache: {} },
     { cache: { segment: 'foobar' } },
     { cache: true },
@@ -255,18 +242,40 @@ test('throw no error if options are valid – secret', (t) => {
   })
 })
 
-test('throw no error if options are valid – publicKey/string', (t) => {
+test('throw no error if options are valid – offline', (t) => {
   const valids = [
-    {},
-    { verifyOpts: undefined },
-    { verifyOpts: {} },
-    { verifyOpts: { audience: 'foobar' } },
     { cache: {} },
     { cache: { segment: 'foobar' } },
     { cache: true },
     { cache: false },
     { userInfo: [] },
-    { userInfo: ['string'] }
+    { userInfo: ['string'] },
+    { minTimeBetweenJwksRequests: 0 },
+    { minTimeBetweenJwksRequests: 42 }
+  ]
+
+  t.plan(valids.length)
+
+  valids.forEach((valid) => {
+    t.notThrows(
+      () => utils.verify(helpers.getOptions(Object.assign({
+        secret: undefined,
+        publicKey: undefined
+      }, valid))),
+      Error, helpers.log('valid.offline', valid))
+  })
+})
+
+test('throw no error if options are valid – publicKey/string', (t) => {
+  const valids = [
+    { cache: {} },
+    { cache: { segment: 'foobar' } },
+    { cache: true },
+    { cache: false },
+    { userInfo: [] },
+    { userInfo: ['string'] },
+    { minTimeBetweenJwksRequests: 0 },
+    { minTimeBetweenJwksRequests: 42 }
   ]
 
   t.plan(valids.length)
@@ -284,15 +293,14 @@ test('throw no error if options are valid – publicKey/string', (t) => {
 test('throw no error if options are valid – publicKey/Buffer', (t) => {
   const valids = [
     {},
-    { verifyOpts: undefined },
-    { verifyOpts: {} },
-    { verifyOpts: { audience: 'foobar' } },
     { cache: {} },
     { cache: { segment: 'foobar' } },
     { cache: true },
     { cache: false },
     { userInfo: [] },
-    { userInfo: ['string'] }
+    { userInfo: ['string'] },
+    { minTimeBetweenJwksRequests: 0 },
+    { minTimeBetweenJwksRequests: 42 }
   ]
 
   t.plan(valids.length)
@@ -310,15 +318,14 @@ test('throw no error if options are valid – publicKey/Buffer', (t) => {
 test('throw no error if options are valid – publicKey/Buffer/string', (t) => {
   const valids = [
     {},
-    { verifyOpts: undefined },
-    { verifyOpts: {} },
-    { verifyOpts: { audience: 'foobar' } },
     { cache: {} },
     { cache: { segment: 'foobar' } },
     { cache: true },
     { cache: false },
     { userInfo: [] },
-    { userInfo: ['string'] }
+    { userInfo: ['string'] },
+    { minTimeBetweenJwksRequests: 0 },
+    { minTimeBetweenJwksRequests: 42 }
   ]
 
   t.plan(valids.length)

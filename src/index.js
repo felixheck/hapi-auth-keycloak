@@ -1,17 +1,18 @@
-const axios = require('axios')
-const jwt = require('jsonwebtoken')
+const { GrantManager } = require('keycloak-auth-utils')
+const Token = require('keycloak-auth-utils/lib/token')
 const cache = require('./cache')
 const token = require('./token')
 const { error, fakeReply, verify } = require('./utils')
 const pkg = require('../package.json')
 
 /**
- * @type Object
+ * @type {Object|GrantManager}
  * @private
  *
- * The plugin related options
+ * The plugin related options and GrantManager instance.
  */
 let options
+let manager
 
 /**
  * @function
@@ -25,16 +26,7 @@ let options
  * @returns {Promise} The error-handled promise
  */
 function validateOffline (token) {
-  const {
-    publicKey,
-    verifyOpts = { algorithms: ['RS256', 'RS384', 'RS512'] }
-  } = options
-
-  return new Promise((resolve, reject) => {
-    jwt.verify(token, publicKey, verifyOpts, (err, decoded) => {
-      err ? reject(err) : resolve(decoded)
-    })
-  })
+  return manager.validateToken(new Token(token, options.clientId))
 }
 
 /**
@@ -49,12 +41,8 @@ function validateOffline (token) {
  * @returns {Promise} The error-handled promise
  */
 function validateOnline (token) {
-  return axios.post(`${options.realmUrl}/protocol/openid-connect/token/introspect`, {
-    token,
-    client_secret: options.secret,
-    client_id: options.clientId
-  }).then(({ data }) => {
-    if (!data.active) {
+  return manager.validateAccessToken(token).then((res) => {
+    if (res === false) {
       throw Error(error.msg.invalid)
     }
 
@@ -149,6 +137,8 @@ function strategy (server) {
  */
 function plugin (server, opts, next) {
   options = verify(opts)
+  manager = new GrantManager(options)
+
   cache.init(server, options.cache)
 
   server.auth.scheme('keycloak-jwt', strategy)

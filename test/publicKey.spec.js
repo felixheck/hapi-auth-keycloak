@@ -94,7 +94,7 @@ test.cb.serial('authentication does fail – expired token', (t) => {
     }, (res) => {
       t.truthy(res)
       t.is(res.statusCode, 401)
-      t.is(res.headers['www-authenticate'], 'Bearer error="jwt expired"')
+      t.is(res.headers['www-authenticate'], 'Bearer error="invalid token (expired)"')
       t.end()
     })
   })
