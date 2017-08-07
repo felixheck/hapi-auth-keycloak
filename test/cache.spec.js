@@ -2,7 +2,7 @@ const test = require('ava')
 const helpers = require('./_helpers')
 const cache = require('../src/cache')
 
-test.afterEach('reset cache', () => {
+test.afterEach.always('reset cache', () => {
   cache.reset()
 })
 
