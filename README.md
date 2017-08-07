@@ -107,18 +107,15 @@ server.route([
 ## API
 #### Plugin Options
 
---- 
-
-**Hint**: By default, the Keycloak server has built-in two ways to authenticate the client: client ID and client secret, or with a signed JWT. This plugin supports both. Check the description of `secret` and `publicKey` for further information:
-
-| Strategy    | Online | Option      |
-|:------------|:------:|:------------|
-| ID + Secret | x      | `secret`    |
-| Signed JWT  | x      |             |
-| Signed JWT  |        | `publicKey` |
-
----
-
+> **Hint**: By default, the Keycloak server has built-in two ways to authenticate the client: client ID and client secret, or with a signed JWT. This plugin supports both. Check the description of `secret` and `publicKey` for further information.
+>
+> If the signed JWTs are used as online strategy, ensure that the identifier of the related realm key (`kid`) is included in their header.
+>
+> | Strategy    | Online | Option      |
+> |:------------|:------:|:------------|
+> | ID + Secret | x      | `secret`    |
+> | Signed JWT  | x      |             |
+> | Signed JWT  |        | `publicKey` |
 
 - `realmUrl {string}`: The absolute uri of the Keycloak realm.<br/>
 Required. Example: `https://localhost:8080/auth/realms/testme`<br/>
