@@ -107,9 +107,9 @@ server.route([
 ## API
 #### Plugin Options
 
-> **Hint**: By default, the Keycloak server has built-in two ways to authenticate the client: client ID and client secret, or with a signed JWT. This plugin supports both. Check the description of `secret` and `publicKey` for further information.
+> By default, the Keycloak server has built-in two ways to authenticate the client: client ID and client secret, or with a signed JWT. This plugin supports both. Check the description of `secret` and `publicKey` for further information.
 >
-> If the signed JWTs are used as online strategy, ensure that the identifier of the related realm key (`kid`) is included in their header.
+> If the signed JWTs are used as online strategy, ensure that the identifier of the related realm key is included in their header as `kid`.
 >
 > | Strategy    | Online | Option      |
 > |:------------|:------:|:------------|
@@ -117,17 +117,17 @@ server.route([
 > | Signed JWT  | x      |             |
 > | Signed JWT  |        | `publicKey` |
 
-- `realmUrl {string}`: The absolute uri of the Keycloak realm.<br/>
+- `realmUrl {string}` – The absolute uri of the Keycloak realm.<br/>
 Required. Example: `https://localhost:8080/auth/realms/testme`<br/>
 
-- `clientId {string}` The identifier of the Keycloak client/application.<br/>
+- `clientId {string}` – The identifier of the Keycloak client/application.<br/>
 Required. Example: `foobar`<br/>
 
-- `secret {string}` The related secret of the Keycloak client/application.<br/>
+- `secret {string}` – The related secret of the Keycloak client/application.<br/>
 Defining this option enables the traditional method described in the OAuth2 specification. To perform an almost offline validation enable the cache — a simple offline verfication with symmetric keys is not provided for security reasons.<br/>
 Optional. Example: `1234-bar-4321-foo`<br/>
   
-- `publicKey {string}` The related public key of the Keycloak client/application.<br/>
+- `publicKey {string}` – The related public key of the Keycloak client/application.<br/>
 Defining this option enables the offline validation using signed JWTs. The public key has to be in [PEM][pem] or [JWK][jwk] format. If you define neither `secret` nor `public` key, the plugin assumes that a signed JWT has to be validated – it retrieves the public key itself from `{realmUrl}/protocol/openid-connect/certs`. The offline strategy its performance is higher but the online strategy is the most flexible one.<br/>
 Optional. 
 
