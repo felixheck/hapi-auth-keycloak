@@ -107,8 +107,7 @@ server.route([
 ## API
 #### Plugin Options
 
-> By default, the Keycloak server has built-in two ways to authenticate the client: client ID and client secret, or with a signed JWT. This plugin supports both. Check the description of `secret` and `publicKey` for further information.<br/>
-> If the signed JWTs are used as online strategy, ensure that the identifier of the related realm key is included in their header as `kid`.
+> By default, the Keycloak server has built-in two ways to authenticate the client: client ID and client secret, or with a signed JWT. This plugin supports both. Check the description of `secret` and `publicKey` for further information. If the signed JWTs are used as online strategy, ensure that the identifier of the related realm key is included in their header as `kid`.
 >
 > | Strategy    | Online | Option      |
 > |:------------|:------:|:------------|
