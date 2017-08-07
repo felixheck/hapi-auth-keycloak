@@ -9,7 +9,20 @@ const realmUrl = `${baseUrl}${realmPath}`
 const clientId = 'foobar'
 const secret = '1234-bar-4321-foo'
 const publicKeyBuffer = fs.readFileSync('./test/fixtures/public.pem')
-const publicKey = `-----BEGIN RSA PUBLIC KEY-----
+const publicKey = `-----BEGIN PUBLIC KEY-----
+MIICCgKCAgEAur96MoQa/blg5eJFqmN//V4oQjKaBJl6KEvWSGAVgRm2PsnFKzCJ
+K9aJrUjETS473/x6fAHXyF5QKun6avNxpWs2VzwlO4t8Bi2EpSW2w0led2OzR/MF
+CYUX1Bg00OXLmdh0kvemABHXSOL4Zs4nN95rr77JsdG6ntylWmtnZlofySwLjFrX
+B2JFpunl4n7eF7y8vD4Zyycvi+xl+OuMA6qomLQmfIDF0qJh0QMt/xh6CB4ooK5a
+Fy6VHORU5gS6MoSgJ78ZPhqmKayRd6U0rhDOq7bWiVykktTPdB1X/YlMbQHonyqZ
+0z2sh7e7olroUdE1FsDi0SdxV2Zzvff8IIPSGT74gQuaU4buoVUpMjSdXDfJw9m4
+i/mhsZwX1/MUU8Oq1AsBHdgTkNVaVwFc6Z7AqJSGW/mxMKQqspOr+/BAM8pnw5BC
+R/RnZBJfMjAYiSh6rVYuEWUBBLgZWIRNAMyRwS8OtWxADfOBtVwn8fmw8schro9X
+D17VcqTdjlS1Mkr73ZoD1GagWZvuSOaz2P0PhnfapRUF1KkbjjnbyzLpfT8Mgovv
+xBQJDIcRYL5oetXu//V5rNAr0na4zMBkPOi3ArpFp+Z4YKulYmSEG//216rLmzjl
+WKEkH1OK39jddDrMTidlxDKY+THheyQBPZ6pFfbKEM5281glYjkeQpECAwEAAQ==
+-----END PUBLIC KEY-----`
+const publicKeyRsa = `-----BEGIN RSA PUBLIC KEY-----
 MIICCgKCAgEAur96MoQa/blg5eJFqmN//V4oQjKaBJl6KEvWSGAVgRm2PsnFKzCJ
 K9aJrUjETS473/x6fAHXyF5QKun6avNxpWs2VzwlO4t8Bi2EpSW2w0led2OzR/MF
 CYUX1Bg00OXLmdh0kvemABHXSOL4Zs4nN95rr77JsdG6ntylWmtnZlofySwLjFrX
@@ -22,7 +35,20 @@ D17VcqTdjlS1Mkr73ZoD1GagWZvuSOaz2P0PhnfapRUF1KkbjjnbyzLpfT8Mgovv
 xBQJDIcRYL5oetXu//V5rNAr0na4zMBkPOi3ArpFp+Z4YKulYmSEG//216rLmzjl
 WKEkH1OK39jddDrMTidlxDKY+THheyQBPZ6pFfbKEM5281glYjkeQpECAwEAAQ==
 -----END RSA PUBLIC KEY-----`
-const publicKeyJWK = {
+const publicKeyCert = `-----BEGIN CERTIFICATE-----
+MIICCgKCAgEAur96MoQa/blg5eJFqmN//V4oQjKaBJl6KEvWSGAVgRm2PsnFKzCJ
+K9aJrUjETS473/x6fAHXyF5QKun6avNxpWs2VzwlO4t8Bi2EpSW2w0led2OzR/MF
+CYUX1Bg00OXLmdh0kvemABHXSOL4Zs4nN95rr77JsdG6ntylWmtnZlofySwLjFrX
+B2JFpunl4n7eF7y8vD4Zyycvi+xl+OuMA6qomLQmfIDF0qJh0QMt/xh6CB4ooK5a
+Fy6VHORU5gS6MoSgJ78ZPhqmKayRd6U0rhDOq7bWiVykktTPdB1X/YlMbQHonyqZ
+0z2sh7e7olroUdE1FsDi0SdxV2Zzvff8IIPSGT74gQuaU4buoVUpMjSdXDfJw9m4
+i/mhsZwX1/MUU8Oq1AsBHdgTkNVaVwFc6Z7AqJSGW/mxMKQqspOr+/BAM8pnw5BC
+R/RnZBJfMjAYiSh6rVYuEWUBBLgZWIRNAMyRwS8OtWxADfOBtVwn8fmw8schro9X
+D17VcqTdjlS1Mkr73ZoD1GagWZvuSOaz2P0PhnfapRUF1KkbjjnbyzLpfT8Mgovv
+xBQJDIcRYL5oetXu//V5rNAr0na4zMBkPOi3ArpFp+Z4YKulYmSEG//216rLmzjl
+WKEkH1OK39jddDrMTidlxDKY+THheyQBPZ6pFfbKEM5281glYjkeQpECAwEAAQ==
+-----END CERTIFICATE-----`
+const publicKeyJwk = {
   kty: 'RSA',
   n: 'ALq_ejKEGv25YOXiRapjf_1eKEIymgSZeihL1khgFYEZtj7JxSswiSvWia1IxE0uO9_8enwB18heUCrp-mrzcaVrNlc8JTuLfAYthKUltsNJXndjs0fzBQmFF9QYNNDly5nYdJL3pgAR10ji-GbOJzfea6--ybHRup7cpVprZ2ZaH8ksC4xa1wdiRabp5eJ-3he8vLw-GcsnL4vsZfjrjAOqqJi0JnyAxdKiYdEDLf8YeggeKKCuWhculRzkVOYEujKEoCe_GT4apimskXelNK4Qzqu21olcpJLUz3QdV_2JTG0B6J8qmdM9rIe3u6Ja6FHRNRbA4tEncVdmc733_CCD0hk--IELmlOG7qFVKTI0nVw3ycPZuIv5obGcF9fzFFPDqtQLAR3YE5DVWlcBXOmewKiUhlv5sTCkKrKTq_vwQDPKZ8OQQkf0Z2QSXzIwGIkoeq1WLhFlAQS4GViETQDMkcEvDrVsQA3zgbVcJ_H5sPLHIa6PVw9e1XKk3Y5UtTJK-92aA9RmoFmb7kjms9j9D4Z32qUVBdSpG44528sy6X0_DIKL78QUCQyHEWC-aHrV7v_1eazQK9J2uMzAZDzotwK6RafmeGCrpWJkhBv_9teqy5s45VihJB9Tit_Y3XQ6zE4nZcQymPkx4XskAT2eqRX2yhDOdvNYJWI5HkKR',
   e: 'AQAB'
@@ -48,8 +74,10 @@ const clientConfig = {
  */
 const common = Object.assign({}, clientConfig, {
   publicKey,
+  publicKeyRsa,
+  publicKeyCert,
   publicKeyBuffer,
-  publicKeyJWK,
+  publicKeyJwk,
   baseUrl,
   token,
   realmPath,
