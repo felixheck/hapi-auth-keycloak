@@ -18,14 +18,14 @@ let manager
  * @function
  * @private
  *
- * Validate the token offline with help of
- * the related public key. Resolve if the
- * verification succeeded.
+ * Validate the signed token offline with help of the related
+ * public key or online with help of the Keycloak server and
+ * JWKS. Resolve if the verification succeeded.
  *
  * @param {string} token The token to be validated
  * @returns {Promise} The error-handled promise
  */
-function validateOffline (token) {
+function validateSignedJwt (token) {
   return manager.validateToken(new Token(token, options.clientId))
 }
 
@@ -33,14 +33,14 @@ function validateOffline (token) {
  * @function
  * @private
  *
- * Validate the token online with help of
- * the related Keycloak server. Resolve if
- * the request succeeded and token is valid.
+ * Validate the token online with help of the related
+ * Keycloak server, the client identifier and its secret.
+ * Resolve if the request succeeded and token is valid.
  *
  * @param {string} token The token to be validated
  * @returns {Promise} The error-handled promise
  */
-function validateOnline (token) {
+function validateSecret (token) {
   return manager.validateAccessToken(token).then((res) => {
     if (res === false) {
       throw Error(error.msg.invalid)
@@ -62,7 +62,7 @@ function validateOnline (token) {
  * @param {Function} reply The callback handler
  */
 function handleKeycloakValidation (tkn, reply) {
-  const validateFn = options.secret ? validateOnline : validateOffline
+  const validateFn = options.secret ? validateSecret : validateSignedJwt
 
   validateFn(tkn.get()).then(() => {
     const { expiresIn, credentials } = tkn.getData(options.userInfo)
