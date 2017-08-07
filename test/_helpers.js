@@ -1,10 +1,7 @@
 const hapi = require('hapi')
-const _ = require('lodash')
-const { GrantManager } = require('keycloak-auth-utils')
+const nock = require('nock')
 const authKeycloak = require('../src')
-const fixtures = require('./_fixtures')
-
-const GrantManagerClone = {}
+const fixtures = require('./fixtures')
 
 /**
  * @type Object
@@ -12,31 +9,53 @@ const GrantManagerClone = {}
  *
  * The default plugin configuration
  */
-const defaults = {
-  client: fixtures.clientConfig,
-  cache: false,
+const defaults = Object.assign({
+  cache: undefined,
   userInfo: undefined
+}, fixtures.clientConfig)
+
+/**
+ * @function
+ * @public
+ *
+ * Get overriden valid default options with customs.
+ *
+ * @param {Object} customs The options to be changed
+ * @returns {Object} The customized options
+ */
+function getOptions (customs) {
+  return Object.assign({}, defaults, customs)
 }
 
 /**
- * @type Object.<Function>
+ * @function
  * @public
  *
- * Provide several functions to clone, reset and
- * stub methods of `GrantManager`.
+ * Mock introspect request to the Keycloak server.
+ *
+ * @param {number} code The status code to be returned
+ * @param {Object} data The response object to be returned
+ * @param {boolean} [isError=false] Whether to reply with an error
  */
-const prototypes = {
-  clone () {
-    GrantManagerClone.prototype = _.cloneDeep(GrantManager.prototype)
-  },
-  reset () {
-    GrantManager.prototype = GrantManagerClone.prototype
-  },
-  stub (name, value, type = 'resolve') {
-    GrantManager.prototype[name] = function () {
-      return Promise[type](value)
-    }
-  }
+function mock (code, data, isError = false) {
+  const base = nock(fixtures.common.baseUrl)
+    .post(`${fixtures.common.realmPath}${fixtures.common.introspectPath}`)
+
+  isError ? base.replyWithError(data) : base.reply(code, data)
+}
+
+/**
+ * @function
+ * @public
+ *
+ * Log the option name with the asserted value.
+ *
+ * @param {string} option The name of the option
+ * @param {*} value The value to be asserted
+ * @returns {string} The aggregated log message
+ */
+function log (option, value) {
+  return `${option}: ${value && value.toString()}`
 }
 
 /**
@@ -138,7 +157,9 @@ function getServer (options, done) {
 }
 
 module.exports = {
+  getOptions,
+  mock,
+  log,
   getServer,
-  registerPlugin,
-  prototypes
+  registerPlugin
 }

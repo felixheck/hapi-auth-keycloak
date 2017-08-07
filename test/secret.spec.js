@@ -1,28 +1,25 @@
+const nock = require('nock')
 const test = require('ava')
+const helpers = require('./_helpers')
+const fixtures = require('./fixtures')
 const cache = require('../src/cache')
-const { prototypes, getServer, registerPlugin } = require('./_helpers')
-const fixtures = require('./_fixtures')
-
-test.beforeEach(() => {
-  prototypes.clone()
-})
 
 test.afterEach('reset instances and prototypes', () => {
   cache.reset()
-  prototypes.reset()
+  nock.cleanAll()
 })
 
 test.cb.serial('throw error if plugin gets registered twice', (t) => {
-  getServer(undefined, (server) => {
-    t.throws(() => registerPlugin(server), Error)
+  helpers.getServer(undefined, (server) => {
+    t.throws(() => helpers.registerPlugin(server), Error)
     t.end()
   })
 })
 
 test.cb.serial('authentication does succeed', (t) => {
-  prototypes.stub('validateAccessToken', fixtures.content.userData)
+  helpers.mock(200, fixtures.content.userData)
 
-  getServer(undefined, (server) => {
+  helpers.getServer(undefined, (server) => {
     server.inject({
       method: 'GET',
       url: '/',
@@ -38,7 +35,7 @@ test.cb.serial('authentication does succeed', (t) => {
 })
 
 test.cb.serial('authentication does succeed – cached', (t) => {
-  prototypes.stub('validateAccessToken', fixtures.content.userData)
+  helpers.mock(200, fixtures.content.userData)
 
   const mockReq = {
     method: 'GET',
@@ -48,10 +45,9 @@ test.cb.serial('authentication does succeed – cached', (t) => {
     }
   }
 
-  getServer({
-    client: fixtures.clientConfig,
-    cache: {}
-  }, (server) => {
+  helpers.getServer(helpers.getOptions({
+    cache: true
+  }), (server) => {
     server.inject(mockReq, () => {
       server.inject(mockReq, (res) => {
         t.truthy(res)
@@ -63,9 +59,9 @@ test.cb.serial('authentication does succeed – cached', (t) => {
 })
 
 test.cb.serial('authentication does success – valid roles', (t) => {
-  prototypes.stub('validateAccessToken', fixtures.content.userData)
+  helpers.mock(200, fixtures.content.userData)
 
-  getServer(undefined, (server) => {
+  helpers.getServer(undefined, (server) => {
     server.inject({
       method: 'GET',
       url: '/role',
@@ -81,9 +77,9 @@ test.cb.serial('authentication does success – valid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid roles', (t) => {
-  prototypes.stub('validateAccessToken', fixtures.content.userData)
+  helpers.mock(200, fixtures.content.userData)
 
-  getServer(undefined, (server) => {
+  helpers.getServer(undefined, (server) => {
     server.inject({
       method: 'GET',
       url: '/role/guest',
@@ -99,9 +95,9 @@ test.cb.serial('authentication does fail – invalid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid token', (t) => {
-  prototypes.stub('validateAccessToken', false)
+  helpers.mock(200, { active: false })
 
-  getServer(undefined, (server) => {
+  helpers.getServer(undefined, (server) => {
     server.inject({
       method: 'GET',
       url: '/',
@@ -118,7 +114,7 @@ test.cb.serial('authentication does fail – invalid token', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid header', (t) => {
-  getServer(undefined, (server) => {
+  helpers.getServer(undefined, (server) => {
     server.inject({
       method: 'GET',
       url: '/',
@@ -134,10 +130,10 @@ test.cb.serial('authentication does fail – invalid header', (t) => {
   })
 })
 
-test.cb.serial('server method validates token', (t) => {
-  prototypes.stub('validateAccessToken', fixtures.content.userData)
+test.cb.serial('server method – authentication does succeed', (t) => {
+  helpers.mock(200, fixtures.content.userData)
 
-  getServer(undefined, (server) => {
+  helpers.getServer(undefined, (server) => {
     server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, (err, res) => {
       t.falsy(err)
       t.truthy(res)
@@ -147,25 +143,26 @@ test.cb.serial('server method validates token', (t) => {
   })
 })
 
-test.cb.serial('server method invalidates token – validation error', (t) => {
-  prototypes.stub('validateAccessToken', new Error('an error'), 'reject')
+test.cb.serial('server method – authentication does succeed – cache', (t) => {
+  helpers.mock(200, fixtures.content.userData)
+  helpers.mock(200, fixtures.content.userData)
 
-  getServer(undefined, (server) => {
-    server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, (err, res) => {
-      t.falsy(res)
-      t.truthy(err)
-      t.truthy(err.isBoom)
-      t.is(err.output.statusCode, 401)
-      t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="Error: an error"')
-      t.end()
+  helpers.getServer(undefined, (server) => {
+    server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, () => {
+      server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, (err, res) => {
+        t.falsy(err)
+        t.truthy(res)
+        t.truthy(res.credentials)
+        t.end()
+      })
     })
   })
 })
 
-test.cb.serial('server method invalidates token – invalid', (t) => {
-  prototypes.stub('validateAccessToken', false)
+test.cb.serial('server method – authentication does fail – invalid token', (t) => {
+  helpers.mock(200, { active: false })
 
-  getServer(undefined, (server) => {
+  helpers.getServer(undefined, (server) => {
     server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, (err, res) => {
       t.falsy(res)
       t.truthy(err)
@@ -177,14 +174,29 @@ test.cb.serial('server method invalidates token – invalid', (t) => {
   })
 })
 
-test.cb.serial('server method invalidates token – wrong format', (t) => {
-  getServer(undefined, (server) => {
+test.cb.serial('server method – authentication does fail – invalid header', (t) => {
+  helpers.getServer(undefined, (server) => {
     server.kjwt.validate(fixtures.jwt.userData, (err, res) => {
       t.falsy(res)
       t.truthy(err)
       t.truthy(err.isBoom)
       t.is(err.output.statusCode, 401)
       t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="Missing or invalid authorization header"')
+      t.end()
+    })
+  })
+})
+
+test.cb.serial('server method – authentication does fail – error', (t) => {
+  helpers.mock(400, 'an error', true)
+
+  helpers.getServer(undefined, (server) => {
+    server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, (err, res) => {
+      t.falsy(res)
+      t.truthy(err)
+      t.truthy(err.isBoom)
+      t.is(err.output.statusCode, 401)
+      t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="an error"')
       t.end()
     })
   })

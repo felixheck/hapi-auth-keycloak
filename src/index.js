@@ -1,43 +1,78 @@
 const { GrantManager } = require('keycloak-auth-utils')
+const Token = require('keycloak-auth-utils/lib/token')
 const cache = require('./cache')
 const token = require('./token')
 const { error, fakeReply, verify } = require('./utils')
 const pkg = require('../package.json')
 
 /**
- * @type Object
+ * @type {Object|GrantManager}
  * @private
  *
- * Internally used properties
+ * The plugin related options and GrantManager instance.
  */
-const internals = {
-  manager: undefined,
-  userInfoFields: undefined
+let options
+let manager
+
+/**
+ * @function
+ * @private
+ *
+ * Validate the token offline with help of
+ * the related public key. Resolve if the
+ * verification succeeded.
+ *
+ * @param {string} token The token to be validated
+ * @returns {Promise} The error-handled promise
+ */
+function validateOffline (token) {
+  return manager.validateToken(new Token(token, options.clientId))
+}
+
+/**
+ * @function
+ * @private
+ *
+ * Validate the token online with help of
+ * the related Keycloak server. Resolve if
+ * the request succeeded and token is valid.
+ *
+ * @param {string} token The token to be validated
+ * @returns {Promise} The error-handled promise
+ */
+function validateOnline (token) {
+  return manager.validateAccessToken(token).then((res) => {
+    if (res === false) {
+      throw Error(error.msg.invalid)
+    }
+
+    return token
+  })
 }
 
 /**
  * @function
  * @public
  *
- * Validate a token with help of Keycloak.
+ * Validate a token either with the help of Keycloak
+ * or a related public key. Store the user data in
+ * cache if enabled.
  *
  * @param {string} token The token to be validated
  * @param {Function} reply The callback handler
  */
 function handleKeycloakValidation (tkn, reply) {
-  const invalidate = (err) => reply(error('unauthorized', err, error.msg.invalid))
+  const validateFn = options.secret ? validateOnline : validateOffline
 
-  internals.manager.validateAccessToken(tkn.get()).then((res) => {
-    if (!res) {
-      return invalidate()
-    }
-
-    const { expiresIn, credentials } = tkn.getData(internals.userInfoFields)
+  validateFn(tkn.get()).then(() => {
+    const { expiresIn, credentials } = tkn.getData(options.userInfo)
     const userData = { credentials }
 
     cache.set(tkn.get(), userData, expiresIn)
-    return reply.continue(userData)
-  }).catch(invalidate)
+    reply.continue(userData)
+  }).catch((err) => {
+    reply(error('unauthorized', err, error.msg.invalid))
+  })
 }
 
 /**
@@ -101,11 +136,10 @@ function strategy (server) {
  * @param {Function} next The callback handler
  */
 function plugin (server, opts, next) {
-  opts = verify(opts)
-  cache.init(server, opts.cache)
+  options = verify(opts)
+  manager = new GrantManager(options)
 
-  internals.manager = new GrantManager(opts.client)
-  internals.userInfoFields = opts.userInfo
+  cache.init(server, options.cache)
 
   server.auth.scheme('keycloak-jwt', strategy)
   server.decorate('server', 'kjwt', { validate })

@@ -8,16 +8,36 @@ const joi = require('joi')
  * The plugin options scheme
  */
 const scheme = joi.object({
-  client: joi.object({
-    realmUrl: joi.string().uri().required(),
-    clientId: joi.string().min(1).required(),
-    secret: joi.string().min(1).required()
-  }).unknown(true).required(),
+  realmUrl: joi.string().uri().required()
+    .description('The absolute uri of the Keycloak realm')
+    .example('https://localhost:8080/auth/realms/testme'),
+  clientId: joi.string().min(1).required()
+    .description('The identifier of the Keycloak client/application')
+    .example('foobar'),
+  secret: joi.string().min(1)
+    .description('The related secret of the Keycloak client/application')
+    .example('1234-bar-4321-foo'),
+  publicKey: joi.alternatives().try(
+    joi.string().regex(/^-----BEGIN(?: RSA)? PUBLIC KEY-----[\s\S]*-----END(?: RSA)? PUBLIC KEY-----\s?$/ig, 'PEM'),
+    joi.object().type(Buffer),
+    joi.object({
+      kty: joi.string().required()
+    }).unknown(true)
+  ).description('The related public key of the Keycloak client/application'),
+  minTimeBetweenJwksRequests: joi.number().integer().positive().allow(0).default(0)
+    .description('The minimum time between JWKS requests in seconds')
+    .example(15),
   cache: joi.alternatives().try(joi.object({
     segment: joi.string().default('keycloakJwt')
-  }), joi.boolean().invalid(true)).default(false),
+  }), joi.boolean()).default(false)
+    .description('The configuration of the hapi.js cache powered by catbox')
+    .example('true'),
   userInfo: joi.array().items(joi.string().min(1))
-}).unknown(true).required()
+    .description('List of properties which should be included in the `request.auth.credentials` object')
+    .example(['name', 'email'])
+})
+.nand('secret', 'publicKey')
+.required()
 
 /**
  * @function
@@ -48,7 +68,7 @@ function verify (opts) {
  * @returns {Boom} The created `Boom` error
  */
 function error (type, err, msg) {
-  return boom[type](err ? err.toString() : msg, 'Bearer')
+  return boom[type](err ? err.message || err.toString() : msg, 'Bearer')
 }
 
 /**

@@ -1,6 +1,7 @@
-const test = require('ava')
 const boom = require('boom')
-const fixtures = require('./_fixtures')
+const test = require('ava')
+const helpers = require('./_helpers')
+const fixtures = require('./fixtures')
 const utils = require('../src/utils')
 
 test('get boom error with default message', (t) => {
@@ -19,7 +20,7 @@ test('get boom error with error message', (t) => {
   const mockErr = new Error('barfoo')
   const result = utils.error('badRequest', mockErr, 'foobar')
   t.truthy(result)
-  t.deepEqual(result, boom.badRequest(mockErr.toString(), 'Bearer'))
+  t.deepEqual(result, boom.badRequest(mockErr.message, 'Bearer'))
 })
 
 test('decorate callback function with `continue`', (t) => {
@@ -38,437 +39,331 @@ test('ignore callback function with exsting `continue`', (t) => {
   t.is(mockFn.continue, 'foo')
 })
 
-test('throw error if options are invalid – client', (t) => {
+test('throw error if options are empty', (t) => {
   t.throws(() => utils.verify(), Error)
   t.throws(() => utils.verify({}), Error)
-
-  t.throws(() => utils.verify({
-    client: null
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: undefined
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: NaN
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: ''
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: 'foobar'
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: 42
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: true
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: []
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: new RegExp()
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: {}
-  }), Error)
 })
 
-test('throw error if options are invalid – client.realmUrl', (t) => {
-  t.throws(() => utils.verify(), Error)
-  t.throws(() => utils.verify({}), Error)
+test('throw error if options are invalid – realmUrl', (t) => {
+  const invalids = [
+    null,
+    undefined,
+    NaN,
+    '',
+    'foobar',
+    42,
+    true,
+    false,
+    [],
+    new RegExp(),
+    {}
+  ]
 
-  t.throws(() => utils.verify({
-    client: {
-      clientId: fixtures.common.clientId,
-      secret: fixtures.secret.clientId,
-      realmUrl: null
-    }
-  }), Error)
+  t.plan(invalids.length)
 
-  t.throws(() => utils.verify({
-    client: {
-      clientId: fixtures.common.clientId,
-      secret: fixtures.secret.clientId,
-      realmUrl: undefined
-    }
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: {
-      clientId: fixtures.common.clientId,
-      secret: fixtures.secret.clientId,
-      realmUrl: NaN
-    }
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: {
-      clientId: fixtures.common.clientId,
-      secret: fixtures.secret.clientId,
-      realmUrl: ''
-    }
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: {
-      clientId: fixtures.common.clientId,
-      secret: fixtures.secret.clientId,
-      realmUrl: 'foobar'
-    }
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: {
-      clientId: fixtures.common.clientId,
-      secret: fixtures.secret.clientId,
-      realmUrl: 42
-    }
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: {
-      clientId: fixtures.common.clientId,
-      secret: fixtures.secret.clientId,
-      realmUrl: true
-    }
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: {
-      clientId: fixtures.common.clientId,
-      secret: fixtures.secret.clientId,
-      realmUrl: []
-    }
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: {
-      clientId: fixtures.common.clientId,
-      secret: fixtures.secret.clientId,
-      realmUrl: new RegExp()
-    }
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: {
-      clientId: fixtures.common.clientId,
-      secret: fixtures.secret.clientId,
-      realmUrl: {}
-    }
-  }), Error)
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      realmUrl: invalid
+    })), Error, helpers.log('realmUrl', invalid))
+  })
 })
 
-test('throw error if options are invalid – client.clientId', (t) => {
-  t.throws(() => utils.verify({
-    client: {
-      realmUrl: fixtures.common.clientId,
-      secret: fixtures.secret.clientId,
-      clientId: null
-    }
-  }), Error)
+test('throw error if options are invalid – clientId', (t) => {
+  const invalids = [
+    null,
+    undefined,
+    NaN,
+    '',
+    42,
+    true,
+    false,
+    [],
+    new RegExp(),
+    {}
+  ]
 
-  t.throws(() => utils.verify({
-    client: {
-      realmUrl: fixtures.common.clientId,
-      secret: fixtures.secret.clientId,
-      clientId: undefined
-    }
-  }), Error)
+  t.plan(invalids.length)
 
-  t.throws(() => utils.verify({
-    client: {
-      realmUrl: fixtures.common.clientId,
-      secret: fixtures.secret.clientId,
-      clientId: NaN
-    }
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: {
-      realmUrl: fixtures.common.clientId,
-      secret: fixtures.secret.clientId,
-      clientId: 42
-    }
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: {
-      realmUrl: fixtures.common.clientId,
-      secret: fixtures.secret.clientId,
-      clientId: ''
-    }
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: {
-      realmUrl: fixtures.common.clientId,
-      secret: fixtures.secret.clientId,
-      clientId: true
-    }
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: {
-      realmUrl: fixtures.common.clientId,
-      secret: fixtures.secret.clientId,
-      clientId: []
-    }
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: {
-      realmUrl: fixtures.common.clientId,
-      secret: fixtures.secret.clientId,
-      clientId: new RegExp()
-    }
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: {
-      realmUrl: fixtures.common.clientId,
-      secret: fixtures.secret.clientId,
-      clientId: {}
-    }
-  }), Error)
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      clientId: invalid
+    })), Error, helpers.log('clientId', invalid))
+  })
 })
 
-test('throw error if options are invalid – client.secret', (t) => {
-  t.throws(() => utils.verify({
-    client: {
-      realmUrl: fixtures.common.clientId,
-      clientId: fixtures.common.clientId,
-      secret: null
-    }
-  }), Error)
+test('throw error if options are invalid – secret', (t) => {
+  const invalids = [
+    null,
+    NaN,
+    '',
+    42,
+    true,
+    false,
+    [],
+    new RegExp(),
+    {}
+  ]
 
-  t.throws(() => utils.verify({
-    client: {
-      realmUrl: fixtures.common.clientId,
-      clientId: fixtures.common.clientId,
-      secret: undefined
-    }
-  }), Error)
+  t.plan(invalids.length)
 
-  t.throws(() => utils.verify({
-    client: {
-      realmUrl: fixtures.common.clientId,
-      clientId: fixtures.common.clientId,
-      secret: NaN
-    }
-  }), Error)
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      secret: invalid
+    })), Error, helpers.log('secret', invalid))
+  })
+})
 
-  t.throws(() => utils.verify({
-    client: {
-      realmUrl: fixtures.common.clientId,
-      clientId: fixtures.common.clientId,
-      secret: 42
+test('throw error if options are invalid – publicKey', (t) => {
+  const invalids = [
+    null,
+    NaN,
+    '',
+    'foobar',
+    fixtures.common.baseUrl,
+    42,
+    true,
+    false,
+    [],
+    new RegExp(),
+    {},
+    {
+      foobar: 42
     }
-  }), Error)
+  ]
 
-  t.throws(() => utils.verify({
-    client: {
-      realmUrl: fixtures.common.clientId,
-      clientId: fixtures.common.clientId,
-      secret: ''
-    }
-  }), Error)
+  t.plan(invalids.length)
 
-  t.throws(() => utils.verify({
-    client: {
-      realmUrl: fixtures.common.clientId,
-      clientId: fixtures.common.clientId,
-      secret: true
-    }
-  }), Error)
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      secret: undefined,
+      publicKey: invalid
+    })), Error, helpers.log('publicKey', invalid))
+  })
+})
 
-  t.throws(() => utils.verify({
-    client: {
-      realmUrl: fixtures.common.clientId,
-      clientId: fixtures.common.clientId,
-      secret: []
-    }
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: {
-      realmUrl: fixtures.common.clientId,
-      clientId: fixtures.common.clientId,
-      secret: new RegExp()
-    }
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: {
-      realmUrl: fixtures.common.clientId,
-      clientId: fixtures.common.clientId,
-      secret: {}
-    }
-  }), Error)
+test('throw error if options are invalid – publicKey/secret conflict', (t) => {
+  t.throws(() => utils.verify(helpers.getOptions({
+    publicKey: fixtures.common.publicKey
+  })), Error, 'publicKey/secret: both defined')
 })
 
 test('throw error if options are invalid – cache', (t) => {
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    cache: null
-  }), Error)
+  const invalids = [
+    null,
+    NaN,
+    '',
+    'foobar',
+    fixtures.common.baseUrl,
+    42,
+    []
+  ]
 
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    cache: NaN
-  }), Error)
+  t.plan(invalids.length)
 
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    cache: ''
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    cache: 'foobar'
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    cache: 42
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    cache: true
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    cache: []
-  }), Error)
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      cache: invalid
+    })), Error, helpers.log('cache', invalid))
+  })
 })
 
 test('throw error if options are invalid – userInfo', (t) => {
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    userInfo: null
-  }), Error)
+  const invalids = [
+    null,
+    NaN,
+    '',
+    'foobar',
+    fixtures.common.baseUrl,
+    42,
+    true,
+    false,
+    new RegExp(),
+    {},
+    [ null ],
+    [ undefined ],
+    [ NaN ],
+    [ '' ],
+    [ 42 ],
+    [ true ],
+    [ false ],
+    [ [] ],
+    [ new RegExp() ],
+    [ {} ]
+  ]
 
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    userInfo: NaN
-  }), Error)
+  t.plan(invalids.length)
 
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    userInfo: ''
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    userInfo: 'foobar'
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    userInfo: 42
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    userInfo: true
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    userInfo: [null]
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    userInfo: [undefined]
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    userInfo: [NaN]
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    userInfo: [42]
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    userInfo: [true]
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    userInfo: ['']
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    userInfo: [{}]
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    userInfo: [[]]
-  }), Error)
-
-  t.throws(() => utils.verify({
-    client: fixtures.clientConfig,
-    userInfo: [new RegExp()]
-  }), Error)
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      userInfo: invalid
+    })), Error, helpers.log('userInfo', invalid))
+  })
 })
 
-test('throw no error if options are valid', (t) => {
-  t.notThrows(() => utils.verify({
-    client: fixtures.clientConfig
-  }), Error)
+test('throw error if options are invalid – minTimeBetweenJwksRequests', (t) => {
+  const invalids = [
+    null,
+    NaN,
+    '',
+    'foobar',
+    fixtures.common.baseUrl,
+    -42,
+    4.2,
+    true,
+    false,
+    new RegExp(),
+    {}
+  ]
 
-  t.notThrows(() => utils.verify({
-    client: fixtures.clientConfig,
-    cache: undefined
-  }), Error)
+  t.plan(invalids.length)
 
-  t.notThrows(() => utils.verify({
-    client: fixtures.clientConfig,
-    cache: {}
-  }), Error)
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      userInfo: invalid
+    })), Error, helpers.log('minTimeBetweenJwksRequests', invalid))
+  })
+})
 
-  t.notThrows(() => utils.verify({
-    client: fixtures.clientConfig,
-    cache: {
-      segment: 'foobar'
-    }
-  }), Error)
+test('throw no error if options are valid – secret', (t) => {
+  const valids = [
+    {},
+    { secret: undefined },
+    { cache: {} },
+    { cache: { segment: 'foobar' } },
+    { cache: true },
+    { cache: false },
+    { userInfo: [] },
+    { userInfo: ['string'] }
+  ]
 
-  t.notThrows(() => utils.verify({
-    client: fixtures.clientConfig,
-    cache: false
-  }), Error)
+  t.plan(valids.length)
 
-  t.notThrows(() => utils.verify({
-    client: fixtures.clientConfig,
-    userInfo: undefined
-  }), Error)
+  valids.forEach((valid) => {
+    t.notThrows(
+      () => utils.verify(helpers.getOptions(valid)),
+      Error, helpers.log('valid.secret', valid))
+  })
+})
 
-  t.notThrows(() => utils.verify({
-    client: fixtures.clientConfig,
-    userInfo: []
-  }), Error)
+test('throw no error if options are valid – offline', (t) => {
+  const valids = [
+    { cache: {} },
+    { cache: { segment: 'foobar' } },
+    { cache: true },
+    { cache: false },
+    { userInfo: [] },
+    { userInfo: ['string'] },
+    { minTimeBetweenJwksRequests: 0 },
+    { minTimeBetweenJwksRequests: 42 }
+  ]
 
-  t.notThrows(() => utils.verify({
-    client: fixtures.clientConfig,
-    userInfo: ['string']
-  }), Error)
+  t.plan(valids.length)
+
+  valids.forEach((valid) => {
+    t.notThrows(
+      () => utils.verify(helpers.getOptions(Object.assign({
+        secret: undefined,
+        publicKey: undefined
+      }, valid))),
+      Error, helpers.log('valid.offline', valid))
+  })
+})
+
+test('throw no error if options are valid – publicKey/string', (t) => {
+  const valids = [
+    { cache: {} },
+    { cache: { segment: 'foobar' } },
+    { cache: true },
+    { cache: false },
+    { userInfo: [] },
+    { userInfo: ['string'] },
+    { minTimeBetweenJwksRequests: 0 },
+    { minTimeBetweenJwksRequests: 42 }
+  ]
+
+  t.plan(valids.length)
+
+  valids.forEach((valid) => {
+    t.notThrows(
+      () => utils.verify(helpers.getOptions(Object.assign({
+        secret: undefined,
+        publicKey: fixtures.common.publicKey
+      }, valid))),
+      Error, helpers.log('valid.publicKey.string', valid))
+  })
+})
+
+test('throw no error if options are valid – publicKey/Buffer', (t) => {
+  const valids = [
+    {},
+    { cache: {} },
+    { cache: { segment: 'foobar' } },
+    { cache: true },
+    { cache: false },
+    { userInfo: [] },
+    { userInfo: ['string'] },
+    { minTimeBetweenJwksRequests: 0 },
+    { minTimeBetweenJwksRequests: 42 }
+  ]
+
+  t.plan(valids.length)
+
+  valids.forEach((valid) => {
+    t.notThrows(
+      () => utils.verify(helpers.getOptions(Object.assign({
+        secret: undefined,
+        publicKey: fixtures.common.publicKeyBuffer
+      }, valid))),
+      Error, helpers.log('valid.publicKey.Buffer', valid))
+  })
+})
+
+test('throw no error if options are valid – publicKey/Buffer/string', (t) => {
+  const valids = [
+    {},
+    { cache: {} },
+    { cache: { segment: 'foobar' } },
+    { cache: true },
+    { cache: false },
+    { userInfo: [] },
+    { userInfo: ['string'] },
+    { minTimeBetweenJwksRequests: 0 },
+    { minTimeBetweenJwksRequests: 42 }
+  ]
+
+  t.plan(valids.length)
+
+  valids.forEach((valid) => {
+    t.notThrows(
+      () => utils.verify(helpers.getOptions(Object.assign({
+        secret: undefined,
+        publicKey: fixtures.common.publicKeyBuffer.toString()
+      }, valid))),
+      Error, helpers.log('valid.publicKey.Buffer.string', valid))
+  })
+})
+
+test('throw no error if options are valid – publicKey/JWK', (t) => {
+  const valids = [
+    {},
+    { cache: {} },
+    { cache: { segment: 'foobar' } },
+    { cache: true },
+    { cache: false },
+    { userInfo: [] },
+    { userInfo: ['string'] },
+    { minTimeBetweenJwksRequests: 0 },
+    { minTimeBetweenJwksRequests: 42 }
+  ]
+
+  t.plan(valids.length)
+
+  valids.forEach((valid) => {
+    t.notThrows(
+      () => utils.verify(helpers.getOptions(Object.assign({
+        secret: undefined,
+        publicKey: fixtures.common.publicKeyJWK
+      }, valid))),
+      Error, helpers.log('valid.publicKey.JWK', valid))
+  })
 })
