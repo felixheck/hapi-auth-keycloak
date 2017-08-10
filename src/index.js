@@ -1,5 +1,5 @@
 const { GrantManager } = require('keycloak-auth-utils')
-const Token = require('keycloak-auth-utils/lib/token')
+const KeycloakToken = require('keycloak-auth-utils/lib/token')
 const cache = require('./cache')
 const token = require('./token')
 const { error, fakeReply, verify } = require('./utils')
@@ -27,7 +27,8 @@ let store
  * @returns {Promise} The error-handled promise
  */
 function validateSignedJwt (tkn) {
-  return manager.validateToken(new Token(tkn, options.clientId))
+  const kcTkn = new KeycloakToken(tkn, options.clientId)
+  return manager.validateToken(kcTkn)
 }
 
 /**
