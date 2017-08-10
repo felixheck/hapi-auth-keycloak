@@ -6,7 +6,7 @@ const { error, fakeReply, verify } = require('./utils')
 const pkg = require('../package.json')
 
 /**
- * @type {Object|GrantManager}
+ * @type {Object}
  * @private
  *
  * The plugin related options and instances.
@@ -85,20 +85,20 @@ function handleKeycloakValidation (tkn, reply) {
  * If yes, return cached user data. Otherwise
  * handle validation with help of Keycloak.
  *
- * @param {string} field The authorization field, e.g. the value of `Authorization`
- * @param {Function} reply The callback handler
+ * @param {string} d The authorization field, e.g. the value of `Authorization`
+ * @param {Function} done The callback handler
  */
-function validate (field, reply) {
+function validate (field, done) {
   const tkn = token.create(field)
-  const done = fakeReply(reply)
+  const reply = fakeReply(done)
 
   if (!tkn) {
-    return done(error('unauthorized', error.msg.missing))
+    return reply(error('unauthorized', error.msg.missing))
   }
 
   cache.get(store, tkn, (err, cached) => {
     const isCached = cached && !err
-    isCached ? done.continue(cached) : handleKeycloakValidation(tkn, done)
+    isCached ? reply.continue(cached) : handleKeycloakValidation(tkn, reply)
   })
 }
 
@@ -117,10 +117,7 @@ function validate (field, reply) {
 function strategy (server) {
   return {
     authenticate (request, reply) {
-      return server.kjwt.validate(
-        request.raw.req.headers.authorization,
-        reply
-      )
+      return validate(request.raw.req.headers.authorization, reply)
     }
   }
 }
