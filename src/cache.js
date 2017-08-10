@@ -8,7 +8,7 @@
  * @param {Object|boolean} opts The instance its options
  * @returns {Object|false} The cache instance
  */
-function init (server, opts) {
+function create (server, opts) {
   return opts ? server.cache(opts === true ? {} : opts) : false
 }
 
@@ -45,7 +45,7 @@ function set (cache, key, value, ttl, done) {
 }
 
 module.exports = {
-  init,
+  create,
   get,
   set
 }
