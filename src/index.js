@@ -23,11 +23,11 @@ let store
  * public key or online with help of the Keycloak server and
  * JWKS. Resolve if the verification succeeded.
  *
- * @param {string} token The token to be validated
+ * @param {string} tkn The token to be validated
  * @returns {Promise} The error-handled promise
  */
-function validateSignedJwt (token) {
-  return manager.validateToken(new Token(token, options.clientId))
+function validateSignedJwt (tkn) {
+  return manager.validateToken(new Token(tkn, options.clientId))
 }
 
 /**
@@ -38,16 +38,16 @@ function validateSignedJwt (token) {
  * Keycloak server, the client identifier and its secret.
  * Resolve if the request succeeded and token is valid.
  *
- * @param {string} token The token to be validated
+ * @param {string} tkn The token to be validated
  * @returns {Promise} The error-handled promise
  */
-function validateSecret (token) {
-  return manager.validateAccessToken(token).then((res) => {
+function validateSecret (tkn) {
+  return manager.validateAccessToken(tkn).then((res) => {
     if (res === false) {
       throw Error(error.msg.invalid)
     }
 
-    return token
+    return tkn
   })
 }
 
@@ -65,11 +65,11 @@ function validateSecret (token) {
 function handleKeycloakValidation (tkn, reply) {
   const validateFn = options.secret ? validateSecret : validateSignedJwt
 
-  validateFn(tkn.get()).then(() => {
-    const { expiresIn, credentials } = tkn.getData(options.userInfo)
+  validateFn(tkn).then(() => {
+    const { expiresIn, credentials } = token.getData(tkn, options.userInfo)
     const userData = { credentials }
 
-    cache.set(store, tkn.get(), userData, expiresIn)
+    cache.set(store, tkn, userData, expiresIn)
     reply.continue(userData)
   }).catch((err) => {
     reply(error('unauthorized', err, error.msg.invalid))
@@ -88,14 +88,14 @@ function handleKeycloakValidation (tkn, reply) {
  * @param {Function} reply The callback handler
  */
 function validate (field, reply) {
-  const tkn = token(field)
+  const tkn = token.create(field)
   const done = fakeReply(reply)
 
   if (!tkn) {
     return done(error('unauthorized', error.msg.missing))
   }
 
-  cache.get(store, tkn.get(), (err, cached) => {
+  cache.get(store, tkn, (err, cached) => {
     const isCached = cached && !err
     isCached ? done.continue(cached) : handleKeycloakValidation(tkn, done)
   })

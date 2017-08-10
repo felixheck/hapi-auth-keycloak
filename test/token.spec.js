@@ -3,63 +3,63 @@ const fixtures = require('./fixtures')
 const token = require('../src/token')
 
 test('enable multiple instances', (t) => {
-  const tkn1 = token('bearer a.b.c')
-  const tkn2 = token('bearer c.b.a')
+  const tkn1 = token.create('bearer a.b.c')
+  const tkn2 = token.create('bearer c.b.a')
   t.truthy(tkn1)
   t.truthy(tkn2)
-  t.is(tkn1.get(), 'a.b.c')
-  t.is(tkn2.get(), 'c.b.a')
+  t.is(tkn1, 'a.b.c')
+  t.is(tkn2, 'c.b.a')
 })
 
 test('get bearer token – lowercase', (t) => {
-  const tkn = token('bearer a.b.c')
+  const tkn = token.create('bearer a.b.c')
   t.truthy(tkn)
-  t.is(tkn.get(), 'a.b.c')
+  t.is(tkn, 'a.b.c')
 })
 
 test('get bearer token – uppercase', (t) => {
-  const tkn = token('Bearer a.b.c')
+  const tkn = token.create('Bearer a.b.c')
   t.truthy(tkn)
-  t.is(tkn.get(), 'a.b.c')
+  t.is(tkn, 'a.b.c')
 })
 
 test('get bearer token – capitalcase', (t) => {
-  const tkn = token('BEARER a.b.c')
+  const tkn = token.create('BEARER a.b.c')
   t.truthy(tkn)
-  t.is(tkn.get(), 'a.b.c')
+  t.is(tkn, 'a.b.c')
 })
 
 test('get no bearer token – wrong scheme', (t) => {
-  const tkn = token('beareer a.b.c')
+  const tkn = token.create('beareer a.b.c')
   t.falsy(tkn)
 })
 
 test('get no bearer token – multiple spaces', (t) => {
-  const tkn = token('bearer  a.b.c')
+  const tkn = token.create('bearer  a.b.c')
   t.falsy(tkn)
 })
 
 test('get no bearer token – too less segments', (t) => {
-  const tkn = token('bearer  a.b')
+  const tkn = token.create('bearer  a.b')
   t.falsy(tkn)
 })
 
 test('get no bearer token – spaces between', (t) => {
-  const tkn = token('bearer  a.b.c c')
+  const tkn = token.create('bearer  a.b.c c')
   t.falsy(tkn)
 })
 
 test('get decoded content part of token', (t) => {
   const jwt = `bearer ${fixtures.jwt.userData}`
-  const tkn = token(jwt)
+  const tkn = token.create(jwt)
 
-  t.deepEqual(tkn.getContent(), fixtures.content.userData)
+  t.deepEqual(token.getContent(tkn), fixtures.content.userData)
 })
 
 test('get user data of token', (t) => {
   const jwt = `bearer ${fixtures.jwt.userData}`
-  const tkn = token(jwt)
-  const data = tkn.getData()
+  const tkn = token.create(jwt)
+  const data = token.getData(tkn)
 
   t.truthy(data)
   t.is(data.expiresIn, 4000)
@@ -70,8 +70,8 @@ test('get user data of token', (t) => {
 
 test('get user data of token – additional fields', (t) => {
   const jwt = `bearer ${fixtures.jwt.userData}`
-  const tkn = token(jwt)
-  const data = tkn.getData(['name'])
+  const tkn = token.create(jwt)
+  const data = token.getData(tkn, ['name'])
 
   t.truthy(data)
   t.is(data.expiresIn, 4000)
@@ -82,8 +82,8 @@ test('get user data of token – additional fields', (t) => {
 
 test('get user data of token – default expiration', (t) => {
   const jwt = `bearer ${fixtures.jwt.userDataExp}`
-  const tkn = token(jwt)
-  const data = tkn.getData()
+  const tkn = token.create(jwt)
+  const data = token.getData(tkn)
 
   t.truthy(data)
   t.is(data.expiresIn, 60000)
@@ -94,8 +94,8 @@ test('get user data of token – default expiration', (t) => {
 
 test('get user data of token – default scopes', (t) => {
   const jwt = `bearer ${fixtures.jwt.userDataScope}`
-  const tkn = token(jwt)
-  const data = tkn.getData()
+  const tkn = token.create(jwt)
+  const data = token.getData(tkn)
 
   t.truthy(data)
   t.is(data.expiresIn, 4000)
