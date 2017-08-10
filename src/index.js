@@ -6,7 +6,7 @@ const { error, fakeReply, verify } = require('./utils')
 const pkg = require('../package.json')
 
 /**
- * @type {Object}
+ * @type {Object|GrantManager}
  * @private
  *
  * The plugin related options and instances.
