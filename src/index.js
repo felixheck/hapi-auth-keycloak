@@ -139,7 +139,7 @@ function strategy (server) {
 function plugin (server, opts, next) {
   options = verify(opts)
   manager = new GrantManager(options)
-  store = cache.init(server, options.cache)
+  store = cache.create(server, options.cache)
 
   server.auth.scheme('keycloak-jwt', strategy)
   server.decorate('server', 'kjwt', { validate })
