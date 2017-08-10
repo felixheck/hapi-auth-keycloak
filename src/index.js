@@ -9,10 +9,11 @@ const pkg = require('../package.json')
  * @type {Object|GrantManager}
  * @private
  *
- * The plugin related options and GrantManager instance.
+ * The plugin related options and instances.
  */
 let options
 let manager
+let store
 
 /**
  * @function
@@ -68,7 +69,7 @@ function handleKeycloakValidation (tkn, reply) {
     const { expiresIn, credentials } = tkn.getData(options.userInfo)
     const userData = { credentials }
 
-    cache.set(tkn.get(), userData, expiresIn)
+    cache.set(store, tkn.get(), userData, expiresIn)
     reply.continue(userData)
   }).catch((err) => {
     reply(error('unauthorized', err, error.msg.invalid))
@@ -94,7 +95,7 @@ function validate (field, reply) {
     return done(error('unauthorized', error.msg.missing))
   }
 
-  cache.get(tkn.get(), (err, cached) => {
+  cache.get(store, tkn.get(), (err, cached) => {
     const isCached = cached && !err
     isCached ? done.continue(cached) : handleKeycloakValidation(tkn, done)
   })
@@ -138,8 +139,7 @@ function strategy (server) {
 function plugin (server, opts, next) {
   options = verify(opts)
   manager = new GrantManager(options)
-
-  cache.init(server, options.cache)
+  store = cache.init(server, options.cache)
 
   server.auth.scheme('keycloak-jwt', strategy)
   server.decorate('server', 'kjwt', { validate })

@@ -1,25 +1,15 @@
-let instance
-
 /**
  * @function
  * @public
  *
- * Initiate a cache singleton
+ * Initiate a cache
  *
  * @param {Hapi.Server} server The created server instance
  * @param {Object|boolean} opts The instance its options
- * @returns {Object} The cache instance
+ * @returns {Object|false} The cache instance
  */
 function init (server, opts) {
-  if (instance === undefined) {
-    if (opts === false) {
-      instance = false
-    } else {
-      instance = server.cache(opts === true ? {} : opts)
-    }
-  }
-
-  return instance
+  return opts ? server.cache(opts === true ? {} : opts) : false
 }
 
 /**
@@ -29,11 +19,12 @@ function init (server, opts) {
  * Get value out of cache by key.
  * Just if cache is initiated.
  *
+ * @param {Object} The cache instance
  * @param {*} key The key to be searched
  * @param {Function} done The callback handler
  */
-function get (key, done) {
-  instance ? instance.get(key, done) : done(null, false)
+function get (cache, key, done) {
+  cache ? cache.get(key, done) : done(null, false)
 }
 
 /**
@@ -43,29 +34,18 @@ function get (key, done) {
  * Set value specified by key in cache.
  * Just if cache is initiated.
  *
+ * @param {Object} The cache instance
  * @param {*} key The key to be indexed
  * @param {*} value The value to be stored
  * @param {number} ttl The time to live
  * @param {Function} done The callback handler
  */
-function set (key, value, ttl, done) {
-  instance && instance.set(key, value, ttl, done)
-}
-
-/**
- * @function
- * @public
- *
- * Reset the current cache instance
- *
- */
-function reset () {
-  instance = undefined
+function set (cache, key, value, ttl, done) {
+  cache && cache.set(key, value, ttl, done)
 }
 
 module.exports = {
   init,
   get,
-  set,
-  reset
+  set
 }
