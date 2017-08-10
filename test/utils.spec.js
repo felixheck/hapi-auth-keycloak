@@ -25,18 +25,21 @@ test('get boom error with error message', (t) => {
 
 test('decorate callback function with `continue`', (t) => {
   const mockFn = function () {}
+  const fake = utils.fakeReply(mockFn)
 
-  utils.fakeReply(mockFn)
   t.truthy(mockFn.continue)
+  t.truthy(fake.continue)
+  t.deepEqual(mockFn, fake)
 })
 
 test('ignore callback function with exsting `continue`', (t) => {
   const mockFn = function () {}
   mockFn.continue = 'foo'
+  const fake = utils.fakeReply(mockFn)
 
-  utils.fakeReply(mockFn)
-  t.truthy(mockFn.continue)
-  t.is(mockFn.continue, 'foo')
+  t.truthy(fake.continue)
+  t.is(fake.continue, 'foo')
+  t.deepEqual(mockFn, fake)
 })
 
 test('throw error if options are empty', (t) => {

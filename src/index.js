@@ -88,15 +88,15 @@ function handleKeycloakValidation (tkn, reply) {
  */
 function validate (field, reply) {
   const tkn = token(field)
-  fakeReply(reply)
+  const done = fakeReply(reply)
 
   if (!tkn) {
-    return reply(error('unauthorized', error.msg.missing))
+    return done(error('unauthorized', error.msg.missing))
   }
 
   cache.get(tkn.get(), (err, cached) => {
     const isCached = cached && !err
-    isCached ? reply.continue(cached) : handleKeycloakValidation(tkn, reply)
+    isCached ? done.continue(cached) : handleKeycloakValidation(tkn, done)
   })
 }
 

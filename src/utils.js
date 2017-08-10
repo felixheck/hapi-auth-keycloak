@@ -89,11 +89,14 @@ error.msg = {
  * error-first but error-less `continue` method.
  *
  * @param {Function} reply
+ * @returns {Function} The decorated function
  */
 function fakeReply (reply) {
   if (!reply.continue) {
     reply.continue = reply.bind(undefined, null)
   }
+
+  return reply
 }
 
 module.exports = {
