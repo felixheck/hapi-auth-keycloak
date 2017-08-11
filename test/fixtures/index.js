@@ -3,11 +3,12 @@ const jsonwebtoken = require('jsonwebtoken')
 
 const token = 'abc.def.ghi'
 const baseUrl = 'http://localhost:8080'
-const realmPath = '/auth/realms/testme'
-const introspectPath = '/protocol/openid-connect/token/introspect'
-const realmUrl = `${baseUrl}${realmPath}`
 const clientId = 'foobar'
 const secret = '1234-bar-4321-foo'
+const realmPath = '/auth/realms/testme'
+const introspectPath = '/protocol/openid-connect/token/introspect'
+const entitlementPath = `/authz/entitlement/${clientId}`
+const realmUrl = `${baseUrl}${realmPath}`
 const publicKeyBuffer = fs.readFileSync('./test/fixtures/public.pem')
 const publicKey = `-----BEGIN PUBLIC KEY-----
 MIICCgKCAgEAur96MoQa/blg5eJFqmN//V4oQjKaBJl6KEvWSGAVgRm2PsnFKzCJ
@@ -81,7 +82,8 @@ const common = Object.assign({}, clientConfig, {
   baseUrl,
   token,
   realmPath,
-  introspectPath
+  introspectPath,
+  entitlementPath
 })
 
 /**
@@ -131,12 +133,19 @@ const contentBase = {
  */
 const content = {
   userData: Object.assign({
-    'exp': 5,
-    'iat': 1
+    exp: 5,
+    iat: 1
   }, contentBase),
   userDataNoExp: Object.assign({
-    'exp': (Date.now() / 1000) + 60 * 60,
-    'iat': (Date.now() / 1000) + 60 * 15
+    exp: (Date.now() / 1000) + 60 * 60,
+    iat: (Date.now() / 1000) + 60 * 15
+  }, contentBase),
+  userDataRpt: Object.assign({
+    authorization: {
+      permissions: {
+        scopes: ['foo.READ', 'foo.WRITE']
+      }
+    }
   }, contentBase)
 }
 

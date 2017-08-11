@@ -8,7 +8,7 @@ test.afterEach.always('reset instances and prototypes', () => {
 })
 
 test.cb.serial('authentication does succeed', (t) => {
-  helpers.mock(200, fixtures.content.userData)
+  helpers.mockIntrospect(200, fixtures.content.userData)
 
   helpers.getServer(undefined, (server) => {
     server.inject({
@@ -26,7 +26,7 @@ test.cb.serial('authentication does succeed', (t) => {
 })
 
 test.cb.serial('authentication does succeed – cached', (t) => {
-  helpers.mock(200, fixtures.content.userData)
+  helpers.mockIntrospect(200, fixtures.content.userData)
 
   const mockReq = {
     method: 'GET',
@@ -50,7 +50,7 @@ test.cb.serial('authentication does succeed – cached', (t) => {
 })
 
 test.cb.serial('authentication does success – valid roles', (t) => {
-  helpers.mock(200, fixtures.content.userData)
+  helpers.mockIntrospect(200, fixtures.content.userData)
 
   helpers.getServer(undefined, (server) => {
     server.inject({
@@ -68,7 +68,7 @@ test.cb.serial('authentication does success – valid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid roles', (t) => {
-  helpers.mock(200, fixtures.content.userData)
+  helpers.mockIntrospect(200, fixtures.content.userData)
 
   helpers.getServer(undefined, (server) => {
     server.inject({
@@ -86,7 +86,7 @@ test.cb.serial('authentication does fail – invalid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid token', (t) => {
-  helpers.mock(200, { active: false })
+  helpers.mockIntrospect(200, { active: false })
 
   helpers.getServer(undefined, (server) => {
     server.inject({

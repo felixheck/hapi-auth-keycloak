@@ -37,9 +37,26 @@ function getOptions (customs) {
  * @param {Object} data The response object to be returned
  * @param {boolean} [isError=false] Whether to reply with an error
  */
-function mock (code, data, isError = false) {
+function mockIntrospect (code, data, isError = false) {
   const base = nock(fixtures.common.baseUrl)
     .post(`${fixtures.common.realmPath}${fixtures.common.introspectPath}`)
+
+  isError ? base.replyWithError(data) : base.reply(code, data)
+}
+
+/**
+ * @function
+ * @public
+ *
+ * Mock entitlement request to the Keycloak server.
+ *
+ * @param {number} code The status code to be returned
+ * @param {Object} data The response object to be returned
+ * @param {boolean} [isError=false] Whether to reply with an error
+ */
+function mockEntitlement (code, data, isError = false) {
+  const base = nock(fixtures.common.baseUrl)
+    .get(`${fixtures.common.realmPath}${fixtures.common.entitlementPath}`)
 
   isError ? base.replyWithError(data) : base.reply(code, data)
 }
@@ -74,7 +91,7 @@ function registerRoutes (server) {
       config: {
         auth: 'keycloak-jwt',
         handler (req, reply) {
-          reply({ foo: 42 })
+          reply(req.auth.credentials.scope)
         }
       }
     },
@@ -89,7 +106,7 @@ function registerRoutes (server) {
           }
         },
         handler (req, reply) {
-          reply({ foo: 42 })
+          reply(req.auth.credentials.scope)
         }
       }
     },
@@ -104,7 +121,22 @@ function registerRoutes (server) {
           }
         },
         handler (req, reply) {
-          reply({ foo: 42 })
+          reply(req.auth.credentials.scope)
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/role/rpt',
+      config: {
+        auth: {
+          strategies: ['keycloak-jwt'],
+          access: {
+            scope: ['scope:foo.READ']
+          }
+        },
+        handler (req, reply) {
+          reply(req.auth.credentials.scope)
         }
       }
     }
@@ -158,7 +190,8 @@ function getServer (options, done) {
 
 module.exports = {
   getOptions,
-  mock,
+  mockIntrospect,
+  mockEntitlement,
   log,
   getServer,
   registerPlugin

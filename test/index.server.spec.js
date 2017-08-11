@@ -8,7 +8,7 @@ test.afterEach.always('reset instances and prototypes', () => {
 })
 
 test.cb.serial('server method – authentication does succeed', (t) => {
-  helpers.mock(200, fixtures.content.userData)
+  helpers.mockIntrospect(200, fixtures.content.userData)
 
   helpers.getServer(undefined, (server) => {
     server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, (err, res) => {
@@ -21,8 +21,8 @@ test.cb.serial('server method – authentication does succeed', (t) => {
 })
 
 test.cb.serial('server method – authentication does succeed – cache', (t) => {
-  helpers.mock(200, fixtures.content.userData)
-  helpers.mock(200, fixtures.content.userData)
+  helpers.mockIntrospect(200, fixtures.content.userData)
+  helpers.mockIntrospect(200, fixtures.content.userData)
 
   helpers.getServer(undefined, (server) => {
     server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, () => {
@@ -37,7 +37,7 @@ test.cb.serial('server method – authentication does succeed – cache', (t) =
 })
 
 test.cb.serial('server method – authentication does fail – invalid token', (t) => {
-  helpers.mock(200, { active: false })
+  helpers.mockIntrospect(200, { active: false })
 
   helpers.getServer(undefined, (server) => {
     server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, (err, res) => {
@@ -65,7 +65,7 @@ test.cb.serial('server method – authentication does fail – invalid header', 
 })
 
 test.cb.serial('server method – authentication does fail – error', (t) => {
-  helpers.mock(400, 'an error', true)
+  helpers.mockIntrospect(400, 'an error', true)
 
   helpers.getServer(undefined, (server) => {
     server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, (err, res) => {
