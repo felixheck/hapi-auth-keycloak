@@ -41,7 +41,6 @@
     "ava": "^0.20.0",
     "coveralls": "^2.13.1",
     "hapi": "^16.4.3",
-    "jsonwebtoken": "^7.4.1",
     "nock": "^9.0.14",
     "nyc": "^11.0.3",
     "standard": "^10.0.2"
@@ -50,6 +49,7 @@
     "axios": "^0.16.2",
     "boom": "^5.2.0",
     "joi": "^10.6.0",
+    "jsonwebtoken": "^7.4.1",
     "keycloak-auth-utils": "^3.2.1",
     "lodash": "^4.17.4"
   },

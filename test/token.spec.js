@@ -49,13 +49,6 @@ test('get no bearer token – spaces between', (t) => {
   t.falsy(tkn)
 })
 
-test('get decoded content part of token', (t) => {
-  const jwt = `bearer ${fixtures.jwt.userData}`
-  const tkn = token.create(jwt)
-
-  t.deepEqual(token.getContent(tkn), fixtures.content.userData)
-})
-
 test('get user data of token', (t) => {
   const jwt = `bearer ${fixtures.jwt.userData}`
   const tkn = token.create(jwt)

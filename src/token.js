@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const jwt = require('jsonwebtoken')
 
 /**
  * @function
@@ -73,20 +74,6 @@ function getUserInfo (content, fields = []) {
  * @function
  * @public
  *
- * Extract content out of token.
- * The content is the middle part.
- *
- * @param {string} tkn The token to be checked
- * @returns {Object} The token its content
- */
-function getContent (tkn) {
-  return JSON.parse(Buffer.from(tkn.split('.')[1], 'base64').toString())
-}
-
-/**
- * @function
- * @public
- *
  * Get various data out of token content.
  * Get the current scope of the user and
  * when the token expires.
@@ -95,7 +82,7 @@ function getContent (tkn) {
  * @returns {Object} The extracted data
  */
 function getData (tkn, userInfoFields) {
-  const content = getContent(tkn)
+  const content = jwt.decode(tkn)
 
   return {
     expiresIn: getExpiration(content),
@@ -122,6 +109,5 @@ function create (field) {
 
 module.exports = {
   create,
-  getContent,
   getData
 }
