@@ -82,6 +82,7 @@ Define your routes and add `keycloak-jwt` when necessary. It is possible to defi
 - To secure a resource with an application role for the current app, use the role name (e.g. `editor`).
 - To secure a resource with an application role for a different app, prefix the role name (e.g. `other-app:creator`)
 - To secure a resource with a realm role, prefix the role name with `realm:` (e.g. `realm:admin`).
+- To secure a resouce with [fine-grained scope definitions][rpt], prefix the Keycloak scopes with `scope:` (e.g. `scope:foo.READ`).
 
 ``` js
 server.route([
@@ -107,13 +108,13 @@ server.route([
 ## API
 #### Plugin Options
 
-> By default, the Keycloak server has built-in [two ways to authenticate][client-auth] the client: client ID and client secret, or with a signed JWT. This plugin supports both. Check the description of `secret` and `publicKey` for further information. If the signed JWTs are used as online strategy, ensure that the identifier of the related realm key is included in their header as `kid`.
+> By default, the Keycloak server has built-in [two ways to authenticate][client-auth] the client: client ID and client secret, or with a signed JWT. This plugin supports both. If the signed JWTs are used as online strategy, ensure that the identifier of the related realm key is included in their header as `kid`. Additionally the 'clientId/secret'-strategy enables [fine-grained scope definitions][rpt]. Check the description of `secret`/`publicKey` and the [terminology][rpt-terms] for further information. 
 >
-> | Strategy    | Online | Option      |
-> |:------------|:------:|:------------|
-> | ID + Secret | x      | `secret`    |
-> | Signed JWT  | x      |             |
-> | Signed JWT  |        | `publicKey` |
+> | Strategy    | Online | [Scopes][rpt] | Option      |
+> |:------------|:------:|:-------------:|:------------|
+> | ID + Secret | x      | x             | `secret`    |
+> | Signed JWT  | x      |               |             |
+> | Signed JWT  |        |               | `publicKey` |
 
 - `realmUrl {string}` – The absolute uri of the Keycloak realm.<br/>
 Required. Example: `https://localhost:8080/auth/realms/testme`<br/>
@@ -122,15 +123,12 @@ Required. Example: `https://localhost:8080/auth/realms/testme`<br/>
 Required. Example: `foobar`<br/>
 
 - `secret {string}` – The related secret of the Keycloak client/application.<br/>
-Defining this option enables the traditional method described in the OAuth2 specification. To perform an almost offline validation enable the cache — a simple offline verfication with symmetric keys is not provided for security reasons.<br/>
+Defining this option enables the traditional method described in the OAuth2 specification. To perform an almost offline validation enable the cache — a simple offline verfication with symmetric keys is not provided for security reasons. Instead [fine-grained scope definitions][rpt] are enabled.<br/>
 Optional. Example: `1234-bar-4321-foo`<br/>
   
 - `publicKey {string}` – The related public key of the Keycloak client/application.<br/>
 Defining this option enables the offline validation using signed JWTs. The public key has to be in [PEM][pem] or [JWK][jwk] format. If you define neither `secret` nor `public` key, the plugin assumes that a signed JWT has to be validated – it retrieves the public key itself from `{realmUrl}/protocol/openid-connect/certs`. The offline strategy its performance is higher but the online strategy is the most flexible one.<br/>
 Optional. 
-
-- `addScopes {boolean}` – Whether the Request Party Token should be retrieved and the scopes be included in the  `request.auth.credentials.scope` object. This enables are [more fine-grained authorization][rpt]. <br/>
-Optional. Default: `false`.
 
 - `minTimeBetweenJwksRequests {number}` – The minimum time between JWKS requests in seconds.<br/>
 The value have to be a positive integer.<br/>
@@ -245,3 +243,4 @@ For further information read the [contributing guideline](CONTRIBUTING.md).
 [pem]: https://tools.ietf.org/html/rfc1421
 [client-auth]: https://keycloak.gitbooks.io/documentation/securing_apps/topics/oidc/java/client-authentication.html
 [rpt]: http://www.keycloak.org/docs/2.4/authorization_services_guide/topics/service/entitlement/entitlement-api-aapi.html
+[rpt-terms]: http://www.keycloak.org/docs/2.4/authorization_services_guide/topics/overview/terminology.html
