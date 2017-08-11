@@ -24,6 +24,9 @@ const scheme = joi.object({
       kty: joi.string().required()
     }).unknown(true)
   ).description('The related public key of the Keycloak client/application'),
+  addScopes: joi.boolean().default(false)
+    .description('Whether the RPT should be retrieved and the scopes be added to `request.auth.credentials.scope`')
+    .example('true'),
   minTimeBetweenJwksRequests: joi.number().integer().positive().allow(0).default(0)
     .description('The minimum time between JWKS requests in seconds')
     .example(15),

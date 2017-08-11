@@ -1,3 +1,4 @@
+const axios = require('axios')
 const { GrantManager } = require('keycloak-auth-utils')
 const KeycloakToken = require('keycloak-auth-utils/lib/token')
 const cache = require('./cache')
@@ -54,26 +55,51 @@ function validateSecret (tkn) {
 
 /**
  * @function
+ * @private
+ *
+ * Retrieve the Requesting Party Token from the Keycloak Server
+ * and extracts the JSON Web Token. Resolves `undefined` if
+ * `options.addScopes` is disabled or an error occures.
+ *
+ * @param {string} tkn The token to be used for authentication
+ * @returns {Promise} The error-handled promise
+ */
+function getRpt (tkn) {
+  if (!options.addScopes) {
+    return Promise.resolve(undefined)
+  }
+
+  return axios.get(`${options.realmUrl}/authz/entitlement/${options.clientId}`, {
+    headers: {
+      authorization: `bearer ${tkn}`
+    }
+  }).then(({ data: { rpt } }) => rpt).catch(() => undefined)
+}
+
+/**
+ * @function
  * @public
  *
  * Validate a token either with the help of Keycloak
  * or a related public key. Store the user data in
  * cache if enabled.
  *
- * @param {string} token The token to be validated
+ * @param {string} tkn The token to be validated
  * @param {Function} reply The callback handler
  */
 function handleKeycloakValidation (tkn, reply) {
   const validateFn = options.secret ? validateSecret : validateSignedJwt
 
-  validateFn(tkn).then(() => {
-    const { expiresIn, credentials } = token.getData(tkn, options.userInfo)
-    const userData = { credentials }
+  getRpt(tkn).then((rpt) => {
+    validateFn(tkn).then(() => {
+      const { expiresIn, credentials } = token.getData(rpt || tkn, options.userInfo)
+      const userData = { credentials }
 
-    cache.set(store, tkn, userData, expiresIn)
-    reply.continue(userData)
-  }).catch((err) => {
-    reply(error('unauthorized', err, error.msg.invalid))
+      cache.set(store, tkn, userData, expiresIn)
+      reply.continue(userData)
+    }).catch((err) => {
+      reply(error('unauthorized', err, error.msg.invalid))
+    })
   })
 }
 

@@ -18,7 +18,7 @@ function extractToken (field) {
  * @function
  * @private
  *
- * Get scope out of token content.
+ * Get roles out of token content.
  * Exclude `account` roles and prefix realm roles
  * with `realm:`. Roles of other resources are prefixed
  * with their name.
@@ -27,16 +27,18 @@ function extractToken (field) {
  * @param {Object} [resource] The resource access data
  * @returns {Array.<?string>} The list of roles
  */
-function getScope ({
+function getRoles ({
   realm_access: realm = { roles: [] },
-  resource_access: resource = {}
+  resource_access: resource = {},
+  authorization: permissions = { permissions: [] }
 }) {
   delete resource.account
+
   const realmRoles = realm.roles.map(role => `realm:${role}`)
-
   const appRoles = _.flatten(_.map(resource, 'roles'))
+  const scopes = _.flatten(_.map(permissions), 'scopes').map(scope => `scope:${scope}`)
 
-  return [...realmRoles, ...appRoles]
+  return [...realmRoles, ...appRoles, ...scopes]
 }
 
 /**
@@ -89,7 +91,7 @@ function getContent (tkn) {
  * Get the current scope of the user and
  * when the token expires.
  *
-* @param {string} tkn The token to be checked
+ * @param {string} tkn The token to be checked
  * @returns {Object} The extracted data
  */
 function getData (tkn, userInfoFields) {
@@ -98,7 +100,7 @@ function getData (tkn, userInfoFields) {
   return {
     expiresIn: getExpiration(content),
     credentials: Object.assign({
-      scope: getScope(content)
+      scope: getRoles(content)
     }, getUserInfo(content, userInfoFields))
   }
 }
