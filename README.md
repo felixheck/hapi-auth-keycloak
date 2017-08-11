@@ -129,6 +129,9 @@ Optional. Example: `1234-bar-4321-foo`<br/>
 Defining this option enables the offline validation using signed JWTs. The public key has to be in [PEM][pem] or [JWK][jwk] format. If you define neither `secret` nor `public` key, the plugin assumes that a signed JWT has to be validated – it retrieves the public key itself from `{realmUrl}/protocol/openid-connect/certs`. The offline strategy its performance is higher but the online strategy is the most flexible one.<br/>
 Optional. 
 
+- `addScopes {boolean}` – Whether the Request Party Token should be retrieved and the scopes be included in the  `request.auth.credentials.scope` object. This enables are [more fine-grained authorization][rpt]. <br/>
+Optional. Default: `false`.
+
 - `minTimeBetweenJwksRequests {number}` – The minimum time between JWKS requests in seconds.<br/>
 The value have to be a positive integer.<br/>
 Optional. Default: `0`.
@@ -241,3 +244,4 @@ For further information read the [contributing guideline](CONTRIBUTING.md).
 [jwk]: https://tools.ietf.org/html/rfc7517
 [pem]: https://tools.ietf.org/html/rfc1421
 [client-auth]: https://keycloak.gitbooks.io/documentation/securing_apps/topics/oidc/java/client-authentication.html
+[rpt]: http://www.keycloak.org/docs/2.4/authorization_services_guide/topics/service/entitlement/entitlement-api-aapi.html
