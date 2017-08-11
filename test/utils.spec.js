@@ -215,15 +215,38 @@ test('throw error if options are invalid – minTimeBetweenJwksRequests', (t) =>
     true,
     false,
     new RegExp(),
-    {}
+    {},
+    []
   ]
 
   t.plan(invalids.length)
 
   invalids.forEach((invalid) => {
     t.throws(() => utils.verify(helpers.getOptions({
-      userInfo: invalid
+      minTimeBetweenJwksRequests: invalid
     })), Error, helpers.log('minTimeBetweenJwksRequests', invalid))
+  })
+})
+
+test('throw error if options are invalid – addScopes', (t) => {
+  const invalids = [
+    null,
+    NaN,
+    '',
+    'foobar',
+    fixtures.common.baseUrl,
+    42,
+    new RegExp(),
+    {},
+    []
+  ]
+
+  t.plan(invalids.length)
+
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      addScopes: invalid
+    })), Error, helpers.log('addScopes', invalid))
   })
 })
 
@@ -236,7 +259,9 @@ test('throw no error if options are valid – secret', (t) => {
     { cache: true },
     { cache: false },
     { userInfo: [] },
-    { userInfo: ['string'] }
+    { userInfo: ['string'] },
+    { addScopes: true },
+    { addScopes: false }
   ]
 
   t.plan(valids.length)
@@ -257,7 +282,9 @@ test('throw no error if options are valid – offline', (t) => {
     { userInfo: [] },
     { userInfo: ['string'] },
     { minTimeBetweenJwksRequests: 0 },
-    { minTimeBetweenJwksRequests: 42 }
+    { minTimeBetweenJwksRequests: 42 },
+    { addScopes: true },
+    { addScopes: false }
   ]
 
   t.plan(valids.length)
@@ -281,7 +308,9 @@ test('throw no error if options are valid – publicKeyRsa/string', (t) => {
     { userInfo: [] },
     { userInfo: ['string'] },
     { minTimeBetweenJwksRequests: 0 },
-    { minTimeBetweenJwksRequests: 42 }
+    { minTimeBetweenJwksRequests: 42 },
+    { addScopes: true },
+    { addScopes: false }
   ]
 
   t.plan(valids.length)
@@ -305,7 +334,9 @@ test('throw no error if options are valid – publicKey/string', (t) => {
     { userInfo: [] },
     { userInfo: ['string'] },
     { minTimeBetweenJwksRequests: 0 },
-    { minTimeBetweenJwksRequests: 42 }
+    { minTimeBetweenJwksRequests: 42 },
+    { addScopes: true },
+    { addScopes: false }
   ]
 
   t.plan(valids.length)
@@ -329,7 +360,9 @@ test('throw no error if options are valid – publicKeyCert/string', (t) => {
     { userInfo: [] },
     { userInfo: ['string'] },
     { minTimeBetweenJwksRequests: 0 },
-    { minTimeBetweenJwksRequests: 42 }
+    { minTimeBetweenJwksRequests: 42 },
+    { addScopes: true },
+    { addScopes: false }
   ]
 
   t.plan(valids.length)
@@ -354,7 +387,9 @@ test('throw no error if options are valid – publicKey/Buffer', (t) => {
     { userInfo: [] },
     { userInfo: ['string'] },
     { minTimeBetweenJwksRequests: 0 },
-    { minTimeBetweenJwksRequests: 42 }
+    { minTimeBetweenJwksRequests: 42 },
+    { addScopes: true },
+    { addScopes: false }
   ]
 
   t.plan(valids.length)
@@ -379,7 +414,9 @@ test('throw no error if options are valid – publicKey/Buffer/string', (t) => {
     { userInfo: [] },
     { userInfo: ['string'] },
     { minTimeBetweenJwksRequests: 0 },
-    { minTimeBetweenJwksRequests: 42 }
+    { minTimeBetweenJwksRequests: 42 },
+    { addScopes: true },
+    { addScopes: false }
   ]
 
   t.plan(valids.length)
@@ -404,7 +441,9 @@ test('throw no error if options are valid – publicKey/JWK', (t) => {
     { userInfo: [] },
     { userInfo: ['string'] },
     { minTimeBetweenJwksRequests: 0 },
-    { minTimeBetweenJwksRequests: 42 }
+    { minTimeBetweenJwksRequests: 42 },
+    { addScopes: true },
+    { addScopes: false }
   ]
 
   t.plan(valids.length)
