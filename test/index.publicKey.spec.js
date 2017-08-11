@@ -1,16 +1,11 @@
 const test = require('ava')
 const helpers = require('./_helpers')
 const fixtures = require('./fixtures')
-const cache = require('../src/cache')
-
-test.afterEach('reset instances and prototypes', () => {
-  cache.reset()
-})
 
 const publicKeyConfig = {
   realmUrl: fixtures.common.realmUrl,
   clientId: fixtures.common.clientId,
-  publicKey: fixtures.common.publicKey
+  publicKey: fixtures.common.publicKeyRsa
 }
 
 test.cb.serial('authentication does succeed', (t) => {

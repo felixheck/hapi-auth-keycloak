@@ -25,18 +25,21 @@ test('get boom error with error message', (t) => {
 
 test('decorate callback function with `continue`', (t) => {
   const mockFn = function () {}
+  const fake = utils.fakeReply(mockFn)
 
-  utils.fakeReply(mockFn)
   t.truthy(mockFn.continue)
+  t.truthy(fake.continue)
+  t.deepEqual(mockFn, fake)
 })
 
 test('ignore callback function with exsting `continue`', (t) => {
   const mockFn = function () {}
   mockFn.continue = 'foo'
+  const fake = utils.fakeReply(mockFn)
 
-  utils.fakeReply(mockFn)
-  t.truthy(mockFn.continue)
-  t.is(mockFn.continue, 'foo')
+  t.truthy(fake.continue)
+  t.is(fake.continue, 'foo')
+  t.deepEqual(mockFn, fake)
 })
 
 test('throw error if options are empty', (t) => {
@@ -143,7 +146,7 @@ test('throw error if options are invalid – publicKey', (t) => {
 
 test('throw error if options are invalid – publicKey/secret conflict', (t) => {
   t.throws(() => utils.verify(helpers.getOptions({
-    publicKey: fixtures.common.publicKey
+    publicKey: fixtures.common.publicKeyRsa
   })), Error, 'publicKey/secret: both defined')
 })
 
@@ -269,6 +272,30 @@ test('throw no error if options are valid – offline', (t) => {
   })
 })
 
+test('throw no error if options are valid – publicKeyRsa/string', (t) => {
+  const valids = [
+    { cache: {} },
+    { cache: { segment: 'foobar' } },
+    { cache: true },
+    { cache: false },
+    { userInfo: [] },
+    { userInfo: ['string'] },
+    { minTimeBetweenJwksRequests: 0 },
+    { minTimeBetweenJwksRequests: 42 }
+  ]
+
+  t.plan(valids.length)
+
+  valids.forEach((valid) => {
+    t.notThrows(
+      () => utils.verify(helpers.getOptions(Object.assign({
+        secret: undefined,
+        publicKey: fixtures.common.publicKeyRsa
+      }, valid))),
+      Error, helpers.log('valid.publicKeyRsa.string', valid))
+  })
+})
+
 test('throw no error if options are valid – publicKey/string', (t) => {
   const valids = [
     { cache: {} },
@@ -290,6 +317,30 @@ test('throw no error if options are valid – publicKey/string', (t) => {
         publicKey: fixtures.common.publicKey
       }, valid))),
       Error, helpers.log('valid.publicKey.string', valid))
+  })
+})
+
+test('throw no error if options are valid – publicKeyCert/string', (t) => {
+  const valids = [
+    { cache: {} },
+    { cache: { segment: 'foobar' } },
+    { cache: true },
+    { cache: false },
+    { userInfo: [] },
+    { userInfo: ['string'] },
+    { minTimeBetweenJwksRequests: 0 },
+    { minTimeBetweenJwksRequests: 42 }
+  ]
+
+  t.plan(valids.length)
+
+  valids.forEach((valid) => {
+    t.notThrows(
+      () => utils.verify(helpers.getOptions(Object.assign({
+        secret: undefined,
+        publicKey: fixtures.common.publicKeyCert
+      }, valid))),
+      Error, helpers.log('valid.publicKeyCert.string', valid))
   })
 })
 
@@ -362,7 +413,7 @@ test('throw no error if options are valid – publicKey/JWK', (t) => {
     t.notThrows(
       () => utils.verify(helpers.getOptions(Object.assign({
         secret: undefined,
-        publicKey: fixtures.common.publicKeyJWK
+        publicKey: fixtures.common.publicKeyJwk
       }, valid))),
       Error, helpers.log('valid.publicKey.JWK', valid))
   })

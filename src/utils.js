@@ -18,7 +18,7 @@ const scheme = joi.object({
     .description('The related secret of the Keycloak client/application')
     .example('1234-bar-4321-foo'),
   publicKey: joi.alternatives().try(
-    joi.string().regex(/^-----BEGIN(?: RSA)? PUBLIC KEY-----[\s\S]*-----END(?: RSA)? PUBLIC KEY-----\s?$/ig, 'PEM'),
+    joi.string().regex(/^-----BEGIN((( RSA)? PUBLIC KEY)| CERTIFICATE)-----[\s\S]*-----END((( RSA)? PUBLIC KEY)| CERTIFICATE)-----\s?$/ig, 'PEM'),
     joi.object().type(Buffer),
     joi.object({
       kty: joi.string().required()
@@ -89,11 +89,14 @@ error.msg = {
  * error-first but error-less `continue` method.
  *
  * @param {Function} reply
+ * @returns {Function} The decorated function
  */
 function fakeReply (reply) {
   if (!reply.continue) {
     reply.continue = reply.bind(undefined, null)
   }
+
+  return reply
 }
 
 module.exports = {
