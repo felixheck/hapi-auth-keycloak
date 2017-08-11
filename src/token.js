@@ -30,13 +30,13 @@ function extractToken (field) {
 function getRoles ({
   realm_access: realm = { roles: [] },
   resource_access: resource = {},
-  authorization: permissions = { permissions: [] }
+  authorization: auth = { permissions: [] }
 }) {
   delete resource.account
 
   const realmRoles = realm.roles.map(role => `realm:${role}`)
   const appRoles = _.flatten(_.map(resource, 'roles'))
-  const scopes = _.flatten(_.map(permissions), 'scopes').map(scope => `scope:${scope}`)
+  const scopes = _.flatten(_.map(auth.permissions, 'scopes')).map(scope => `scope:${scope}`)
 
   return [...realmRoles, ...appRoles, ...scopes]
 }

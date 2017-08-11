@@ -68,6 +68,18 @@ test('get user data of token', (t) => {
   t.deepEqual(data.credentials.scope.sort(), ['editor', 'other-app:creator', 'realm:admin'])
 })
 
+test('get user data of token – rpt', (t) => {
+  const jwt = `bearer ${fixtures.jwt.userDataRpt}`
+  const tkn = token.create(jwt)
+  const data = token.getData(tkn)
+
+  t.truthy(data)
+  t.is(data.expiresIn, 4000)
+  t.is(data.credentials.sub, fixtures.content.userData.sub)
+  t.falsy(data.credentials.name)
+  t.deepEqual(data.credentials.scope.sort(), ['editor', 'other-app:creator', 'realm:admin', 'scope:foo.READ', 'scope:foo.WRITE'])
+})
+
 test('get user data of token – additional fields', (t) => {
   const jwt = `bearer ${fixtures.jwt.userData}`
   const tkn = token.create(jwt)
