@@ -108,13 +108,16 @@ server.route([
 ## API
 #### Plugin Options
 
-> By default, the Keycloak server has built-in [two ways to authenticate][client-auth] the client: client ID and client secret, or with a signed JWT. This plugin supports both. If the signed JWTs are used as online strategy, ensure that the identifier of the related realm key is included in their header as `kid`. Additionally the 'clientId/secret'-strategy enables [fine-grained scope definitions][rpt]. Check the description of `secret`/`publicKey` and the [terminology][rpt-terms] for further information. 
+> By default, the Keycloak server has built-in [two ways to authenticate][client-auth] the client: client ID and client secret **(1)**, or with a signed JWT **(2)**. This plugin supports both. If a non-live strategy is used, ensure that the identifier of the related realm key is included in their header as `kid`. Check the description of `secret`/`publicKey`/`live` and the [terminology][rpt-terms] for further information. 
 >
-> | Strategy    | Online | [Scopes][rpt] | Option      |
-> |:------------|:------:|:-------------:|:------------|
-> | ID + Secret | x      | x             | `secret`    |
-> | Signed JWT  | x      |               |             |
-> | Signed JWT  |        |               | `publicKey` |
+> | Strategies  | Online | Live |[Scopes][rpt]  | Options         | Note         |
+> |:------------|:------:|:----:|:-------------:|:----------------|:-------------|
+> | **(1) (2)** |        |      |               | `publicKey`     | fast         |
+> | **(1) (2)** | x      |      |               |                 | flexible     |
+> | **(1)**     | x      | x    |               | `secret + live` | accurate     |
+> | **(1)**     | x      | x    | x             | `live`          | fine-grained |
+>
+> **Hint:** If you define neither `secret` nor `public` and disable `live`, the plugin retrieves the public key itself from `{realmUrl}/protocol/openid-connect/certs`.
 
 - `realmUrl {string}` – The absolute uri of the Keycloak realm.<br/>
 Required. Example: `https://localhost:8080/auth/realms/testme`<br/>
@@ -123,12 +126,16 @@ Required. Example: `https://localhost:8080/auth/realms/testme`<br/>
 Required. Example: `foobar`<br/>
 
 - `secret {string}` – The related secret of the Keycloak client/application.<br/>
-Defining this option enables the traditional method described in the OAuth2 specification. To perform an almost offline validation enable the cache — a simple offline verfication with symmetric keys is not provided for security reasons. Instead [fine-grained scope definitions][rpt] are enabled.<br/>
+Defining this option enables the traditional method described in the OAuth2 specification. This option is just effective if `live` is enabled. Both in combination performs a [introspect][introspect] request.<br/>
 Optional. Example: `1234-bar-4321-foo`<br/>
   
 - `publicKey {string}` – The related public key of the Keycloak client/application.<br/>
-Defining this option enables the offline validation using signed JWTs. The public key has to be in [PEM][pem] or [JWK][jwk] format. If you define neither `secret` nor `public` key, the plugin assumes that a signed JWT has to be validated – it retrieves the public key itself from `{realmUrl}/protocol/openid-connect/certs`. The offline strategy its performance is higher but the online strategy is the most flexible one.<br/>
+Defining this option enables the offline and non-live validation. The public key has to be in [PEM][pem] or [JWK][jwk] format.
+This option is just effective if `live` is disabled.<br/>
 Optional. 
+
+- `live {boolean}` – Whether the token should be validated live to get the most accurate result. Enaling this option will decelerate the process marginally.<br/>
+Optional. Default: `false`.
 
 - `minTimeBetweenJwksRequests {number}` – The minimum time between JWKS requests in seconds.<br/>
 The value have to be a positive integer.<br/>
@@ -242,5 +249,6 @@ For further information read the [contributing guideline](CONTRIBUTING.md).
 [jwk]: https://tools.ietf.org/html/rfc7517
 [pem]: https://tools.ietf.org/html/rfc1421
 [client-auth]: https://keycloak.gitbooks.io/documentation/securing_apps/topics/oidc/java/client-authentication.html
+[introspect]: http://www.keycloak.org/docs/2.4/authorization_services_guide/topics/service/protection/token-introspection.html
 [rpt]: http://www.keycloak.org/docs/2.4/authorization_services_guide/topics/service/entitlement/entitlement-api-aapi.html
 [rpt-terms]: http://www.keycloak.org/docs/2.4/authorization_services_guide/topics/overview/terminology.html
