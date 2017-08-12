@@ -113,7 +113,7 @@ server.route([
 > |:-----------|:------:|:----:|:-------------:|:----------------|:-------------|
 > | (1) + (2)  |        |      |               | `publicKey`     | fast         |
 > | (1) + (2)  | x      |      |               |                 | flexible     |
-> | (1)        | x      | x    |               | `secret + live` | accurate     |
+> | (1)        | x      | x    |               | `live + secret` | accurate     |
 > | (1) + (2)  | x      | x    | x             | `live`          | fine-grained |
 >
 > Please mind that the accurate strategy is 4-5x faster than the fine-grained one.<br/>
@@ -125,6 +125,9 @@ Required. Example: `https://localhost:8080/auth/realms/testme`<br/>
 - `clientId {string}` – The identifier of the Keycloak client/application.<br/>
 Required. Example: `foobar`<br/>
 
+- `live {boolean}` – Whether the token should be validated live to get the most accurate result. Enabling this option decelerates the process marginally.<br/>
+Optional. Default: `false`.
+
 - `secret {string}` – The related secret of the Keycloak client/application.<br/>
 Defining this option enables the traditional method described in the OAuth2 specification. This option is just effective if `live` is enabled. Both in combination performs a [introspect][introspect] request.<br/>
 Optional. Example: `1234-bar-4321-foo`<br/>
@@ -134,20 +137,17 @@ Defining this option enables the offline and non-live validation. The public key
 This option is just effective if `live` is disabled.<br/>
 Optional. 
 
-- `live {boolean}` – Whether the token should be validated live to get the most accurate result. Enaling this option will decelerate the process marginally.<br/>
-Optional. Default: `false`.
-
 - `minTimeBetweenJwksRequests {number}` – The minimum time between JWKS requests in seconds.<br/>
 This is relevant for online/non-live strategies retrieving JWKS from the Keycloak server.<br/>
 The value have to be a positive integer.<br/>
 Optional. Default: `0`.
 
+- `userInfo {Array.<?string>}` — List of properties which should be included in the `request.auth.credentials` object besides `scope` and `sub`.<br/>
+Optional. Default: `[]`.<br/>
+
 - `cache {Object|boolean}` — The configuration of the [hapi.js cache](https://hapijs.com/api#servercacheoptions) powered by [catbox][catbox].<br/>
 If `false` the cache is disabled. Use `true` or an empty object (`{}`) to use the built-in default cache.<br/>
 Optional. Default: `false`.
-
-- `userInfo {Array.<?string>}` — List of properties which should be included in the `request.auth.credentials` object besides `scope` and `sub`.<br/>
-Optional. Default: `[]`.<br/>
 
 #### `server.kjwt.validate(field {string}, done {Function})`
 - `field {string}` — The `Bearer` field, including the scheme (`bearer`) itself.<br/>
