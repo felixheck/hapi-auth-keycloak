@@ -9,7 +9,9 @@
  * @returns {Object|false} The cache instance
  */
 function create (server, opts) {
-  return opts ? server.cache(opts === true ? {} : opts) : false
+  return opts
+    ? server.cache(opts === true ? { segment: 'keycloakJwt' } : opts)
+    : false
 }
 
 /**
