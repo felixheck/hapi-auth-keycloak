@@ -23,7 +23,7 @@ const scheme = joi.object({
     joi.object({
       kty: joi.string().required()
     }).unknown(true)
-  ).description('The related public key of the Keycloak client/application'),
+  ).description('The realm its public key related to the private key used to sign the token'),
   entitlement: joi.boolean().invalid(false)
     .description('The token should be validated with the entitlement API')
     .example('true'),
