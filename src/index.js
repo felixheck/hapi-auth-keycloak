@@ -7,7 +7,7 @@ const { error, fakeReply, verify } = require('./utils')
 const pkg = require('../package.json')
 
 /**
- * @type {Object|GrantManager}
+ * @type {Object}
  * @private
  *
  * The plugin related options and instances.
@@ -21,29 +21,29 @@ let store
  * @private
  *
  * Validate the signed token offline with help of the related
- * public key or online with help of the Keycloak server and
- * JWKS. Resolve if the verification succeeded.
+ * public key or online with the Keycloak server and JWKS.
+ * Both are non-live. Resolve if the verification succeeded.
  *
  * @param {string} tkn The token to be validated
  * @returns {Promise} The error-handled promise
  */
 function validateSignedJwt (tkn) {
   const kcTkn = new KeycloakToken(tkn, options.clientId)
-  return manager.validateToken(kcTkn)
+  return manager.validateToken(kcTkn).then(() => tkn)
 }
 
 /**
  * @function
  * @private
  *
- * Validate the token online with help of the related
+ * Validate the token live with help of the related
  * Keycloak server, the client identifier and its secret.
  * Resolve if the request succeeded and token is valid.
  *
  * @param {string} tkn The token to be validated
  * @returns {Promise} The error-handled promise
  */
-function validateSecret (tkn) {
+function validateLive (tkn) {
   return manager.validateAccessToken(tkn).then((res) => {
     if (res === false) {
       throw Error(error.msg.invalid)
@@ -57,23 +57,35 @@ function validateSecret (tkn) {
  * @function
  * @private
  *
- * Retrieve the Requesting Party Token from the Keycloak Server
- * and extracts the JSON Web Token. Resolves `undefined` if
- * `options.addScopes` is disabled or an error occures.
+ * Retrieve the Requesting Party Token from the Keycloak Server.
  *
  * @param {string} tkn The token to be used for authentication
- * @returns {Promise} The error-handled promise
+ * @returns {Promise} The modified, non-error-handling promise
  */
 function getRpt (tkn) {
-  if (!options.addScopes) {
-    return Promise.resolve(undefined)
-  }
-
   return axios.get(`${options.realmUrl}/authz/entitlement/${options.clientId}`, {
     headers: {
       authorization: `bearer ${tkn}`
     }
-  }).then(({ data: { rpt } }) => rpt).catch(() => undefined)
+  }).then(({ data }) => data.rpt).catch(() => {
+    throw Error(error.msg.invalid)
+  })
+}
+
+/**
+ * @function
+ * @private
+ *
+ * Get validation strategy based on the options.
+ * If `live` is enabled and no secret provided.
+ * it retrieves the RPT, otherwise the token gets
+ * introspected. Else perform a non-live validation
+ * with public keys.
+ *
+ * @returns {Function} The related validation strategy
+ */
+function getValidateFn () {
+  return options.live ? !options.secret ? getRpt : validateLive : validateSignedJwt
 }
 
 /**
@@ -88,18 +100,14 @@ function getRpt (tkn) {
  * @param {Function} reply The callback handler
  */
 function handleKeycloakValidation (tkn, reply) {
-  const validateFn = options.secret ? validateSecret : validateSignedJwt
+  getValidateFn()(tkn).then((info) => {
+    const { expiresIn, credentials } = token.getData(info || tkn, options.userInfo)
+    const userData = { credentials }
 
-  getRpt(tkn).then((rpt) => {
-    validateFn(tkn).then(() => {
-      const { expiresIn, credentials } = token.getData(rpt || tkn, options.userInfo)
-      const userData = { credentials }
-
-      cache.set(store, tkn, userData, expiresIn)
-      reply.continue(userData)
-    }).catch((err) => {
-      reply(error('unauthorized', err, error.msg.invalid))
-    })
+    cache.set(store, tkn, userData, expiresIn)
+    reply.continue(userData)
+  }).catch((err) => {
+    reply(error('unauthorized', err, error.msg.invalid))
   })
 }
 
