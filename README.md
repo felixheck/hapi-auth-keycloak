@@ -110,12 +110,12 @@ server.route([
 
 > By default, the Keycloak server has built-in [two ways to authenticate][client-auth] the client: client ID and client secret **(1)**, or with a signed JWT **(2)**. This plugin supports both. If a non-live strategy is used, ensure that the identifier of the related realm key is included in their header as `kid`. Check the description of `secret`/`publicKey`/`live` and the [terminology][rpt-terms] for further information. 
 >
-> | Strategies  | Online | Live |[Scopes][rpt]  | Options         | Note         |
-> |:------------|:------:|:----:|:-------------:|:----------------|:-------------|
-> | **(1) (2)** |        |      |               | `publicKey`     | fast         |
-> | **(1) (2)** | x      |      |               |                 | flexible     |
-> | **(1)**     | x      | x    |               | `secret + live` | accurate     |
-> | **(1)**     | x      | x    | x             | `live`          | fine-grained |
+> | Strategies | Online | Live |[Scopes][rpt]  | Options         | Note         |
+> |:-----------|:------:|:----:|:-------------:|:----------------|:-------------|
+> | (1) (2)    |        |      |               | `publicKey`     | fast         |
+> | (1) (2)    | x      |      |               |                 | flexible     |
+> | (1)        | x      | x    |               | `secret + live` | accurate     |
+> | (1)        | x      | x    | x             | `live`          | fine-grained |
 >
 > **Hint:** If you define neither `secret` nor `public` and disable `live`, the plugin retrieves the public key itself from `{realmUrl}/protocol/openid-connect/certs`.
 
