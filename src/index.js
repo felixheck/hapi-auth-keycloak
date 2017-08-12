@@ -85,7 +85,7 @@ function getRpt (tkn) {
  * @returns {Function} The related validation strategy
  */
 function getValidateFn () {
-  return options.live ? !options.secret ? getRpt : validateLive : validateSignedJwt
+  return options.live ? options.secret ? validateLive : getRpt : validateSignedJwt
 }
 
 /**

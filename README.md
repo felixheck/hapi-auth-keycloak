@@ -125,7 +125,7 @@ Required. Example: `https://localhost:8080/auth/realms/testme`<br/>
 - `clientId {string}` – The identifier of the Keycloak client/application.<br/>
 Required. Example: `foobar`<br/>
 
-- `live {boolean}` – Whether the token should be validated live to get the most accurate result. Enabling this option decelerates the process marginally.<br/>
+- `live {boolean}` – Whether the token should be validated live to get the most accurate result. Enabling this option decelerates the process marginally, if no `secret` is provided. <br/>
 Optional. Default: `false`.
 
 - `secret {string}` – The related secret of the Keycloak client/application.<br/>

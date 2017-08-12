@@ -3,6 +3,20 @@ const helpers = require('./_helpers')
 const fixtures = require('./fixtures')
 const utils = require('../src/utils')
 
+const valids = [
+  {},
+  { cache: {} },
+  { cache: { segment: 'foobar' } },
+  { cache: true },
+  { cache: false },
+  { userInfo: [] },
+  { userInfo: ['string'] },
+  { minTimeBetweenJwksRequests: 0 },
+  { minTimeBetweenJwksRequests: 42 },
+  { live: true },
+  { live: false }
+]
+
 test('throw error if options are empty', (t) => {
   t.throws(() => utils.verify(), Error)
   t.throws(() => utils.verify({}), Error)
@@ -212,43 +226,18 @@ test('throw error if options are invalid – publicKey/secret conflict', (t) => 
 })
 
 test('throw no error if options are valid – secret', (t) => {
-  const valids = [
-    {},
-    { cache: {} },
-    { cache: { segment: 'foobar' } },
-    { cache: true },
-    { cache: false },
-    { userInfo: [] },
-    { userInfo: ['string'] },
-    { live: true },
-    { live: false }
-  ]
-
   t.plan(valids.length)
 
   valids.forEach((valid) => {
     t.notThrows(
-      () => utils.verify(Object.assign({
+      () => utils.verify(helpers.getOptions(Object.assign({
         secret: fixtures.common.secret
-      }, helpers.getOptions(valid))),
+      }, valid))),
       Error, helpers.log('valid.secret', valid))
   })
 })
 
 test('throw no error if options are valid – offline', (t) => {
-  const valids = [
-    { cache: {} },
-    { cache: { segment: 'foobar' } },
-    { cache: true },
-    { cache: false },
-    { userInfo: [] },
-    { userInfo: ['string'] },
-    { minTimeBetweenJwksRequests: 0 },
-    { minTimeBetweenJwksRequests: 42 },
-    { live: true },
-    { live: false }
-  ]
-
   t.plan(valids.length)
 
   valids.forEach((valid) => {
@@ -259,19 +248,6 @@ test('throw no error if options are valid – offline', (t) => {
 })
 
 test('throw no error if options are valid – publicKey', (t) => {
-  const valids = [
-    { cache: {} },
-    { cache: { segment: 'foobar' } },
-    { cache: true },
-    { cache: false },
-    { userInfo: [] },
-    { userInfo: ['string'] },
-    { minTimeBetweenJwksRequests: 0 },
-    { minTimeBetweenJwksRequests: 42 },
-    { live: true },
-    { live: false }
-  ]
-
   t.plan(valids.length)
 
   valids.forEach((valid) => {
@@ -284,19 +260,6 @@ test('throw no error if options are valid – publicKey', (t) => {
 })
 
 test('throw no error if options are valid – publicKey/Rsa', (t) => {
-  const valids = [
-    { cache: {} },
-    { cache: { segment: 'foobar' } },
-    { cache: true },
-    { cache: false },
-    { userInfo: [] },
-    { userInfo: ['string'] },
-    { minTimeBetweenJwksRequests: 0 },
-    { minTimeBetweenJwksRequests: 42 },
-    { live: true },
-    { live: false }
-  ]
-
   t.plan(valids.length)
 
   valids.forEach((valid) => {
@@ -309,19 +272,6 @@ test('throw no error if options are valid – publicKey/Rsa', (t) => {
 })
 
 test('throw no error if options are valid – publicKey/Cert', (t) => {
-  const valids = [
-    { cache: {} },
-    { cache: { segment: 'foobar' } },
-    { cache: true },
-    { cache: false },
-    { userInfo: [] },
-    { userInfo: ['string'] },
-    { minTimeBetweenJwksRequests: 0 },
-    { minTimeBetweenJwksRequests: 42 },
-    { live: true },
-    { live: false }
-  ]
-
   t.plan(valids.length)
 
   valids.forEach((valid) => {
@@ -334,20 +284,6 @@ test('throw no error if options are valid – publicKey/Cert', (t) => {
 })
 
 test('throw no error if options are valid – publicKey/Buffer', (t) => {
-  const valids = [
-    {},
-    { cache: {} },
-    { cache: { segment: 'foobar' } },
-    { cache: true },
-    { cache: false },
-    { userInfo: [] },
-    { userInfo: ['string'] },
-    { minTimeBetweenJwksRequests: 0 },
-    { minTimeBetweenJwksRequests: 42 },
-    { live: true },
-    { live: false }
-  ]
-
   t.plan(valids.length)
 
   valids.forEach((valid) => {
@@ -360,20 +296,6 @@ test('throw no error if options are valid – publicKey/Buffer', (t) => {
 })
 
 test('throw no error if options are valid – publicKey/JWK', (t) => {
-  const valids = [
-    {},
-    { cache: {} },
-    { cache: { segment: 'foobar' } },
-    { cache: true },
-    { cache: false },
-    { userInfo: [] },
-    { userInfo: ['string'] },
-    { minTimeBetweenJwksRequests: 0 },
-    { minTimeBetweenJwksRequests: 42 },
-    { live: true },
-    { live: false }
-  ]
-
   t.plan(valids.length)
 
   valids.forEach((valid) => {
