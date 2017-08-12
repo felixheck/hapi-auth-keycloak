@@ -99,7 +99,6 @@ test('throw error if options are invalid – publicKey', (t) => {
 
   invalids.forEach((invalid) => {
     t.throws(() => utils.verify(helpers.getOptions({
-      secret: undefined,
       publicKey: invalid
     })), Error, helpers.log('publicKey', invalid))
   })
@@ -207,14 +206,14 @@ test('throw error if options are invalid – live', (t) => {
 
 test('throw error if options are invalid – publicKey/secret conflict', (t) => {
   t.throws(() => utils.verify(helpers.getOptions({
-    publicKey: fixtures.common.publicKeyRsa
+    publicKey: fixtures.common.publicKeyRsa,
+    secret: fixtures.common.secret
   })), Error, 'publicKey/secret: both defined')
 })
 
 test('throw no error if options are valid – secret', (t) => {
   const valids = [
     {},
-    { secret: undefined },
     { cache: {} },
     { cache: { segment: 'foobar' } },
     { cache: true },
@@ -229,7 +228,9 @@ test('throw no error if options are valid – secret', (t) => {
 
   valids.forEach((valid) => {
     t.notThrows(
-      () => utils.verify(helpers.getOptions(valid)),
+      () => utils.verify(Object.assign({
+        secret: fixtures.common.secret
+      }, helpers.getOptions(valid))),
       Error, helpers.log('valid.secret', valid))
   })
 })
@@ -252,10 +253,7 @@ test('throw no error if options are valid – offline', (t) => {
 
   valids.forEach((valid) => {
     t.notThrows(
-      () => utils.verify(helpers.getOptions(Object.assign({
-        secret: undefined,
-        publicKey: undefined
-      }, valid))),
+      () => utils.verify(helpers.getOptions(valid)),
       Error, helpers.log('valid.offline', valid))
   })
 })
@@ -279,7 +277,6 @@ test('throw no error if options are valid – publicKey', (t) => {
   valids.forEach((valid) => {
     t.notThrows(
       () => utils.verify(helpers.getOptions(Object.assign({
-        secret: undefined,
         publicKey: fixtures.common.publicKey
       }, valid))),
       Error, helpers.log('valid.publicKey', valid))
@@ -305,7 +302,6 @@ test('throw no error if options are valid – publicKey/Rsa', (t) => {
   valids.forEach((valid) => {
     t.notThrows(
       () => utils.verify(helpers.getOptions(Object.assign({
-        secret: undefined,
         publicKey: fixtures.common.publicKeyRsa
       }, valid))),
       Error, helpers.log('valid.publicKey/Rsa', valid))
@@ -331,7 +327,6 @@ test('throw no error if options are valid – publicKey/Cert', (t) => {
   valids.forEach((valid) => {
     t.notThrows(
       () => utils.verify(helpers.getOptions(Object.assign({
-        secret: undefined,
         publicKey: fixtures.common.publicKeyCert
       }, valid))),
       Error, helpers.log('valid.publicKey/Cert', valid))
@@ -358,7 +353,6 @@ test('throw no error if options are valid – publicKey/Buffer', (t) => {
   valids.forEach((valid) => {
     t.notThrows(
       () => utils.verify(helpers.getOptions(Object.assign({
-        secret: undefined,
         publicKey: fixtures.common.publicKeyBuffer
       }, valid))),
       Error, helpers.log('valid.publicKey/Buffer', valid))
@@ -385,7 +379,6 @@ test('throw no error if options are valid – publicKey/JWK', (t) => {
   valids.forEach((valid) => {
     t.notThrows(
       () => utils.verify(helpers.getOptions(Object.assign({
-        secret: undefined,
         publicKey: fixtures.common.publicKeyJwk
       }, valid))),
       Error, helpers.log('valid.publicKey/JWK', valid))

@@ -9,10 +9,7 @@ const fixtures = require('./fixtures')
  *
  * The default plugin configuration
  */
-const defaults = Object.assign({
-  cache: undefined,
-  userInfo: undefined
-}, fixtures.clientConfig)
+const defaults = Object.assign({}, fixtures.clientConfig, { secret: undefined })
 
 /**
  * @function
