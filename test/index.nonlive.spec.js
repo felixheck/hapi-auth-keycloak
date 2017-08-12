@@ -2,21 +2,21 @@ const test = require('ava')
 const helpers = require('./_helpers')
 const fixtures = require('./fixtures')
 
-const publicKeyConfig = {
-  realmUrl: fixtures.common.realmUrl,
-  clientId: fixtures.common.clientId,
+const cfg = helpers.getOptions({
   publicKey: fixtures.common.publicKeyRsa
-}
+})
 
 test.cb.serial('authentication does succeed', (t) => {
-  helpers.getServer(publicKeyConfig, (server) => {
-    server.inject({
-      method: 'GET',
-      url: '/',
-      headers: {
-        authorization: `bearer ${fixtures.jwt.userDataPublicKey()}`
-      }
-    }, (res) => {
+  const mockReq = {
+    method: 'GET',
+    url: '/',
+    headers: {
+      authorization: `bearer ${fixtures.jwt.userDataPublicKey()}`
+    }
+  }
+
+  helpers.getServer(cfg, (server) => {
+    server.inject(mockReq, (res) => {
       t.truthy(res)
       t.is(res.statusCode, 200)
       t.end()
@@ -33,9 +33,7 @@ test.cb.serial('authentication does succeed – cached', (t) => {
     }
   }
 
-  helpers.getServer(Object.assign({
-    cache: true
-  }, publicKeyConfig), (server) => {
+  helpers.getServer(Object.assign({ cache: true }, cfg), (server) => {
     server.inject(mockReq, () => {
       server.inject(mockReq, (res) => {
         t.truthy(res)
@@ -47,14 +45,16 @@ test.cb.serial('authentication does succeed – cached', (t) => {
 })
 
 test.cb.serial('authentication does success – valid roles', (t) => {
-  helpers.getServer(publicKeyConfig, (server) => {
-    server.inject({
-      method: 'GET',
-      url: '/role',
-      headers: {
-        authorization: `bearer ${fixtures.jwt.userDataPublicKey()}`
-      }
-    }, (res) => {
+  const mockReq = {
+    method: 'GET',
+    url: '/role',
+    headers: {
+      authorization: `bearer ${fixtures.jwt.userDataPublicKey()}`
+    }
+  }
+
+  helpers.getServer(cfg, (server) => {
+    server.inject(mockReq, (res) => {
       t.truthy(res)
       t.is(res.statusCode, 200)
       t.end()
@@ -63,14 +63,16 @@ test.cb.serial('authentication does success – valid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid roles', (t) => {
-  helpers.getServer(publicKeyConfig, (server) => {
-    server.inject({
-      method: 'GET',
-      url: '/role/guest',
-      headers: {
-        authorization: `bearer ${fixtures.jwt.userDataPublicKey()}`
-      }
-    }, (res) => {
+  const mockReq = {
+    method: 'GET',
+    url: '/role/guest',
+    headers: {
+      authorization: `bearer ${fixtures.jwt.userDataPublicKey()}`
+    }
+  }
+
+  helpers.getServer(cfg, (server) => {
+    server.inject(mockReq, (res) => {
       t.truthy(res)
       t.is(res.statusCode, 403)
       t.end()
@@ -79,14 +81,16 @@ test.cb.serial('authentication does fail – invalid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – expired token', (t) => {
-  helpers.getServer(publicKeyConfig, (server) => {
-    server.inject({
-      method: 'GET',
-      url: '/',
-      headers: {
-        authorization: `bearer ${fixtures.jwt.userDataPublicKeyExp}`
-      }
-    }, (res) => {
+  const mockReq = {
+    method: 'GET',
+    url: '/',
+    headers: {
+      authorization: `bearer ${fixtures.jwt.userDataPublicKeyExp}`
+    }
+  }
+
+  helpers.getServer(cfg, (server) => {
+    server.inject(mockReq, (res) => {
       t.truthy(res)
       t.is(res.statusCode, 401)
       t.is(res.headers['www-authenticate'], 'Bearer error="invalid token (expired)"')
@@ -96,14 +100,16 @@ test.cb.serial('authentication does fail – expired token', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid header', (t) => {
-  helpers.getServer(publicKeyConfig, (server) => {
-    server.inject({
-      method: 'GET',
-      url: '/',
-      headers: {
-        authorization: fixtures.common.token
-      }
-    }, (res) => {
+  const mockReq = {
+    method: 'GET',
+    url: '/',
+    headers: {
+      authorization: fixtures.common.token
+    }
+  }
+
+  helpers.getServer(cfg, (server) => {
+    server.inject(mockReq, (res) => {
       t.truthy(res)
       t.is(res.statusCode, 401)
       t.is(res.headers['www-authenticate'], 'Bearer error="Missing or invalid authorization header"')

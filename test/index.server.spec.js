@@ -3,6 +3,11 @@ const test = require('ava')
 const helpers = require('./_helpers')
 const fixtures = require('./fixtures')
 
+const cfg = helpers.getOptions({
+  secret: fixtures.common.secret,
+  live: true
+})
+
 test.afterEach.always('reset instances and prototypes', () => {
   nock.cleanAll()
 })
@@ -10,7 +15,7 @@ test.afterEach.always('reset instances and prototypes', () => {
 test.cb.serial('server method – authentication does succeed', (t) => {
   helpers.mockIntrospect(200, fixtures.content.userData)
 
-  helpers.getServer(undefined, (server) => {
+  helpers.getServer(cfg, (server) => {
     server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, (err, res) => {
       t.falsy(err)
       t.truthy(res)
@@ -24,7 +29,7 @@ test.cb.serial('server method – authentication does succeed – cache', (t) =
   helpers.mockIntrospect(200, fixtures.content.userData)
   helpers.mockIntrospect(200, fixtures.content.userData)
 
-  helpers.getServer(undefined, (server) => {
+  helpers.getServer(cfg, (server) => {
     server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, () => {
       server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, (err, res) => {
         t.falsy(err)
@@ -39,7 +44,7 @@ test.cb.serial('server method – authentication does succeed – cache', (t) =
 test.cb.serial('server method – authentication does fail – invalid token', (t) => {
   helpers.mockIntrospect(200, { active: false })
 
-  helpers.getServer(undefined, (server) => {
+  helpers.getServer(cfg, (server) => {
     server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, (err, res) => {
       t.falsy(res)
       t.truthy(err)
@@ -52,7 +57,7 @@ test.cb.serial('server method – authentication does fail – invalid token', (
 })
 
 test.cb.serial('server method – authentication does fail – invalid header', (t) => {
-  helpers.getServer(undefined, (server) => {
+  helpers.getServer(cfg, (server) => {
     server.kjwt.validate(fixtures.jwt.userData, (err, res) => {
       t.falsy(res)
       t.truthy(err)
@@ -67,7 +72,7 @@ test.cb.serial('server method – authentication does fail – invalid header', 
 test.cb.serial('server method – authentication does fail – error', (t) => {
   helpers.mockIntrospect(400, 'an error', true)
 
-  helpers.getServer(undefined, (server) => {
+  helpers.getServer(cfg, (server) => {
     server.kjwt.validate(`bearer ${fixtures.jwt.userData}`, (err, res) => {
       t.falsy(res)
       t.truthy(err)

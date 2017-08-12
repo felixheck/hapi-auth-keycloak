@@ -3,6 +3,11 @@ const test = require('ava')
 const helpers = require('./_helpers')
 const fixtures = require('./fixtures')
 
+const cfg = helpers.getOptions({
+  secret: fixtures.common.secret,
+  live: true
+})
+
 test.afterEach.always('reset instances and prototypes', () => {
   nock.cleanAll()
 })
@@ -18,10 +23,7 @@ test.cb.serial('authentication does succeed', (t) => {
     }
   }
 
-  helpers.getServer(helpers.getOptions({
-    secret: fixtures.common.secret,
-    live: true
-  }), (server) => {
+  helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
       t.truthy(res)
       t.is(res.statusCode, 200)
@@ -41,11 +43,7 @@ test.cb.serial('authentication does succeed – cached', (t) => {
     }
   }
 
-  helpers.getServer(helpers.getOptions(helpers.getOptions({
-    secret: fixtures.common.secret,
-    live: true,
-    cache: true
-  })), (server) => {
+  helpers.getServer(Object.assign({ cache: true }, cfg), (server) => {
     server.inject(mockReq, () => {
       server.inject(mockReq, (res) => {
         t.truthy(res)
@@ -67,10 +65,7 @@ test.cb.serial('authentication does success – valid roles', (t) => {
     }
   }
 
-  helpers.getServer(helpers.getOptions({
-    secret: fixtures.common.secret,
-    live: true
-  }), (server) => {
+  helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
       t.truthy(res)
       t.is(res.statusCode, 200)
@@ -90,10 +85,7 @@ test.cb.serial('authentication does fail – invalid roles', (t) => {
     }
   }
 
-  helpers.getServer(helpers.getOptions({
-    secret: fixtures.common.secret,
-    live: true
-  }), (server) => {
+  helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
       t.truthy(res)
       t.is(res.statusCode, 403)
@@ -113,10 +105,7 @@ test.cb.serial('authentication does fail – invalid token', (t) => {
     }
   }
 
-  helpers.getServer(helpers.getOptions({
-    secret: fixtures.common.secret,
-    live: true
-  }), (server) => {
+  helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
       t.truthy(res)
       t.is(res.statusCode, 401)
@@ -135,10 +124,7 @@ test.cb.serial('authentication does fail – invalid header', (t) => {
     }
   }
 
-  helpers.getServer(helpers.getOptions({
-    secret: fixtures.common.secret,
-    live: true
-  }), (server) => {
+  helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
       t.truthy(res)
       t.is(res.statusCode, 401)
