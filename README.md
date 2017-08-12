@@ -62,9 +62,8 @@ server.register({
   options: {
     realmUrl: 'https://localhost:8080/auth/realms/testme',
     clientId: 'foobar',
-    secret: '1234-bar-4321-foo',
     minTimeBetweenJwksRequests: 15,
-    cache: {},
+    cache: true,
     userInfo: ['name', 'email']
   }
 }, function(err) {
@@ -138,6 +137,7 @@ Optional.
 Optional. Default: `false`.
 
 - `minTimeBetweenJwksRequests {number}` – The minimum time between JWKS requests in seconds.<br/>
+This is relevant for online/non-live strategies retrieving JWKS from the Keycloak server.<br/>
 The value have to be a positive integer.<br/>
 Optional. Default: `0`.
 
@@ -195,9 +195,8 @@ server.register({
   options: {
     realmUrl: 'https://localhost:8080/auth/realms/testme',
     clientId: 'foobar',
-    secret: '1234-bar-4321-foo',
     minTimeBetweenJwksRequests: 15,
-    cache: {},
+    cache: true,
     userInfo: ['name', 'email']
   }
 }).then(() => {
