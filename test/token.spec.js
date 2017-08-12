@@ -23,7 +23,7 @@ test('get bearer token – uppercase', (t) => {
   t.is(tkn, 'a.b.c')
 })
 
-test('get bearer token – capitalcase', (t) => {
+test('get bearer token – capital case', (t) => {
   const tkn = token.create('BEARER a.b.c')
   t.truthy(tkn)
   t.is(tkn, 'a.b.c')

@@ -30,7 +30,7 @@ test('decorate callback function with `continue`', (t) => {
   t.deepEqual(mockFn, fake)
 })
 
-test('ignore callback function with exsting `continue`', (t) => {
+test('ignore callback function with existing `continue`', (t) => {
   const mockFn = function () {}
   mockFn.continue = 'foo'
   const fake = utils.fakeReply(mockFn)

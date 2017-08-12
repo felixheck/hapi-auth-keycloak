@@ -81,7 +81,7 @@ Define your routes and add `keycloak-jwt` when necessary. It is possible to defi
 - To secure a resource with an application role for the current app, use the role name (e.g. `editor`).
 - To secure a resource with an application role for a different app, prefix the role name (e.g. `other-app:creator`)
 - To secure a resource with a realm role, prefix the role name with `realm:` (e.g. `realm:admin`).
-- To secure a resouce with [fine-grained scope definitions][rpt], prefix the Keycloak scopes with `scope:` (e.g. `scope:foo.READ`).
+- To secure a resource with [fine-grained scope definitions][rpt], prefix the Keycloak scopes with `scope:` (e.g. `scope:foo.READ`).
 
 ``` js
 server.route([

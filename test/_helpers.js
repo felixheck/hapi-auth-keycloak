@@ -15,7 +15,7 @@ const defaults = Object.assign({}, fixtures.clientConfig, { secret: undefined })
  * @function
  * @public
  *
- * Get overriden valid default options with customs.
+ * Get overridden valid default options with customs.
  *
  * @param {Object} customs The options to be changed
  * @returns {Object} The customized options
