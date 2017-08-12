@@ -3,39 +3,39 @@ const test = require('ava')
 const helpers = require('./_helpers')
 const fixtures = require('./fixtures')
 
-const cfg = helpers.getOptions({
-  secret: fixtures.common.secret,
-  live: true
-})
+const targetScope = ['editor', 'other-app:creator', 'realm:admin', 'scope:foo.READ', 'scope:foo.WRITE']
+const cfg = helpers.getOptions({ entitlement: true })
 
 test.afterEach.always('reset instances and prototypes', () => {
   nock.cleanAll()
 })
 
 test.cb.serial('authentication does succeed', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt}`)
 
-  helpers.mockIntrospect(200, fixtures.content.current)
+  helpers.mockEntitlement(200, fixtures.content.rpt)
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
       t.truthy(res)
       t.is(res.statusCode, 200)
+      t.deepEqual(JSON.parse(res.payload).sort(), targetScope)
       t.end()
     })
   })
 })
 
 test.cb.serial('authentication does succeed – cached', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt}`)
 
-  helpers.mockIntrospect(200, fixtures.content.current)
+  helpers.mockEntitlement(200, fixtures.content.rpt)
 
   helpers.getServer(Object.assign({ cache: true }, cfg), (server) => {
     server.inject(mockReq, () => {
       server.inject(mockReq, (res) => {
         t.truthy(res)
         t.is(res.statusCode, 200)
+        t.deepEqual(JSON.parse(res.payload).sort(), targetScope)
         t.end()
       })
     })
@@ -43,23 +43,39 @@ test.cb.serial('authentication does succeed – cached', (t) => {
 })
 
 test.cb.serial('authentication does success – valid roles', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`, '/role')
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt}`, '/role')
 
-  helpers.mockIntrospect(200, fixtures.content.current)
+  helpers.mockEntitlement(200, fixtures.content.rpt)
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
       t.truthy(res)
       t.is(res.statusCode, 200)
+      t.deepEqual(JSON.parse(res.payload).sort(), targetScope)
+      t.end()
+    })
+  })
+})
+
+test.cb.serial('authentication does success – valid roles', (t) => {
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt}`, '/role/rpt')
+
+  helpers.mockEntitlement(200, fixtures.content.rpt)
+
+  helpers.getServer(cfg, (server) => {
+    server.inject(mockReq, (res) => {
+      t.truthy(res)
+      t.is(res.statusCode, 200)
+      t.deepEqual(JSON.parse(res.payload).sort(), targetScope)
       t.end()
     })
   })
 })
 
 test.cb.serial('authentication does fail – invalid roles', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`, '/role/guest')
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt}`, '/role/guest')
 
-  helpers.mockIntrospect(200, fixtures.content.current)
+  helpers.mockEntitlement(200, fixtures.content.rpt)
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
@@ -71,9 +87,9 @@ test.cb.serial('authentication does fail – invalid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid token', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt}`)
 
-  helpers.mockIntrospect(200, { active: false })
+  helpers.mockEntitlement(400, fixtures.content.rpt)
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {

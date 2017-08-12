@@ -24,8 +24,8 @@ const scheme = joi.object({
       kty: joi.string().required()
     }).unknown(true)
   ).description('The related public key of the Keycloak client/application'),
-  live: joi.boolean().default(false)
-    .description('Whether the token should be validated live')
+  entitlement: joi.boolean().invalid(false)
+    .description('The token should be validated with the entitlement API')
     .example('true'),
   minTimeBetweenJwksRequests: joi.number().integer().positive().allow(0).default(0)
     .description('The minimum time between JWKS requests in seconds')
@@ -39,7 +39,9 @@ const scheme = joi.object({
     .description('List of properties which should be included in the `request.auth.credentials` object')
     .example(['name', 'email'])
 })
-.nand('secret', 'publicKey')
+.without('entitlement', ['secret', 'publicKey'])
+.without('secret', ['entitlement', 'publicKey'])
+.without('publicKey', ['entitlement', 'secret'])
 .required()
 
 /**

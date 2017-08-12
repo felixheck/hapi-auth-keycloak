@@ -107,17 +107,17 @@ server.route([
 ## API
 #### Plugin Options
 
-> By default, the Keycloak server has built-in [two ways to authenticate][client-auth] the client: client ID and client secret **(1)**, or with a signed JWT **(2)**. This plugin supports both. If a non-live strategy is used, ensure that the identifier of the related realm key is included in their header as `kid`. Check the description of `secret`/`publicKey`/`live` and the [terminology][rpt-terms] for further information. 
+> By default, the Keycloak server has built-in [two ways to authenticate][client-auth] the client: client ID and client secret **(1)**, or with a signed JWT **(2)**. This plugin supports both. If a non-live strategy is used, ensure that the identifier of the related realm key is included in their header as `kid`. Check the description of `secret`/`publicKey`/`entitlement` and the [terminology][rpt-terms] for further information. 
 >
-> | Strategies | Online | Live |[Scopes][rpt]  | Truthy Options  | Note         |
-> |:-----------|:------:|:----:|:-------------:|:----------------|:-------------|
-> | (1) + (2)  |        |      |               | `publicKey`     | fast         |
-> | (1) + (2)  | x      |      |               |                 | flexible     |
-> | (1)        | x      | x    |               | `live + secret` | accurate     |
-> | (1) + (2)  | x      | x    | x             | `live`          | fine-grained |
+> | Strategies | Online | Live |[Scopes][rpt]  | Truthy Option | Note         |
+> |:-----------|:------:|:----:|:-------------:|:---------------|:-------------|
+> | (1) + (2)  |        |      |               | `publicKey`    | fast         |
+> | (1) + (2)  | x      |      |               |                | flexible     |
+> | (1)        | x      | x    |               | `secret`       | accurate     |
+> | (1) + (2)  | x      | x    | x             | `entitlement`  | fine-grained |
 >
 > Please mind that the accurate strategy is 4-5x faster than the fine-grained one.<br/>
-> **Hint:** If you define neither `secret` nor `public` and disable `live`, the plugin retrieves the public key itself from `{realmUrl}/protocol/openid-connect/certs`.
+> **Hint:** If you define neither `secret` nor `public` and disable `entitlement`, the plugin retrieves the public key itself from `{realmUrl}/protocol/openid-connect/certs`.
 
 - `realmUrl {string}` – The absolute uri of the Keycloak realm.<br/>
 Required. Example: `https://localhost:8080/auth/realms/testme`<br/>
@@ -125,20 +125,19 @@ Required. Example: `https://localhost:8080/auth/realms/testme`<br/>
 - `clientId {string}` – The identifier of the Keycloak client/application.<br/>
 Required. Example: `foobar`<br/>
 
-- `live {boolean}` – Whether the token should be validated live to get the most accurate result. Enabling this option decelerates the process marginally, if no `secret` is provided. <br/>
-Optional. Default: `false`.
-
 - `secret {string}` – The related secret of the Keycloak client/application.<br/>
-Defining this option enables the traditional method described in the OAuth2 specification. This option is just effective if `live` is enabled. Both in combination performs a [introspect][introspect] request.<br/>
+Defining this option enables the traditional method described in the OAuth2 specification and performs an [introspect][introspect] request.<br/>
 Optional. Example: `1234-bar-4321-foo`<br/>
   
 - `publicKey {string}` – The related public key of the Keycloak client/application.<br/>
-Defining this option enables the offline and non-live validation. The public key has to be in [PEM][pem] or [JWK][jwk] format.
-This option is just effective if `live` is disabled.<br/>
+Defining this option enables the offline and non-live validation. The public key has to be in [PEM][pem] or [JWK][jwk] format.<br/>
 Optional. 
 
+- `entitlement {boolean=true}` – The token should be validated with the entitlement API to enable fine-grained authorization. Enabling this option decelerates the process marginally. Mind that `false` is an invalid value.<br/>
+Optional. Default: `undefined`.
+
 - `minTimeBetweenJwksRequests {number}` – The minimum time between JWKS requests in seconds.<br/>
-This is relevant for online/non-live strategies retrieving JWKS from the Keycloak server.<br/>
+This is relevant for the online/non-live strategy retrieving JWKS from the Keycloak server.<br/>
 The value have to be a positive integer.<br/>
 Optional. Default: `0`.
 

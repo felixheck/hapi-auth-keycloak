@@ -12,9 +12,7 @@ const valids = [
   { userInfo: [] },
   { userInfo: ['string'] },
   { minTimeBetweenJwksRequests: 0 },
-  { minTimeBetweenJwksRequests: 42 },
-  { live: true },
-  { live: false }
+  { minTimeBetweenJwksRequests: 42 }
 ]
 
 test('throw error if options are empty', (t) => {
@@ -196,7 +194,7 @@ test('throw error if options are invalid – minTimeBetweenJwksRequests', (t) =>
   })
 })
 
-test('throw error if options are invalid – live', (t) => {
+test('throw error if options are invalid – entitlement', (t) => {
   const invalids = [
     null,
     NaN,
@@ -204,6 +202,7 @@ test('throw error if options are invalid – live', (t) => {
     'foobar',
     fixtures.common.baseUrl,
     42,
+    false,
     new RegExp(),
     {},
     []
@@ -213,16 +212,26 @@ test('throw error if options are invalid – live', (t) => {
 
   invalids.forEach((invalid) => {
     t.throws(() => utils.verify(helpers.getOptions({
-      live: invalid
-    })), Error, helpers.log('live', invalid))
+      entitlement: invalid
+    })), Error, helpers.log('entitlement', invalid))
   })
 })
 
-test('throw error if options are invalid – publicKey/secret conflict', (t) => {
+test('throw error if options are invalid – publicKey/secret/entitlement conflict', (t) => {
   t.throws(() => utils.verify(helpers.getOptions({
     publicKey: fixtures.common.publicKeyRsa,
     secret: fixtures.common.secret
   })), Error, 'publicKey/secret: both defined')
+
+  t.throws(() => utils.verify(helpers.getOptions({
+    publicKey: fixtures.common.publicKeyRsa,
+    entitlement: true
+  })), Error, 'publicKey/entitlement: both defined')
+
+  t.throws(() => utils.verify(helpers.getOptions({
+    secret: fixtures.common.secret,
+    entitlement: true
+  })), Error, 'secret/entitlement: both defined')
 })
 
 test('throw no error if options are valid – secret', (t) => {
@@ -238,9 +247,11 @@ test('throw no error if options are valid – secret', (t) => {
 })
 
 test('throw no error if options are valid – offline', (t) => {
-  t.plan(valids.length)
+  const customValids = [...valids, { entitlement: true }]
 
-  valids.forEach((valid) => {
+  t.plan(customValids.length)
+
+  customValids.forEach((valid) => {
     t.notThrows(
       () => utils.verify(helpers.getOptions(valid)),
       Error, helpers.log('valid.offline', valid))

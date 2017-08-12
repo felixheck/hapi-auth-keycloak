@@ -3,10 +3,7 @@ const test = require('ava')
 const helpers = require('./_helpers')
 const fixtures = require('./fixtures')
 
-const cfg = helpers.getOptions({
-  secret: fixtures.common.secret,
-  live: true
-})
+const cfg = helpers.getOptions({ secret: fixtures.common.secret })
 
 test.afterEach.always('reset instances and prototypes', () => {
   nock.cleanAll()

@@ -20,14 +20,14 @@ let store
  * @function
  * @private
  *
- * Validate the signed token offline with help of the related
+ * Verify the signed token offline with help of the related
  * public key or online with the Keycloak server and JWKS.
  * Both are non-live. Resolve if the verification succeeded.
  *
  * @param {string} tkn The token to be validated
  * @returns {Promise} The error-handled promise
  */
-function validateSignedJwt (tkn) {
+function verifySignedJwt (tkn) {
   const kcTkn = new KeycloakToken(tkn, options.clientId)
   return manager.validateToken(kcTkn).then(() => tkn)
 }
@@ -43,7 +43,7 @@ function validateSignedJwt (tkn) {
  * @param {string} tkn The token to be validated
  * @returns {Promise} The error-handled promise
  */
-function validateLive (tkn) {
+function introspect (tkn) {
   return manager.validateAccessToken(tkn).then((res) => {
     if (res === false) {
       throw Error(error.msg.invalid)
@@ -77,15 +77,14 @@ function getRpt (tkn) {
  * @private
  *
  * Get validation strategy based on the options.
- * If `live` is enabled and no secret provided.
- * it retrieves the RPT, otherwise the token gets
- * introspected. Else perform a non-live validation
- * with public keys.
+ * If `secret` is set the token gets introspected.
+ * If `entitlement` is truthy it retrieves the RPT.
+ * Else perform a non-live validation with public keys.
  *
  * @returns {Function} The related validation strategy
  */
 function getValidateFn () {
-  return options.live ? options.secret ? validateLive : getRpt : validateSignedJwt
+  return options.secret ? introspect : options.entitlement ? getRpt : verifySignedJwt
 }
 
 /**

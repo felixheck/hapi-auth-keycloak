@@ -1,13 +1,18 @@
+const nock = require('nock')
 const test = require('ava')
 const helpers = require('./_helpers')
 const fixtures = require('./fixtures')
 
-const cfg = helpers.getOptions({
-  publicKey: fixtures.common.publicKeyRsa
+const cfg = helpers.getOptions({ secret: fixtures.common.secret })
+
+test.afterEach.always('reset instances and prototypes', () => {
+  nock.cleanAll()
 })
 
 test.cb.serial('authentication does succeed', (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`)
+
+  helpers.mockIntrospect(200, fixtures.content.current)
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
@@ -20,6 +25,8 @@ test.cb.serial('authentication does succeed', (t) => {
 
 test.cb.serial('authentication does succeed – cached', (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`)
+
+  helpers.mockIntrospect(200, fixtures.content.current)
 
   helpers.getServer(Object.assign({ cache: true }, cfg), (server) => {
     server.inject(mockReq, () => {
@@ -35,6 +42,8 @@ test.cb.serial('authentication does succeed – cached', (t) => {
 test.cb.serial('authentication does success – valid roles', (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`, '/role')
 
+  helpers.mockIntrospect(200, fixtures.content.current)
+
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
       t.truthy(res)
@@ -47,6 +56,8 @@ test.cb.serial('authentication does success – valid roles', (t) => {
 test.cb.serial('authentication does fail – invalid roles', (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`, '/role/guest')
 
+  helpers.mockIntrospect(200, fixtures.content.current)
+
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
       t.truthy(res)
@@ -56,14 +67,16 @@ test.cb.serial('authentication does fail – invalid roles', (t) => {
   })
 })
 
-test.cb.serial('authentication does fail – expired token', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.expired}`)
+test.cb.serial('authentication does fail – invalid token', (t) => {
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`)
+
+  helpers.mockIntrospect(200, { active: false })
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
       t.truthy(res)
       t.is(res.statusCode, 401)
-      t.is(res.headers['www-authenticate'], 'Bearer error="invalid token (expired)"')
+      t.is(res.headers['www-authenticate'], 'Bearer error="Invalid credentials"')
       t.end()
     })
   })
