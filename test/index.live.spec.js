@@ -13,15 +13,9 @@ test.afterEach.always('reset instances and prototypes', () => {
 })
 
 test.cb.serial('authentication does succeed', (t) => {
-  helpers.mockIntrospect(200, fixtures.content.current)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`)
 
-  const mockReq = {
-    method: 'GET',
-    url: '/',
-    headers: {
-      authorization: `bearer ${fixtures.jwt.current()}`
-    }
-  }
+  helpers.mockIntrospect(200, fixtures.content.current)
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
@@ -33,15 +27,9 @@ test.cb.serial('authentication does succeed', (t) => {
 })
 
 test.cb.serial('authentication does succeed – cached', (t) => {
-  helpers.mockIntrospect(200, fixtures.content.current)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`)
 
-  const mockReq = {
-    method: 'GET',
-    url: '/',
-    headers: {
-      authorization: `bearer ${fixtures.jwt.current()}`
-    }
-  }
+  helpers.mockIntrospect(200, fixtures.content.current)
 
   helpers.getServer(Object.assign({ cache: true }, cfg), (server) => {
     server.inject(mockReq, () => {
@@ -55,15 +43,9 @@ test.cb.serial('authentication does succeed – cached', (t) => {
 })
 
 test.cb.serial('authentication does success – valid roles', (t) => {
-  helpers.mockIntrospect(200, fixtures.content.current)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`, '/role')
 
-  const mockReq = {
-    method: 'GET',
-    url: '/role',
-    headers: {
-      authorization: `bearer ${fixtures.jwt.current()}`
-    }
-  }
+  helpers.mockIntrospect(200, fixtures.content.current)
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
@@ -75,15 +57,9 @@ test.cb.serial('authentication does success – valid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid roles', (t) => {
-  helpers.mockIntrospect(200, fixtures.content.current)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`, '/role/guest')
 
-  const mockReq = {
-    method: 'GET',
-    url: '/role/guest',
-    headers: {
-      authorization: `bearer ${fixtures.jwt.current()}`
-    }
-  }
+  helpers.mockIntrospect(200, fixtures.content.current)
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
@@ -95,15 +71,9 @@ test.cb.serial('authentication does fail – invalid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid token', (t) => {
-  helpers.mockIntrospect(200, { active: false })
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`)
 
-  const mockReq = {
-    method: 'GET',
-    url: '/',
-    headers: {
-      authorization: `bearer ${fixtures.jwt.current()}`
-    }
-  }
+  helpers.mockIntrospect(200, { active: false })
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
@@ -116,13 +86,7 @@ test.cb.serial('authentication does fail – invalid token', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid header', (t) => {
-  const mockReq = {
-    method: 'GET',
-    url: '/',
-    headers: {
-      authorization: fixtures.common.token
-    }
-  }
+  const mockReq = helpers.mockRequest(fixtures.common.token)
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {

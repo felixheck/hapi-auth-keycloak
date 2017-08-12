@@ -62,6 +62,26 @@ function mockEntitlement (code, data, isError = false) {
  * @function
  * @public
  *
+ * Mock request object to be injected.
+ *
+ * @param {string} field The `authorization` header its value
+ * @param {string} [url] The url of the request
+ * @returns {Object} The composed request object
+ */
+function mockRequest (field, url = '/') {
+  return {
+    method: 'GET',
+    url,
+    headers: {
+      authorization: field
+    }
+  }
+}
+
+/**
+ * @function
+ * @public
+ *
  * Log the option name with the asserted value.
  *
  * @param {string} option The name of the option
@@ -189,6 +209,7 @@ module.exports = {
   getOptions,
   mockIntrospect,
   mockEntitlement,
+  mockRequest,
   log,
   getServer,
   registerPlugin

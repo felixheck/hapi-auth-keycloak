@@ -7,13 +7,7 @@ const cfg = helpers.getOptions({
 })
 
 test.cb.serial('authentication does succeed', (t) => {
-  const mockReq = {
-    method: 'GET',
-    url: '/',
-    headers: {
-      authorization: `bearer ${fixtures.jwt.current()}`
-    }
-  }
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`)
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
@@ -25,13 +19,7 @@ test.cb.serial('authentication does succeed', (t) => {
 })
 
 test.cb.serial('authentication does succeed – cached', (t) => {
-  const mockReq = {
-    method: 'GET',
-    url: '/',
-    headers: {
-      authorization: `bearer ${fixtures.jwt.current()}`
-    }
-  }
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`)
 
   helpers.getServer(Object.assign({ cache: true }, cfg), (server) => {
     server.inject(mockReq, () => {
@@ -45,13 +33,7 @@ test.cb.serial('authentication does succeed – cached', (t) => {
 })
 
 test.cb.serial('authentication does success – valid roles', (t) => {
-  const mockReq = {
-    method: 'GET',
-    url: '/role',
-    headers: {
-      authorization: `bearer ${fixtures.jwt.current()}`
-    }
-  }
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`, '/role')
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
@@ -63,13 +45,7 @@ test.cb.serial('authentication does success – valid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid roles', (t) => {
-  const mockReq = {
-    method: 'GET',
-    url: '/role/guest',
-    headers: {
-      authorization: `bearer ${fixtures.jwt.current()}`
-    }
-  }
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`, '/role/guest')
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
@@ -81,13 +57,7 @@ test.cb.serial('authentication does fail – invalid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – expired token', (t) => {
-  const mockReq = {
-    method: 'GET',
-    url: '/',
-    headers: {
-      authorization: `bearer ${fixtures.jwt.expired}`
-    }
-  }
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.expired}`)
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
@@ -100,13 +70,7 @@ test.cb.serial('authentication does fail – expired token', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid header', (t) => {
-  const mockReq = {
-    method: 'GET',
-    url: '/',
-    headers: {
-      authorization: fixtures.common.token
-    }
-  }
+  const mockReq = helpers.mockRequest(fixtures.common.token)
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
