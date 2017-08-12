@@ -129,7 +129,7 @@ Required. Example: `foobar`<br/>
 Defining this option enables the traditional method described in the OAuth2 specification and performs an [introspect][introspect] request.<br/>
 Optional. Example: `1234-bar-4321-foo`<br/>
   
-- `publicKey {string}` – The related public key of the Keycloak client/application.<br/>
+- `publicKey {string}` – The realm its public key related to the private key used to sign the token.<br/>
 Defining this option enables the offline and non-live validation. The public key has to be in [PEM][pem] or [JWK][jwk] format.<br/>
 Optional. 
 
