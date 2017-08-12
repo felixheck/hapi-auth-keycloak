@@ -112,8 +112,8 @@ server.route([
 >
 > | Strategies | Online | Live |[Scopes][rpt]  | Options         | Note         |
 > |:-----------|:------:|:----:|:-------------:|:----------------|:-------------|
-> | (1) (2)    |        |      |               | `publicKey`     | fast         |
-> | (1) (2)    | x      |      |               |                 | flexible     |
+> | (1) + (2)  |        |      |               | `publicKey`     | fast         |
+> | (1) + (2)  | x      |      |               |                 | flexible     |
 > | (1)        | x      | x    |               | `secret + live` | accurate     |
 > | (1)        | x      | x    | x             | `live`          | fine-grained |
 >
