@@ -114,8 +114,9 @@ server.route([
 > | (1) + (2)  |        |      |               | `publicKey`     | fast         |
 > | (1) + (2)  | x      |      |               |                 | flexible     |
 > | (1)        | x      | x    |               | `secret + live` | accurate     |
-> | (1)        | x      | x    | x             | `live`          | fine-grained |
+> | (1) + (2)  | x      | x    | x             | `live`          | fine-grained |
 >
+> Please mind that the accurate strategy is 4-5x faster than the fine-grained one.<br/>
 > **Hint:** If you define neither `secret` nor `public` and disable `live`, the plugin retrieves the public key itself from `{realmUrl}/protocol/openid-connect/certs`.
 
 - `realmUrl {string}` – The absolute uri of the Keycloak realm.<br/>
