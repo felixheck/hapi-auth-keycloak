@@ -94,7 +94,7 @@ server.route([
       auth: {
         strategies: ['keycloak-jwt'],
         access: {
-          scope: ['realm:admin', 'editor', 'other-app:creator']
+          scope: ['realm:admin', 'editor', 'other-app:creator', 'scope:foo.READ']
         }
       },
       handler (req, reply) {
@@ -174,7 +174,7 @@ server.route([
       auth: {
         strategies: ['keycloak-jwt'],
         access: {
-          scope: ['realm:admin', 'editor', 'other-app:creator']
+          scope: ['realm:admin', 'editor', 'other-app:creator', 'scope:foo.READ']
         }
       },
       handler (req, reply) {
