@@ -11,7 +11,7 @@ const jwt = require('jsonwebtoken')
  * @param {string} field The header field to be scanned
  * @returns {string} The extracted header
  */
-function extractToken (field) {
+function getToken (field) {
   return /^(?:bearer) ([a-zA-Z0-9\-_]+?\.[a-zA-Z0-9\-_]+?\.([a-zA-Z0-9\-_]+)?)$/i.exec(field)
 }
 
@@ -83,12 +83,11 @@ function getUserInfo (content, fields = []) {
  */
 function getData (tkn, userInfoFields) {
   const content = jwt.decode(tkn)
+  const scope = getRoles(content)
 
   return {
     expiresIn: getExpiration(content),
-    credentials: Object.assign({
-      scope: getRoles(content)
-    }, getUserInfo(content, userInfoFields))
+    credentials: Object.assign({ scope }, getUserInfo(content, userInfoFields))
   }
 }
 
@@ -102,7 +101,7 @@ function getData (tkn, userInfoFields) {
  * @returns {string|false} The token or `false` dependent on field
  */
 function create (field) {
-  const match = extractToken(field)
+  const match = getToken(field)
 
   return match ? match[1] : false
 }
