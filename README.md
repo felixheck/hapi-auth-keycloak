@@ -117,7 +117,7 @@ server.route([
 > | (1) + (2)  | x      | x    | x             | `entitlement`  | fine-grained |
 >
 > Please mind that the accurate strategy is 4-5x faster than the fine-grained one.<br/>
-> **Hint:** If you define neither `secret` nor `public` and disable `entitlement`, the plugin retrieves the public key itself from `{realmUrl}/protocol/openid-connect/certs`.
+> **Hint:** If you define neither `secret` nor `public` nor `entitlement`, the plugin retrieves the public key itself from `{realmUrl}/protocol/openid-connect/certs`.
 
 - `realmUrl {string}` – The absolute uri of the Keycloak realm.<br/>
 Required. Example: `https://localhost:8080/auth/realms/testme`<br/>
