@@ -11,7 +11,7 @@ test.cb.serial('authentication does succeed', (t) => {
     method: 'GET',
     url: '/',
     headers: {
-      authorization: `bearer ${fixtures.jwt.userDataPublicKey()}`
+      authorization: `bearer ${fixtures.jwt.current()}`
     }
   }
 
@@ -29,7 +29,7 @@ test.cb.serial('authentication does succeed – cached', (t) => {
     method: 'GET',
     url: '/',
     headers: {
-      authorization: `bearer ${fixtures.jwt.userDataPublicKey()}`
+      authorization: `bearer ${fixtures.jwt.current()}`
     }
   }
 
@@ -49,7 +49,7 @@ test.cb.serial('authentication does success – valid roles', (t) => {
     method: 'GET',
     url: '/role',
     headers: {
-      authorization: `bearer ${fixtures.jwt.userDataPublicKey()}`
+      authorization: `bearer ${fixtures.jwt.current()}`
     }
   }
 
@@ -67,7 +67,7 @@ test.cb.serial('authentication does fail – invalid roles', (t) => {
     method: 'GET',
     url: '/role/guest',
     headers: {
-      authorization: `bearer ${fixtures.jwt.userDataPublicKey()}`
+      authorization: `bearer ${fixtures.jwt.current()}`
     }
   }
 
@@ -85,7 +85,7 @@ test.cb.serial('authentication does fail – expired token', (t) => {
     method: 'GET',
     url: '/',
     headers: {
-      authorization: `bearer ${fixtures.jwt.userDataPublicKeyExp}`
+      authorization: `bearer ${fixtures.jwt.expired}`
     }
   }
 

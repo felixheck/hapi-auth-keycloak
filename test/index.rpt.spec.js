@@ -13,13 +13,13 @@ test.afterEach.always('reset instances and prototypes', () => {
 })
 
 test.cb.serial('authentication does succeed', (t) => {
-  helpers.mockEntitlement(200, fixtures.content.userDataRpt)
+  helpers.mockEntitlement(200, fixtures.content.rpt)
 
   const mockReq = {
     method: 'GET',
     url: '/',
     headers: {
-      authorization: `bearer ${fixtures.jwt.userDataRpt}`
+      authorization: `bearer ${fixtures.jwt.rpt}`
     }
   }
 
@@ -34,13 +34,13 @@ test.cb.serial('authentication does succeed', (t) => {
 })
 
 test.cb.serial('authentication does succeed – cached', (t) => {
-  helpers.mockEntitlement(200, fixtures.content.userDataRpt)
+  helpers.mockEntitlement(200, fixtures.content.rpt)
 
   const mockReq = {
     method: 'GET',
     url: '/',
     headers: {
-      authorization: `bearer ${fixtures.jwt.userDataRpt}`
+      authorization: `bearer ${fixtures.jwt.rpt}`
     }
   }
 
@@ -57,13 +57,13 @@ test.cb.serial('authentication does succeed – cached', (t) => {
 })
 
 test.cb.serial('authentication does success – valid roles', (t) => {
-  helpers.mockEntitlement(200, fixtures.content.userDataRpt)
+  helpers.mockEntitlement(200, fixtures.content.rpt)
 
   const mockReq = {
     method: 'GET',
     url: '/role',
     headers: {
-      authorization: `bearer ${fixtures.jwt.userDataRpt}`
+      authorization: `bearer ${fixtures.jwt.rpt}`
     }
   }
 
@@ -78,13 +78,13 @@ test.cb.serial('authentication does success – valid roles', (t) => {
 })
 
 test.cb.serial('authentication does success – valid roles', (t) => {
-  helpers.mockEntitlement(200, fixtures.content.userDataRpt)
+  helpers.mockEntitlement(200, fixtures.content.rpt)
 
   const mockReq = {
     method: 'GET',
     url: '/role/rpt',
     headers: {
-      authorization: `bearer ${fixtures.jwt.userDataRpt}`
+      authorization: `bearer ${fixtures.jwt.rpt}`
     }
   }
 
@@ -99,13 +99,13 @@ test.cb.serial('authentication does success – valid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid roles', (t) => {
-  helpers.mockEntitlement(200, fixtures.content.userDataRpt)
+  helpers.mockEntitlement(200, fixtures.content.rpt)
 
   const mockReq = {
     method: 'GET',
     url: '/role/guest',
     headers: {
-      authorization: `bearer ${fixtures.jwt.userDataRpt}`
+      authorization: `bearer ${fixtures.jwt.rpt}`
     }
   }
 
@@ -119,13 +119,13 @@ test.cb.serial('authentication does fail – invalid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid token', (t) => {
-  helpers.mockEntitlement(400, fixtures.content.userDataRpt)
+  helpers.mockEntitlement(400, fixtures.content.rpt)
 
   const mockReq = {
     method: 'GET',
     url: '/',
     headers: {
-      authorization: `bearer ${fixtures.jwt.userDataRpt}`
+      authorization: `bearer ${fixtures.jwt.rpt}`
     }
   }
 

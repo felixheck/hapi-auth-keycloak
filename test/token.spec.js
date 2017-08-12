@@ -50,61 +50,61 @@ test('get no bearer token – spaces between', (t) => {
 })
 
 test('get user data of token', (t) => {
-  const jwt = `bearer ${fixtures.jwt.userData}`
+  const jwt = `bearer ${fixtures.jwt.current()}`
   const tkn = token.create(jwt)
   const data = token.getData(tkn)
 
-  t.truthy(data)
-  t.is(data.expiresIn, 4000)
-  t.is(data.credentials.sub, fixtures.content.userData.sub)
+  t.truthy(tkn)
+  t.is(data.expiresIn, 2700000)
+  t.is(data.credentials.sub, fixtures.content.current.sub)
   t.falsy(data.credentials.name)
   t.deepEqual(data.credentials.scope.sort(), ['editor', 'other-app:creator', 'realm:admin'])
 })
 
 test('get user data of token – rpt', (t) => {
-  const jwt = `bearer ${fixtures.jwt.userDataRpt}`
+  const jwt = `bearer ${fixtures.jwt.rpt}`
   const tkn = token.create(jwt)
   const data = token.getData(tkn)
 
-  t.truthy(data)
+  t.truthy(tkn)
   t.is(data.expiresIn, 4000)
-  t.is(data.credentials.sub, fixtures.content.userData.sub)
+  t.is(data.credentials.sub, fixtures.content.rpt.sub)
   t.falsy(data.credentials.name)
   t.deepEqual(data.credentials.scope.sort(), ['editor', 'other-app:creator', 'realm:admin', 'scope:foo.READ', 'scope:foo.WRITE'])
 })
 
 test('get user data of token – additional fields', (t) => {
-  const jwt = `bearer ${fixtures.jwt.userData}`
+  const jwt = `bearer ${fixtures.jwt.current()}`
   const tkn = token.create(jwt)
   const data = token.getData(tkn, ['name'])
 
-  t.truthy(data)
-  t.is(data.expiresIn, 4000)
-  t.is(data.credentials.sub, fixtures.content.userData.sub)
-  t.is(data.credentials.name, fixtures.content.userData.name)
+  t.truthy(tkn)
+  t.is(data.expiresIn, 2700000)
+  t.is(data.credentials.sub, fixtures.content.current.sub)
+  t.is(data.credentials.name, fixtures.content.current.name)
   t.deepEqual(data.credentials.scope.sort(), ['editor', 'other-app:creator', 'realm:admin'])
 })
 
 test('get user data of token – default expiration', (t) => {
-  const jwt = `bearer ${fixtures.jwt.userDataExp}`
+  const jwt = `bearer ${fixtures.jwt.defaultExp}`
   const tkn = token.create(jwt)
   const data = token.getData(tkn)
 
-  t.truthy(data)
+  t.truthy(tkn)
   t.is(data.expiresIn, 60000)
-  t.is(data.credentials.sub, fixtures.content.userData.sub)
+  t.is(data.credentials.sub, fixtures.content.expired.sub)
   t.falsy(data.credentials.name)
   t.deepEqual(data.credentials.scope.sort(), ['editor', 'other-app:creator', 'realm:admin'])
 })
 
 test('get user data of token – default scopes', (t) => {
-  const jwt = `bearer ${fixtures.jwt.userDataScope}`
+  const jwt = `bearer ${fixtures.jwt.defaultScope}`
   const tkn = token.create(jwt)
   const data = token.getData(tkn)
 
-  t.truthy(data)
+  t.truthy(tkn)
   t.is(data.expiresIn, 4000)
-  t.is(data.credentials.sub, fixtures.content.userData.sub)
+  t.is(data.credentials.sub, fixtures.content.expired.sub)
   t.falsy(data.credentials.name)
   t.deepEqual(data.credentials.scope, [])
 })

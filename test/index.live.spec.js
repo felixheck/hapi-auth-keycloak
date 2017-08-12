@@ -13,13 +13,13 @@ test.afterEach.always('reset instances and prototypes', () => {
 })
 
 test.cb.serial('authentication does succeed', (t) => {
-  helpers.mockIntrospect(200, fixtures.content.userData)
+  helpers.mockIntrospect(200, fixtures.content.current)
 
   const mockReq = {
     method: 'GET',
     url: '/',
     headers: {
-      authorization: `bearer ${fixtures.jwt.userData}`
+      authorization: `bearer ${fixtures.jwt.current()}`
     }
   }
 
@@ -33,13 +33,13 @@ test.cb.serial('authentication does succeed', (t) => {
 })
 
 test.cb.serial('authentication does succeed – cached', (t) => {
-  helpers.mockIntrospect(200, fixtures.content.userData)
+  helpers.mockIntrospect(200, fixtures.content.current)
 
   const mockReq = {
     method: 'GET',
     url: '/',
     headers: {
-      authorization: `bearer ${fixtures.jwt.userData}`
+      authorization: `bearer ${fixtures.jwt.current()}`
     }
   }
 
@@ -55,13 +55,13 @@ test.cb.serial('authentication does succeed – cached', (t) => {
 })
 
 test.cb.serial('authentication does success – valid roles', (t) => {
-  helpers.mockIntrospect(200, fixtures.content.userData)
+  helpers.mockIntrospect(200, fixtures.content.current)
 
   const mockReq = {
     method: 'GET',
     url: '/role',
     headers: {
-      authorization: `bearer ${fixtures.jwt.userData}`
+      authorization: `bearer ${fixtures.jwt.current()}`
     }
   }
 
@@ -75,13 +75,13 @@ test.cb.serial('authentication does success – valid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid roles', (t) => {
-  helpers.mockIntrospect(200, fixtures.content.userData)
+  helpers.mockIntrospect(200, fixtures.content.current)
 
   const mockReq = {
     method: 'GET',
     url: '/role/guest',
     headers: {
-      authorization: `bearer ${fixtures.jwt.userData}`
+      authorization: `bearer ${fixtures.jwt.current()}`
     }
   }
 
@@ -101,7 +101,7 @@ test.cb.serial('authentication does fail – invalid token', (t) => {
     method: 'GET',
     url: '/',
     headers: {
-      authorization: `bearer ${fixtures.jwt.userData}`
+      authorization: `bearer ${fixtures.jwt.current()}`
     }
   }
 
