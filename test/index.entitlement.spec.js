@@ -3,15 +3,15 @@ const test = require('ava')
 const helpers = require('./_helpers')
 const fixtures = require('./fixtures')
 
-const targetScope = ['editor', 'other-app:creator', 'realm:admin', 'scope:foo.READ', 'scope:foo.WRITE']
 const cfg = helpers.getOptions({ entitlement: true })
+const targetScope = [...fixtures.targetScope, 'scope:foo.READ', 'scope:foo.WRITE']
 
 test.afterEach.always('reset instances and prototypes', () => {
   nock.cleanAll()
 })
 
 test.cb.serial('authentication does succeed', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt}`)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt()}`)
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
 
@@ -26,7 +26,7 @@ test.cb.serial('authentication does succeed', (t) => {
 })
 
 test.cb.serial('authentication does succeed – cached', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt}`)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt()}`)
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
 
@@ -43,7 +43,7 @@ test.cb.serial('authentication does succeed – cached', (t) => {
 })
 
 test.cb.serial('authentication does success – valid roles', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt}`, '/role')
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt()}`, '/role')
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
 
@@ -58,7 +58,7 @@ test.cb.serial('authentication does success – valid roles', (t) => {
 })
 
 test.cb.serial('authentication does success – valid roles', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt}`, '/role/rpt')
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt()}`, '/role/rpt')
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
 
@@ -73,7 +73,7 @@ test.cb.serial('authentication does success – valid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid roles', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt}`, '/role/guest')
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt()}`, '/role/guest')
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
 
@@ -87,7 +87,7 @@ test.cb.serial('authentication does fail – invalid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid token', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt}`)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt()}`)
 
   helpers.mockEntitlement(400, fixtures.content.rpt)
 

@@ -100,7 +100,7 @@ function getValidateFn () {
  */
 function handleKeycloakValidation (tkn, reply) {
   getValidateFn()(tkn).then((info) => {
-    const { expiresIn, credentials } = token.getData(info || tkn, options.userInfo)
+    const { expiresIn, credentials } = token.getData(info || tkn, options)
     const userData = { credentials }
 
     cache.set(store, tkn, userData, expiresIn)

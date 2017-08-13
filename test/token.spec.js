@@ -50,57 +50,55 @@ test('get no bearer token – spaces between', (t) => {
 })
 
 test('get user data of token', (t) => {
-  const jwt = `bearer ${fixtures.jwt.current()}`
-  const tkn = token.create(jwt)
-  const data = token.getData(tkn)
+  const tkn = fixtures.jwt.current()
+  const data = token.getData(tkn, { clientId: fixtures.common.clientId })
 
   t.truthy(tkn)
   t.is(data.expiresIn, 2700000)
   t.is(data.credentials.sub, fixtures.content.current.sub)
   t.falsy(data.credentials.name)
-  t.deepEqual(data.credentials.scope.sort(), ['editor', 'other-app:creator', 'realm:admin'])
+  t.deepEqual(data.credentials.scope.sort(), fixtures.targetScope)
 })
 
 test('get user data of token – rpt', (t) => {
-  const jwt = `bearer ${fixtures.jwt.rpt}`
-  const tkn = token.create(jwt)
-  const data = token.getData(tkn)
+  const tkn = fixtures.jwt.rpt()
+  const data = token.getData(tkn, { clientId: fixtures.common.clientId })
 
   t.truthy(tkn)
   t.is(data.expiresIn, 4000)
   t.is(data.credentials.sub, fixtures.content.rpt.sub)
   t.falsy(data.credentials.name)
-  t.deepEqual(data.credentials.scope.sort(), ['editor', 'other-app:creator', 'realm:admin', 'scope:foo.READ', 'scope:foo.WRITE'])
+  t.deepEqual(data.credentials.scope.sort(), [...fixtures.targetScope, 'scope:foo.READ', 'scope:foo.WRITE'])
 })
 
 test('get user data of token – additional fields', (t) => {
-  const jwt = `bearer ${fixtures.jwt.current()}`
-  const tkn = token.create(jwt)
-  const data = token.getData(tkn, ['name'])
+  const tkn = fixtures.jwt.current()
+  const data = token.getData(tkn, {
+    clientId: fixtures.common.clientId,
+    userInfoFields: ['name']
+  })
 
   t.truthy(tkn)
   t.is(data.expiresIn, 2700000)
   t.is(data.credentials.sub, fixtures.content.current.sub)
   t.is(data.credentials.name, fixtures.content.current.name)
-  t.deepEqual(data.credentials.scope.sort(), ['editor', 'other-app:creator', 'realm:admin'])
+  t.deepEqual(data.credentials.scope.sort(), fixtures.targetScope)
 })
 
 test('get user data of token – default expiration', (t) => {
-  const jwt = `bearer ${fixtures.jwt.defaultExp}`
-  const tkn = token.create(jwt)
-  const data = token.getData(tkn)
+  const tkn = fixtures.jwt.defaultExp()
+  const data = token.getData(tkn, { clientId: fixtures.common.clientId })
 
   t.truthy(tkn)
   t.is(data.expiresIn, 60000)
   t.is(data.credentials.sub, fixtures.content.expired.sub)
   t.falsy(data.credentials.name)
-  t.deepEqual(data.credentials.scope.sort(), ['editor', 'other-app:creator', 'realm:admin'])
+  t.deepEqual(data.credentials.scope.sort(), fixtures.targetScope)
 })
 
 test('get user data of token – default scopes', (t) => {
-  const jwt = `bearer ${fixtures.jwt.defaultScope}`
-  const tkn = token.create(jwt)
-  const data = token.getData(tkn)
+  const tkn = fixtures.jwt.defaultScope()
+  const data = token.getData(tkn, { clientId: fixtures.common.clientId })
 
   t.truthy(tkn)
   t.is(data.expiresIn, 4000)

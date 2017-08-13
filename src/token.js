@@ -19,27 +19,41 @@ function getToken (field) {
  * @function
  * @private
  *
+ * Get function prefixing role with respective key.
+ *
+ * @param {string} clientId The current client its identifier
+ * @param {string} key The role its key
+ * @returns {Function} The composed prefixing function
+ */
+function prefixRole (clientId, key) {
+  return (role) => key === clientId ? role : `${key}:${role}`
+}
+
+/**
+ * @function
+ * @private
+ *
  * Get roles out of token content.
  * Exclude `account` roles and prefix realm roles
  * with `realm:`. Roles of other resources are prefixed
  * with their name.
  *
+ * @param {string} clientId The current client its identifier
  * @param {Object} [realm] The realm access data
  * @param {Object} [resource] The resource access data
  * @returns {Array.<?string>} The list of roles
  */
-function getRoles ({
+function getRoles (clientId, {
   realm_access: realm = { roles: [] },
-  resource_access: resource = {},
+  resource_access: resources = {},
   authorization: auth = { permissions: [] }
 }) {
-  delete resource.account
+  const prefix = prefixRole.bind(undefined, clientId)
+  const realmRoles = realm.roles.map(prefix('realm'))
+  const scopes = _.flatten(_.map(auth.permissions, 'scopes')).map(prefix('scope'))
+  const appRoles = Object.keys(resources).map((key) => resources[key].roles.map(prefix(key)))
 
-  const realmRoles = realm.roles.map(role => `realm:${role}`)
-  const appRoles = _.flatten(_.map(resource, 'roles'))
-  const scopes = _.flatten(_.map(auth.permissions, 'scopes')).map(scope => `scope:${scope}`)
-
-  return [...realmRoles, ...appRoles, ...scopes]
+  return _.flattenDepth([realmRoles, scopes, appRoles], 2)
 }
 
 /**
@@ -47,13 +61,15 @@ function getRoles ({
  * @private
  *
  * Get expiration out of token content.
+ * If `exp` or `iat` is undefined just 60
+ * seconds as default expiration time.
  *
- * @param {number} [exp] The `expiration` timestamp in seconds
- * @param {number} [iat] The `issued at` timestamp in seconds
+ * @param {number} exp The `expiration` timestamp in seconds
+ * @param {number} iat The `issued at` timestamp in seconds
  * @returns {number} The expiration delta in milliseconds
  */
-function getExpiration ({ exp = 60, iat = 0 }) {
-  return (exp - iat) * 1000
+function getExpiration ({ exp, iat }) {
+  return [exp, iat].includes(undefined) ? 60 * 1000 : (exp - iat) * 1000
 }
 
 /**
@@ -79,11 +95,13 @@ function getUserInfo (content, fields = []) {
  * when the token expires.
  *
  * @param {string} tkn The token to be checked
+ * @param {string} clientId The current client its identifier
+ * @param {Array.<?string>} [userInfoFields] The necessary user info fields
  * @returns {Object} The extracted data
  */
-function getData (tkn, userInfoFields) {
+function getData (tkn, { clientId, userInfoFields }) {
   const content = jwt.decode(tkn)
-  const scope = getRoles(content)
+  const scope = getRoles(clientId, content)
 
   return {
     expiresIn: getExpiration(content),

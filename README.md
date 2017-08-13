@@ -78,10 +78,10 @@ server.register({
 #### Route Configuration & Scope
 Define your routes and add `keycloak-jwt` when necessary. It is possible to define the necessary scope like documented by the [express.js middleware][keycloak-node]:
 
-- To secure a resource with an application role for the current app, use the role name (e.g. `editor`).
-- To secure a resource with an application role for a different app, prefix the role name (e.g. `other-app:creator`)
-- To secure a resource with a realm role, prefix the role name with `realm:` (e.g. `realm:admin`).
-- To secure a resource with [fine-grained scope definitions][rpt], prefix the Keycloak scopes with `scope:` (e.g. `scope:foo.READ`).
+- To secure an endpoint with a resource's role , use the role name (e.g. `editor`).
+- To secure an endpoint with another resource's role, prefix the role name (e.g. `other-resource:creator`)
+- To secure an endpoint with a realm role, prefix the role name with `realm:` (e.g. `realm:admin`).
+- To secure an endpoint with [fine-grained scope definitions][rpt], prefix the Keycloak scopes with `scope:` (e.g. `scope:foo.READ`).
 
 ``` js
 server.route([
@@ -93,7 +93,7 @@ server.route([
       auth: {
         strategies: ['keycloak-jwt'],
         access: {
-          scope: ['realm:admin', 'editor', 'other-app:creator', 'scope:foo.READ']
+          scope: ['realm:admin', 'editor', 'other-resource:creator', 'scope:foo.READ']
         }
       },
       handler (req, reply) {
@@ -107,7 +107,7 @@ server.route([
 ## API
 #### Plugin Options
 
-> By default, the Keycloak server has built-in [two ways to authenticate][client-auth] the client: client ID and client secret **(1)**, or with a signed JWT **(2)**. This plugin supports both. If a non-live strategy is used, ensure that the identifier of the related realm key is included in their header as `kid`. Check the description of `secret`/`publicKey`/`entitlement` and the [terminology][rpt-terms] for further information. 
+> By default, the Keycloak server has built-in [two ways to authenticate][client-auth] the client: client ID and client secret **(1)**, or with a signed JWT **(2)**. This plugin supports both. If a non-live strategy is used, ensure that the identifier of the related realm key is included in their header as `kid`. Check the description of `secret`/`publicKey`/`entitlement` and the [terminology][rpt-terms] for further information.
 >
 > | Strategies | Online | Live |[Scopes][rpt]  | Truthy Option | Note         |
 > |:-----------|:------:|:----:|:-------------:|:---------------|:-------------|
@@ -128,10 +128,10 @@ Required. Example: `foobar`<br/>
 - `secret {string}` – The related secret of the Keycloak client/application.<br/>
 Defining this option enables the traditional method described in the OAuth2 specification and performs an [introspect][introspect] request.<br/>
 Optional. Example: `1234-bar-4321-foo`<br/>
-  
+
 - `publicKey {string}` – The realm its public key related to the private key used to sign the token.<br/>
 Defining this option enables the offline and non-live validation. The public key has to be in [PEM][pem] or [JWK][jwk] format.<br/>
-Optional. 
+Optional.
 
 - `entitlement {boolean=true}` – The token should be validated with the entitlement API to enable fine-grained authorization. Enabling this option decelerates the process marginally. Mind that `false` is an invalid value.<br/>
 Optional. Default: `undefined`.
@@ -157,53 +157,67 @@ Required.
 Required.
 
 ## Example
+#### `routes.js`
 
 ``` js
-const Hapi = require('hapi');
-const authKeycloak = require('hapi-auth-keycloak');
+exports.register = function (server, options, next) {
+  server.route([
+    {
+      method: 'GET',
+      path: '/',
+      config: {
+        auth: {
+          strategies: ['keycloak-jwt'],
+          access: {
+            scope: ['realm:admin', 'editor', 'other-resource:creator', 'scope:foo.READ']
+          }
+        },
+        handler (req, reply) {
+          reply(req.auth.credentials)
+        }
+      }
+    }
+  ])
+
+  next()
+}
+
+exports.register.attributes = {
+  name: 'example-routes',
+  version: '0.0.1'
+}
+```
+
+#### `index.js`
+``` js
+const Hapi = require('hapi')
+const authKeycloak = require('hapi-auth-keycloak')
+const routes = require('./routes')
 
 const server = new Hapi.Server()
 server.connection({ port: 3000, host: 'localhost' })
 
-server.route([
-  {
-    method: 'GET',
-    path: '/',
-    config: {
-      description: 'protected endpoint',
-      auth: {
-        strategies: ['keycloak-jwt'],
-        access: {
-          scope: ['realm:admin', 'editor', 'other-app:creator', 'scope:foo.READ']
-        }
-      },
-      handler (req, reply) {
-        reply('hello world')
-      }
-    }
-  },
-])
+const options = {
+  realmUrl: 'https://localhost:8080/auth/realms/testme',
+  clientId: 'foobar',
+  minTimeBetweenJwksRequests: 15,
+  cache: true,
+  userInfo: ['name', 'email']
+}
 
 process.on('SIGINT', () => {
-  server.stop().then((err) => {
-    process.exit((err) ? 1 : 0)
-  })
+  server.stop().then((err) => process.exit(err ? 1 : 0))
 })
 
-server.register({
-  register: authKeycloak,
-  options: {
-    realmUrl: 'https://localhost:8080/auth/realms/testme',
-    clientId: 'foobar',
-    minTimeBetweenJwksRequests: 15,
-    cache: true,
-    userInfo: ['name', 'email']
-  }
-}).then(() => {
-  server.auth.strategy('keycloak-jwt', 'keycloak-jwt');
+server.register({ register: authKeycloak, options }).then(() => {
+  server.auth.strategy('keycloak-jwt', 'keycloak-jwt')
+}).then(() => (
+  server.register({ register: routes })
+)).then(() => (
   server.start()
-})
-.catch(console.error)
+)).then(() => {
+  console.log('Server started successfully')
+}).catch(console.error)
 ```
 
 ## Developing and Testing

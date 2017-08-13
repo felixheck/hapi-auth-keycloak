@@ -55,7 +55,7 @@ test.cb.serial('authentication does fail – invalid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – expired token', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.expired}`)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.expired()}`)
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
