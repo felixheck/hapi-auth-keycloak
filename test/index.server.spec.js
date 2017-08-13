@@ -13,7 +13,7 @@ test.cb.serial('server method – authentication does succeed', (t) => {
   helpers.mockIntrospect(200, fixtures.content.current)
 
   helpers.getServer(cfg, (server) => {
-    server.kjwt.validate(`bearer ${fixtures.jwt.current()}`, (err, res) => {
+    server.kjwt.validate(`bearer ${fixtures.composeJwt('current')}`, (err, res) => {
       t.falsy(err)
       t.truthy(res)
       t.truthy(res.credentials)
@@ -26,7 +26,7 @@ test.cb.serial('server method – authentication does succeed – cache', (t) =
   helpers.mockIntrospect(200, fixtures.content.current)
   helpers.mockIntrospect(200, fixtures.content.current)
 
-  const mockTkn = `bearer ${fixtures.jwt.current()}`
+  const mockTkn = `bearer ${fixtures.composeJwt('current')}`
 
   helpers.getServer(cfg, (server) => {
     server.kjwt.validate(mockTkn, () => {
@@ -44,7 +44,7 @@ test.cb.serial('server method – authentication does fail – invalid token', (
   helpers.mockIntrospect(200, { active: false })
 
   helpers.getServer(cfg, (server) => {
-    server.kjwt.validate(`bearer ${fixtures.jwt.current()}`, (err, res) => {
+    server.kjwt.validate(`bearer ${fixtures.composeJwt('current')}`, (err, res) => {
       t.falsy(res)
       t.truthy(err)
       t.truthy(err.isBoom)
@@ -57,7 +57,7 @@ test.cb.serial('server method – authentication does fail – invalid token', (
 
 test.cb.serial('server method – authentication does fail – invalid header', (t) => {
   helpers.getServer(cfg, (server) => {
-    server.kjwt.validate(fixtures.jwt.current(), (err, res) => {
+    server.kjwt.validate(fixtures.composeJwt('current'), (err, res) => {
       t.falsy(res)
       t.truthy(err)
       t.truthy(err.isBoom)
@@ -72,7 +72,7 @@ test.cb.serial('server method – authentication does fail – error', (t) => {
   helpers.mockIntrospect(400, 'an error', true)
 
   helpers.getServer(cfg, (server) => {
-    server.kjwt.validate(`bearer ${fixtures.jwt.current()}`, (err, res) => {
+    server.kjwt.validate(`bearer ${fixtures.composeJwt('current')}`, (err, res) => {
       t.falsy(res)
       t.truthy(err)
       t.truthy(err.isBoom)

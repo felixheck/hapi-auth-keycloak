@@ -10,7 +10,7 @@ test.afterEach.always('reset instances and prototypes', () => {
 })
 
 test.cb.serial('authentication does succeed', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('current')}`)
 
   helpers.mockIntrospect(200, fixtures.content.current)
 
@@ -24,7 +24,7 @@ test.cb.serial('authentication does succeed', (t) => {
 })
 
 test.cb.serial('authentication does succeed – cached', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('current')}`)
 
   helpers.mockIntrospect(200, fixtures.content.current)
 
@@ -40,7 +40,7 @@ test.cb.serial('authentication does succeed – cached', (t) => {
 })
 
 test.cb.serial('authentication does success – valid roles', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`, '/role')
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('current')}`, '/role')
 
   helpers.mockIntrospect(200, fixtures.content.current)
 
@@ -54,7 +54,7 @@ test.cb.serial('authentication does success – valid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid roles', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`, '/role/guest')
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('current')}`, '/role/guest')
 
   helpers.mockIntrospect(200, fixtures.content.current)
 
@@ -68,7 +68,7 @@ test.cb.serial('authentication does fail – invalid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid token', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('current')}`)
 
   helpers.mockIntrospect(200, { active: false })
 

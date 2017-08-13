@@ -50,7 +50,7 @@ test('get no bearer token – spaces between', (t) => {
 })
 
 test('get user data of token', (t) => {
-  const tkn = fixtures.jwt.current()
+  const tkn = fixtures.composeJwt('current')
   const data = token.getData(tkn, { clientId: fixtures.common.clientId })
 
   t.truthy(tkn)
@@ -61,7 +61,7 @@ test('get user data of token', (t) => {
 })
 
 test('get user data of token – rpt', (t) => {
-  const tkn = fixtures.jwt.rpt()
+  const tkn = fixtures.composeJwt('rpt')
   const data = token.getData(tkn, { clientId: fixtures.common.clientId })
 
   t.truthy(tkn)
@@ -72,7 +72,7 @@ test('get user data of token – rpt', (t) => {
 })
 
 test('get user data of token – additional fields', (t) => {
-  const tkn = fixtures.jwt.current()
+  const tkn = fixtures.composeJwt('current')
   const data = token.getData(tkn, {
     clientId: fixtures.common.clientId,
     userInfo: ['name']
@@ -86,7 +86,7 @@ test('get user data of token – additional fields', (t) => {
 })
 
 test('get user data of token – default expiration', (t) => {
-  const tkn = fixtures.jwt.defaultExp()
+  const tkn = fixtures.composeJwt('noExp')
   const data = token.getData(tkn, { clientId: fixtures.common.clientId })
 
   t.truthy(tkn)
@@ -97,7 +97,7 @@ test('get user data of token – default expiration', (t) => {
 })
 
 test('get user data of token – default scopes', (t) => {
-  const tkn = fixtures.jwt.defaultScope()
+  const tkn = fixtures.composeJwt('noScope')
   const data = token.getData(tkn, { clientId: fixtures.common.clientId })
 
   t.truthy(tkn)

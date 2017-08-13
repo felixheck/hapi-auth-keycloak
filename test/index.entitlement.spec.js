@@ -11,7 +11,7 @@ test.afterEach.always('reset instances and prototypes', () => {
 })
 
 test.cb.serial('authentication does succeed', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt()}`)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`)
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
 
@@ -26,7 +26,7 @@ test.cb.serial('authentication does succeed', (t) => {
 })
 
 test.cb.serial('authentication does succeed – cached', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt()}`)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`)
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
 
@@ -43,7 +43,7 @@ test.cb.serial('authentication does succeed – cached', (t) => {
 })
 
 test.cb.serial('authentication does success – valid roles', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt()}`, '/role')
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`, '/role')
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
 
@@ -58,7 +58,7 @@ test.cb.serial('authentication does success – valid roles', (t) => {
 })
 
 test.cb.serial('authentication does success – valid roles', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt()}`, '/role/rpt')
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`, '/role/rpt')
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
 
@@ -73,7 +73,7 @@ test.cb.serial('authentication does success – valid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid roles', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt()}`, '/role/guest')
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`, '/role/guest')
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
 
@@ -87,7 +87,7 @@ test.cb.serial('authentication does fail – invalid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid token', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.rpt()}`)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`)
 
   helpers.mockEntitlement(400, fixtures.content.rpt)
 

@@ -5,7 +5,7 @@ const fixtures = require('./fixtures')
 const cfg = helpers.getOptions({ publicKey: fixtures.common.publicKeyRsa })
 
 test.cb.serial('authentication does succeed', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('current')}`)
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
@@ -17,7 +17,7 @@ test.cb.serial('authentication does succeed', (t) => {
 })
 
 test.cb.serial('authentication does succeed – cached', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('current')}`)
 
   helpers.getServer(Object.assign({ cache: true }, cfg), (server) => {
     server.inject(mockReq, () => {
@@ -31,7 +31,7 @@ test.cb.serial('authentication does succeed – cached', (t) => {
 })
 
 test.cb.serial('authentication does success – valid roles', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`, '/role')
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('current')}`, '/role')
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
@@ -43,7 +43,7 @@ test.cb.serial('authentication does success – valid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – invalid roles', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.current()}`, '/role/guest')
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('current')}`, '/role/guest')
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {
@@ -55,7 +55,7 @@ test.cb.serial('authentication does fail – invalid roles', (t) => {
 })
 
 test.cb.serial('authentication does fail – expired token', (t) => {
-  const mockReq = helpers.mockRequest(`bearer ${fixtures.jwt.expired()}`)
+  const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('expired')}`)
 
   helpers.getServer(cfg, (server) => {
     server.inject(mockReq, (res) => {

@@ -17,15 +17,15 @@ const composeContent = (access, customs = {}) => (
 
 /**
  * @function
- * @private
+ * @public
  *
  * Compose JWT with private key and payload
  *
- * @param {Object} data The data to be signed
+ * @param {string} key The key of the `content` object to be signed
  * @returns {string} The composed JWT
  */
-const composeJwt = (data) => (
-  jsonwebtoken.sign(data, fs.readFileSync('./test/fixtures/private-rsa.pem'), { algorithm: 'RS256' })
+const composeJwt = (key) => (
+  jsonwebtoken.sign(content[key], fs.readFileSync('./test/fixtures/private-rsa.pem'), { algorithm: 'RS256' })
 )
 
 /**
@@ -177,24 +177,10 @@ const content = {
   })
 }
 
-/**
- * @type Object
- * @public
- *
- * Various JSON Web Tokens
- */
-const jwt = {
-  expired: () => composeJwt(content.expired),
-  defaultExp: () => composeJwt(content.noExp),
-  defaultScope: () => composeJwt(content.noScope),
-  current: () => composeJwt(content.current),
-  rpt: () => composeJwt(content.rpt)
-}
-
 module.exports = {
   common,
   clientConfig,
+  composeJwt,
   targetScope,
-  content,
-  jwt
+  content
 }
