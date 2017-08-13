@@ -8,11 +8,15 @@ const jsonwebtoken = require('jsonwebtoken')
  * Compose content object for JWT
  *
  * @param {boolean} access Whether `accessBase` should be added
+ * @param {boolean} dates Whether date data should be added
  * @param {Object} [customs] The custom data to be added
  * @returns {Object} The composed content object
  */
-const composeContent = (access, customs = {}) => (
-  Object.assign(customs, contentBase, access ? accessBase : {})
+const composeContent = (access, dates, customs = {}) => (
+  Object.assign(customs, contentBase,
+    access ? accessBase : {},
+    dates ? { exp: 5, iat: 1 } : {}
+  )
 )
 
 /**
@@ -89,14 +93,7 @@ const common = Object.assign({}, clientConfig, {
  *
  * Scope list to be targeted
  */
-const targetScope = [
-  'account:manage-account',
-  'account:manage-account-links',
-  'account:view-profile',
-  'editor',
-  'otherApp:creator',
-  'realm:admin'
-]
+const targetScope = ['account:manage-account', 'editor', 'otherApp:creator', 'realm:admin']
 
 /**
  * @type Object
@@ -120,29 +117,11 @@ const contentBase = {
  * Access attributes for JWT generation
  */
 const accessBase = {
-  realm_access: {
-    roles: [
-      'admin'
-    ]
-  },
+  realm_access: { roles: ['admin'] },
   resource_access: {
-    account: {
-      roles: [
-        'manage-account',
-        'manage-account-links',
-        'view-profile'
-      ]
-    },
-    foobar: {
-      roles: [
-        'editor'
-      ]
-    },
-    otherApp: {
-      roles: [
-        'creator'
-      ]
-    }
+    account: { roles: ['manage-account'] },
+    foobar: { roles: ['editor'] },
+    otherApp: { roles: ['creator'] }
   }
 }
 
@@ -153,22 +132,14 @@ const accessBase = {
  * Content Parts of JWTs
  */
 const content = {
-  expired: composeContent(true, {
-    exp: 5,
-    iat: 1
-  }),
-  current: composeContent(true, {
+  expired: composeContent(true, true),
+  current: composeContent(true, false, {
     exp: parseInt(Date.now() / 1000) + 60 * 60,
     iat: parseInt(Date.now() / 1000) + 60 * 15
   }),
-  noExp: composeContent(true),
-  noScope: composeContent(false, {
-    exp: 5,
-    iat: 1
-  }),
-  rpt: composeContent(true, {
-    exp: 5,
-    iat: 1,
+  noExp: composeContent(true, false),
+  noScope: composeContent(false, true),
+  rpt: composeContent(true, true, {
     authorization: {
       permissions: [{
         scopes: ['foo.READ', 'foo.WRITE']
