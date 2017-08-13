@@ -96,16 +96,16 @@ function getUserInfo (content, fields = []) {
  *
  * @param {string} tkn The token to be checked
  * @param {string} clientId The current client its identifier
- * @param {Array.<?string>} [userInfoFields] The necessary user info fields
+ * @param {Array.<?string>} [userInfo] The necessary user info fields
  * @returns {Object} The extracted data
  */
-function getData (tkn, { clientId, userInfoFields }) {
+function getData (tkn, { clientId, userInfo }) {
   const content = jwt.decode(tkn)
   const scope = getRoles(clientId, content)
 
   return {
     expiresIn: getExpiration(content),
-    credentials: Object.assign({ scope }, getUserInfo(content, userInfoFields))
+    credentials: Object.assign({ scope }, getUserInfo(content, userInfo))
   }
 }
 

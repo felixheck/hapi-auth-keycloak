@@ -75,7 +75,7 @@ test('get user data of token – additional fields', (t) => {
   const tkn = fixtures.jwt.current()
   const data = token.getData(tkn, {
     clientId: fixtures.common.clientId,
-    userInfoFields: ['name']
+    userInfo: ['name']
   })
 
   t.truthy(tkn)
