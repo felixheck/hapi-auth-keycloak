@@ -2,7 +2,7 @@ const boom = require('boom')
 const joi = require('joi')
 
 /**
- * @type joi.scheme
+ * @type Object
  * @private
  *
  * The plugin options scheme
@@ -54,7 +54,7 @@ const scheme = joi.object({
  * @param {Object} opts The plugin related options
  * @returns {Object} The validated options
  *
- * @throws Options are invalid
+ * @throws {Error} Options are invalid
  */
 function verify (opts) {
   return joi.attempt(opts, scheme)

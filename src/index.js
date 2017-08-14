@@ -42,6 +42,8 @@ function verifySignedJwt (tkn) {
  *
  * @param {string} tkn The token to be validated
  * @returns {Promise} The error-handled promise
+ *
+ * @throws {Error} If token is invalid
  */
 function introspect (tkn) {
   return manager.validateAccessToken(tkn).then((res) => {
@@ -61,6 +63,8 @@ function introspect (tkn) {
  *
  * @param {string} tkn The token to be used for authentication
  * @returns {Promise} The modified, non-error-handling promise
+ *
+ * @throws {Error} If request failed or token is invalid
  */
 function getRpt (tkn) {
   return axios.get(`${options.realmUrl}/authz/entitlement/${options.clientId}`, {
