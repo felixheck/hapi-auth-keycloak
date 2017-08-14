@@ -2,7 +2,7 @@ const boom = require('boom')
 const joi = require('joi')
 
 /**
- * @type `joi.scheme`
+ * @type joi.scheme
  * @private
  *
  * The plugin options scheme
@@ -42,6 +42,7 @@ const scheme = joi.object({
 .without('entitlement', ['secret', 'publicKey'])
 .without('secret', ['entitlement', 'publicKey'])
 .without('publicKey', ['entitlement', 'secret'])
+.unknown(false)
 .required()
 
 /**

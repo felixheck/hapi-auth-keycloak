@@ -60,21 +60,12 @@ const publicKeyJwk = {
  * @type Object
  * @public
  *
- * Client config
- */
-const clientConfig = {
-  realmUrl,
-  clientId,
-  secret
-}
-
-/**
- * @type Object
- * @public
- *
  * Common attributes
  */
-const common = Object.assign({}, clientConfig, {
+const common = {
+  realmUrl,
+  clientId,
+  secret,
   publicKey,
   publicKeyRsa,
   publicKeyCert,
@@ -85,7 +76,7 @@ const common = Object.assign({}, clientConfig, {
   realmPath,
   introspectPath,
   entitlementPath
-})
+}
 
 /**
  * @type Array
@@ -133,12 +124,12 @@ const accessBase = {
  */
 const content = {
   expired: composeContent(true, true),
+  noExp: composeContent(true, false),
+  noScope: composeContent(false, true),
   current: composeContent(true, false, {
     exp: parseInt(Date.now() / 1000) + 60 * 60,
     iat: parseInt(Date.now() / 1000) + 60 * 15
   }),
-  noExp: composeContent(true, false),
-  noScope: composeContent(false, true),
   rpt: composeContent(true, true, {
     authorization: {
       permissions: [{
@@ -150,7 +141,6 @@ const content = {
 
 module.exports = {
   common,
-  clientConfig,
   composeJwt,
   targetScope,
   content

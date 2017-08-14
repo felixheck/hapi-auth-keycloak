@@ -9,7 +9,10 @@ const fixtures = require('./fixtures')
  *
  * The default plugin configuration
  */
-const defaults = Object.assign({}, fixtures.clientConfig, { secret: undefined })
+const defaults = {
+  realmUrl: fixtures.common.realmUrl,
+  clientId: fixtures.common.clientId
+}
 
 /**
  * @function
