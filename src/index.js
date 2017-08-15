@@ -1,3 +1,4 @@
+const axios = require('axios')
 const { GrantManager } = require('keycloak-auth-utils')
 const KeycloakToken = require('keycloak-auth-utils/lib/token')
 const cache = require('./cache')
@@ -6,7 +7,7 @@ const { error, fakeReply, verify } = require('./utils')
 const pkg = require('../package.json')
 
 /**
- * @type {Object|GrantManager}
+ * @type {Object}
  * @private
  *
  * The plugin related options and instances.
@@ -19,30 +20,32 @@ let store
  * @function
  * @private
  *
- * Validate the signed token offline with help of the related
- * public key or online with help of the Keycloak server and
- * JWKS. Resolve if the verification succeeded.
+ * Verify the signed token offline with help of the related
+ * public key or online with the Keycloak server and JWKS.
+ * Both are non-live. Resolve if the verification succeeded.
  *
  * @param {string} tkn The token to be validated
  * @returns {Promise} The error-handled promise
  */
-function validateSignedJwt (tkn) {
+function verifySignedJwt (tkn) {
   const kcTkn = new KeycloakToken(tkn, options.clientId)
-  return manager.validateToken(kcTkn)
+  return manager.validateToken(kcTkn).then(() => tkn)
 }
 
 /**
  * @function
  * @private
  *
- * Validate the token online with help of the related
+ * Validate the token live with help of the related
  * Keycloak server, the client identifier and its secret.
  * Resolve if the request succeeded and token is valid.
  *
  * @param {string} tkn The token to be validated
  * @returns {Promise} The error-handled promise
+ *
+ * @throws {Error} If token is invalid
  */
-function validateSecret (tkn) {
+function introspect (tkn) {
   return manager.validateAccessToken(tkn).then((res) => {
     if (res === false) {
       throw Error(error.msg.invalid)
@@ -54,20 +57,54 @@ function validateSecret (tkn) {
 
 /**
  * @function
+ * @private
+ *
+ * Retrieve the Requesting Party Token from the Keycloak Server.
+ *
+ * @param {string} tkn The token to be used for authentication
+ * @returns {Promise} The modified, non-error-handling promise
+ *
+ * @throws {Error} If request failed or token is invalid
+ */
+function getRpt (tkn) {
+  return axios.get(`${options.realmUrl}/authz/entitlement/${options.clientId}`, {
+    headers: {
+      authorization: `bearer ${tkn}`
+    }
+  }).then(({ data }) => data.rpt).catch(() => {
+    throw Error(error.msg.invalid)
+  })
+}
+
+/**
+ * @function
+ * @private
+ *
+ * Get validation strategy based on the options.
+ * If `secret` is set the token gets introspected.
+ * If `entitlement` is truthy it retrieves the RPT.
+ * Else perform a non-live validation with public keys.
+ *
+ * @returns {Function} The related validation strategy
+ */
+function getValidateFn () {
+  return options.secret ? introspect : options.entitlement ? getRpt : verifySignedJwt
+}
+
+/**
+ * @function
  * @public
  *
  * Validate a token either with the help of Keycloak
  * or a related public key. Store the user data in
  * cache if enabled.
  *
- * @param {string} token The token to be validated
+ * @param {string} tkn The token to be validated
  * @param {Function} reply The callback handler
  */
 function handleKeycloakValidation (tkn, reply) {
-  const validateFn = options.secret ? validateSecret : validateSignedJwt
-
-  validateFn(tkn).then(() => {
-    const { expiresIn, credentials } = token.getData(tkn, options.userInfo)
+  getValidateFn()(tkn).then((info) => {
+    const { expiresIn, credentials } = token.getData(info || tkn, options)
     const userData = { credentials }
 
     cache.set(store, tkn, userData, expiresIn)

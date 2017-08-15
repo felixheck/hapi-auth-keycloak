@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const jwt = require('jsonwebtoken')
 
 /**
  * @function
@@ -10,7 +11,7 @@ const _ = require('lodash')
  * @param {string} field The header field to be scanned
  * @returns {string} The extracted header
  */
-function extractToken (field) {
+function getToken (field) {
   return /^(?:bearer) ([a-zA-Z0-9\-_]+?\.[a-zA-Z0-9\-_]+?\.([a-zA-Z0-9\-_]+)?)$/i.exec(field)
 }
 
@@ -18,25 +19,41 @@ function extractToken (field) {
  * @function
  * @private
  *
- * Get scope out of token content.
+ * Get function prefixing role with respective key.
+ *
+ * @param {string} clientId The current client its identifier
+ * @param {string} key The role its key
+ * @returns {Function} The composed prefixing function
+ */
+function prefixRole (clientId, key) {
+  return (role) => key === clientId ? role : `${key}:${role}`
+}
+
+/**
+ * @function
+ * @private
+ *
+ * Get roles out of token content.
  * Exclude `account` roles and prefix realm roles
  * with `realm:`. Roles of other resources are prefixed
  * with their name.
  *
+ * @param {string} clientId The current client its identifier
  * @param {Object} [realm] The realm access data
  * @param {Object} [resource] The resource access data
  * @returns {Array.<?string>} The list of roles
  */
-function getScope ({
+function getRoles (clientId, {
   realm_access: realm = { roles: [] },
-  resource_access: resource = {}
+  resource_access: resources = {},
+  authorization: auth = { permissions: [] }
 }) {
-  delete resource.account
-  const realmRoles = realm.roles.map(role => `realm:${role}`)
+  const prefix = prefixRole.bind(undefined, clientId)
+  const realmRoles = realm.roles.map(prefix('realm'))
+  const scopes = _.flatten(_.map(auth.permissions, 'scopes')).map(prefix('scope'))
+  const appRoles = Object.keys(resources).map((key) => resources[key].roles.map(prefix(key)))
 
-  const appRoles = _.flatten(_.map(resource, 'roles'))
-
-  return [...realmRoles, ...appRoles]
+  return _.flattenDepth([realmRoles, scopes, appRoles], 2)
 }
 
 /**
@@ -44,13 +61,15 @@ function getScope ({
  * @private
  *
  * Get expiration out of token content.
+ * If `exp` or `iat` is undefined just 60
+ * seconds as default expiration time.
  *
- * @param {number} [exp] The `expiration` timestamp in seconds
- * @param {number} [iat] The `issued at` timestamp in seconds
+ * @param {number} exp The `expiration` timestamp in seconds
+ * @param {number} iat The `issued at` timestamp in seconds
  * @returns {number} The expiration delta in milliseconds
  */
-function getExpiration ({ exp = 60, iat = 0 }) {
-  return (exp - iat) * 1000
+function getExpiration ({ exp, iat }) {
+  return [exp, iat].includes(undefined) ? 60 * 1000 : (exp - iat) * 1000
 }
 
 /**
@@ -71,35 +90,22 @@ function getUserInfo (content, fields = []) {
  * @function
  * @public
  *
- * Extract content out of token.
- * The content is the middle part.
- *
- * @param {string} tkn The token to be checked
- * @returns {Object} The token its content
- */
-function getContent (tkn) {
-  return JSON.parse(Buffer.from(tkn.split('.')[1], 'base64').toString())
-}
-
-/**
- * @function
- * @public
- *
  * Get various data out of token content.
  * Get the current scope of the user and
  * when the token expires.
  *
-* @param {string} tkn The token to be checked
+ * @param {string} tkn The token to be checked
+ * @param {string} clientId The current client its identifier
+ * @param {Array.<?string>} [userInfo] The necessary user info fields
  * @returns {Object} The extracted data
  */
-function getData (tkn, userInfoFields) {
-  const content = getContent(tkn)
+function getData (tkn, { clientId, userInfo }) {
+  const content = jwt.decode(tkn)
+  const scope = getRoles(clientId, content)
 
   return {
     expiresIn: getExpiration(content),
-    credentials: Object.assign({
-      scope: getScope(content)
-    }, getUserInfo(content, userInfoFields))
+    credentials: Object.assign({ scope }, getUserInfo(content, userInfo))
   }
 }
 
@@ -113,13 +119,12 @@ function getData (tkn, userInfoFields) {
  * @returns {string|false} The token or `false` dependent on field
  */
 function create (field) {
-  const match = extractToken(field)
+  const match = getToken(field)
 
   return match ? match[1] : false
 }
 
 module.exports = {
   create,
-  getContent,
   getData
 }

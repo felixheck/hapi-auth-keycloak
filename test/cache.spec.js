@@ -3,7 +3,7 @@ const helpers = require('./_helpers')
 const cache = require('../src/cache')
 
 test.cb.serial('set and get value', (t) => {
-  helpers.getServer(false, (server) => {
+  helpers.getServer(undefined, (server) => {
     const store = cache.create(server, { segment: 'foo' })
     cache.set(store, 'bar', 42, 10000)
 
@@ -15,8 +15,21 @@ test.cb.serial('set and get value', (t) => {
   })
 })
 
+test.cb.serial('set and get value – true/defaults', (t) => {
+  helpers.getServer(undefined, (server) => {
+    const store = cache.create(server, true)
+    cache.set(store, 'bar', 42, 10000)
+
+    cache.get(store, 'bar', (err, res) => {
+      t.falsy(err)
+      t.is(res, 42)
+      t.end()
+    })
+  })
+})
+
 test.cb.serial('set and get value – no cache', (t) => {
-  helpers.getServer(false, (server) => {
+  helpers.getServer(undefined, (server) => {
     const store = cache.create(server, false)
     cache.set(store, 'bar', 42, 10000)
 
@@ -29,7 +42,7 @@ test.cb.serial('set and get value – no cache', (t) => {
 })
 
 test.cb.serial('set and get value – expired', (t) => {
-  helpers.getServer(false, (server) => {
+  helpers.getServer(undefined, (server) => {
     const store = cache.create(server, { segment: 'foo' })
     cache.set(store, 'bar', 42, 100)
 

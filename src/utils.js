@@ -2,7 +2,7 @@ const boom = require('boom')
 const joi = require('joi')
 
 /**
- * @type `joi.scheme`
+ * @type Object
  * @private
  *
  * The plugin options scheme
@@ -23,7 +23,10 @@ const scheme = joi.object({
     joi.object({
       kty: joi.string().required()
     }).unknown(true)
-  ).description('The related public key of the Keycloak client/application'),
+  ).description('The realm its public key related to the private key used to sign the token'),
+  entitlement: joi.boolean().invalid(false)
+    .description('The token should be validated with the entitlement API')
+    .example('true'),
   minTimeBetweenJwksRequests: joi.number().integer().positive().allow(0).default(0)
     .description('The minimum time between JWKS requests in seconds')
     .example(15),
@@ -36,7 +39,10 @@ const scheme = joi.object({
     .description('List of properties which should be included in the `request.auth.credentials` object')
     .example(['name', 'email'])
 })
-.nand('secret', 'publicKey')
+.without('entitlement', ['secret', 'publicKey'])
+.without('secret', ['entitlement', 'publicKey'])
+.without('publicKey', ['entitlement', 'secret'])
+.unknown(false)
 .required()
 
 /**
@@ -48,7 +54,7 @@ const scheme = joi.object({
  * @param {Object} opts The plugin related options
  * @returns {Object} The validated options
  *
- * @throws Options are invalid
+ * @throws {Error} Options are invalid
  */
 function verify (opts) {
   return joi.attempt(opts, scheme)
