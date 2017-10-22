@@ -53,7 +53,7 @@ const server = hapi.server({
 Finally register the plugin, set the correct options and the authentication strategy:
 ``` js
 await server.register({
-  register: authKeycloak,
+  plugin: authKeycloak,
   options: {
     realmUrl: 'https://localhost:8080/auth/realms/testme',
     clientId: 'foobar',
@@ -139,13 +139,13 @@ Optional. Default: `[]`.<br/>
 If `false` the cache is disabled. Use `true` or an empty object (`{}`) to use the built-in default cache.<br/>
 Optional. Default: `false`.
 
-#### `server.kjwt.validate(field {string}, done {Function})`
+#### `await server.kjwt.validate(field {string})`
 - `field {string}` — The `Bearer` field, including the scheme (`bearer`) itself.<br/>
 Example: `bearer 12345.abcde.67890`.<br/>
 Required.
 
-- `done {Function}` — The callback handler is passed `err {Error}, result {Object|false}` (error-first approach).<br/>If an error occurs, `err` is not `null`.  If the token is invalid, the `result` is `false`. Otherwise it is an object containing all relevant credentials.<br/>
-Required.
+If an error occurs, it get thrown — so take care and implement a kind of catching.<br/>
+If the token is invalid, the `result` is `false`. Otherwise it is an object containing all relevant credentials.
 
 ## Example
 #### `routes.js`
@@ -200,9 +200,9 @@ process.on('SIGINT', () => {
 
 (async () => {
   try {
-    await server.register({ register: authKeycloak, options });
+    await server.register({ plugin: authKeycloak, options });
     server.auth.strategy('keycloak-jwt', 'keycloak-jwt');
-    await server.register({ register: routes });
+    await server.register({ plugin: routes });
     await server.start();
     console.log('Server started successfully');
   } catch (err) {
