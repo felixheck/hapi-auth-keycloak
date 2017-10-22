@@ -10,106 +10,90 @@ test.afterEach.always('reset instances and prototypes', () => {
   nock.cleanAll()
 })
 
-test.cb.serial('authentication does succeed', (t) => {
+test.serial('authentication does succeed', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`)
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
 
-  helpers.getServer(cfg, (server) => {
-    server.inject(mockReq, (res) => {
-      t.truthy(res)
-      t.is(res.statusCode, 200)
-      t.deepEqual(JSON.parse(res.payload).sort(), targetScope)
-      t.end()
-    })
-  })
+  const server = await helpers.getServer(cfg)
+  const res = await server.inject(mockReq)
+
+  t.truthy(res)
+  t.is(res.statusCode, 200)
+  t.deepEqual(JSON.parse(res.payload).sort(), targetScope)
 })
 
-test.cb.serial('authentication does succeed – cached', (t) => {
+test.serial('authentication does succeed – cached', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`)
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
 
-  helpers.getServer(Object.assign({ cache: true }, cfg), (server) => {
-    server.inject(mockReq, () => {
-      server.inject(mockReq, (res) => {
-        t.truthy(res)
-        t.is(res.statusCode, 200)
-        t.deepEqual(JSON.parse(res.payload).sort(), targetScope)
-        t.end()
-      })
-    })
-  })
+  const server = await helpers.getServer(Object.assign({ cache: true }, cfg))
+  const res = await server.inject(mockReq)
+
+  t.truthy(res)
+  t.is(res.statusCode, 200)
+  t.deepEqual(JSON.parse(res.payload).sort(), targetScope)
 })
 
-test.cb.serial('authentication does success – valid roles', (t) => {
+test.serial('authentication does success – valid roles', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`, '/role')
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
 
-  helpers.getServer(cfg, (server) => {
-    server.inject(mockReq, (res) => {
-      t.truthy(res)
-      t.is(res.statusCode, 200)
-      t.deepEqual(JSON.parse(res.payload).sort(), targetScope)
-      t.end()
-    })
-  })
+  const server = await helpers.getServer(cfg)
+  const res = await server.inject(mockReq)
+
+  t.truthy(res)
+  t.is(res.statusCode, 200)
+  t.deepEqual(JSON.parse(res.payload).sort(), targetScope)
 })
 
-test.cb.serial('authentication does success – valid roles', (t) => {
+test.serial('authentication does success – valid roles', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`, '/role/rpt')
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
 
-  helpers.getServer(cfg, (server) => {
-    server.inject(mockReq, (res) => {
-      t.truthy(res)
-      t.is(res.statusCode, 200)
-      t.deepEqual(JSON.parse(res.payload).sort(), targetScope)
-      t.end()
-    })
-  })
+  const server = await helpers.getServer(cfg)
+  const res = await server.inject(mockReq)
+
+  t.truthy(res)
+  t.is(res.statusCode, 200)
+  t.deepEqual(JSON.parse(res.payload).sort(), targetScope)
 })
 
-test.cb.serial('authentication does fail – invalid roles', (t) => {
+test.serial('authentication does fail – invalid roles', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`, '/role/guest')
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
 
-  helpers.getServer(cfg, (server) => {
-    server.inject(mockReq, (res) => {
-      t.truthy(res)
-      t.is(res.statusCode, 403)
-      t.end()
-    })
-  })
+  const server = await helpers.getServer(cfg)
+  const res = await server.inject(mockReq)
+
+  t.truthy(res)
+  t.is(res.statusCode, 403)
 })
 
-test.cb.serial('authentication does fail – invalid token', (t) => {
+test.serial('authentication does fail – invalid token', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`)
 
   helpers.mockEntitlement(400, fixtures.content.rpt)
 
-  helpers.getServer(cfg, (server) => {
-    server.inject(mockReq, (res) => {
-      t.truthy(res)
-      t.is(res.statusCode, 401)
-      t.is(res.headers['www-authenticate'], 'Bearer error="Invalid credentials"')
-      t.end()
-    })
-  })
+  const server = await helpers.getServer(cfg)
+  const res = await server.inject(mockReq)
+
+  t.truthy(res)
+  t.is(res.statusCode, 401)
+  t.is(res.headers['www-authenticate'], 'Bearer error="Invalid credentials"')
 })
 
-test.cb.serial('authentication does fail – invalid header', (t) => {
+test.serial('authentication does fail – invalid header', async (t) => {
   const mockReq = helpers.mockRequest(fixtures.common.token)
 
-  helpers.getServer(cfg, (server) => {
-    server.inject(mockReq, (res) => {
-      t.truthy(res)
-      t.is(res.statusCode, 401)
-      t.is(res.headers['www-authenticate'], 'Bearer error="Missing or invalid authorization header"')
-      t.end()
-    })
-  })
+  const server = await helpers.getServer(cfg)
+  const res = await server.inject(mockReq)
+
+  t.truthy(res)
+  t.is(res.statusCode, 401)
+  t.is(res.headers['www-authenticate'], 'Bearer error="Missing or invalid authorization header"')
 })

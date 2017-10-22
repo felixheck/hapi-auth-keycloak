@@ -23,10 +23,9 @@ function create (server, opts) {
  *
  * @param {Object} The cache instance
  * @param {*} key The key to be searched
- * @param {Function} done The callback handler
  */
-function get (cache, key, done) {
-  cache ? cache.get(key, done) : done(null, false)
+async function get (cache, key) {
+  return cache ? cache.get(key) : false
 }
 
 /**
@@ -40,10 +39,9 @@ function get (cache, key, done) {
  * @param {*} key The key to be indexed
  * @param {*} value The value to be stored
  * @param {number} ttl The time to live
- * @param {Function} done The callback handler
  */
-function set (cache, key, value, ttl, done) {
-  cache && cache.set(key, value, ttl, done)
+async function set (cache, key, value, ttl) {
+  cache && await cache.set(key, value, ttl)
 }
 
 module.exports = {

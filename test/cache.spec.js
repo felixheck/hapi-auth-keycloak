@@ -2,56 +2,34 @@ const test = require('ava')
 const helpers = require('./_helpers')
 const cache = require('../src/cache')
 
-test.cb.serial('set and get value', (t) => {
-  helpers.getServer(undefined, (server) => {
-    const store = cache.create(server, { segment: 'foo' })
-    cache.set(store, 'bar', 42, 10000)
+test.serial('set and get value', async (t) => {
+  const server = await helpers.getServer(undefined)
+  const store = cache.create(server, { segment: 'foo' })
 
-    cache.get(store, 'bar', (err, res) => {
-      t.falsy(err)
-      t.is(res, 42)
-      t.end()
-    })
-  })
+  await cache.set(store, 'bar', 42, 10000)
+  t.is(await cache.get(store, 'bar'), 42)
 })
 
-test.cb.serial('set and get value – true/defaults', (t) => {
-  helpers.getServer(undefined, (server) => {
-    const store = cache.create(server, true)
-    cache.set(store, 'bar', 42, 10000)
+test.serial('set and get value – true/defaults', async (t) => {
+  const server = await helpers.getServer(undefined)
+  const store = cache.create(server, true)
 
-    cache.get(store, 'bar', (err, res) => {
-      t.falsy(err)
-      t.is(res, 42)
-      t.end()
-    })
-  })
+  await cache.set(store, 'bar', 42, 10000)
+  t.is(await cache.get(store, 'bar'), 42)
 })
 
-test.cb.serial('set and get value – no cache', (t) => {
-  helpers.getServer(undefined, (server) => {
-    const store = cache.create(server, false)
-    cache.set(store, 'bar', 42, 10000)
+test.serial('set and get value – no cache', async (t) => {
+  const server = await helpers.getServer(undefined)
+  const store = cache.create(server, false)
 
-    cache.get(store, 'bar', (err, res) => {
-      t.falsy(err)
-      t.is(res, false)
-      t.end()
-    })
-  })
+  await cache.set(store, 'bar', 42, 10000)
+  t.is(await cache.get(store, 'bar'), false)
 })
 
-test.cb.serial('set and get value – expired', (t) => {
-  helpers.getServer(undefined, (server) => {
-    const store = cache.create(server, { segment: 'foo' })
-    cache.set(store, 'bar', 42, 100)
+test.serial('set and get value – expired', async (t) => {
+  const server = await helpers.getServer(undefined)
+  const store = cache.create(server, { segment: 'foo' })
 
-    setTimeout(() => {
-      cache.get(store, 'bar', (err, res) => {
-        t.falsy(err)
-        t.is(res, null)
-        t.end()
-      })
-    }, 200)
-  })
+  await cache.set(store, 'bar', 42, 0)
+  t.is(await cache.get(store, 'bar'), null)
 })

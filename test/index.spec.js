@@ -1,9 +1,7 @@
 const test = require('ava')
 const helpers = require('./_helpers')
 
-test.cb('throw error if plugin gets registered twice', (t) => {
-  helpers.getServer(undefined, (server) => {
-    t.throws(() => helpers.registerPlugin(server), Error)
-    t.end()
-  })
+test('throw error if plugin gets registered twice', async (t) => {
+  const server = await helpers.getServer(undefined)
+  await t.throws(helpers.registerPlugin(server))
 })

@@ -110,8 +110,8 @@ function registerRoutes (server) {
       path: '/',
       config: {
         auth: 'keycloak-jwt',
-        handler (req, reply) {
-          reply(req.auth.credentials.scope)
+        handler (req) {
+          return req.auth.credentials.scope
         }
       }
     },
@@ -125,8 +125,8 @@ function registerRoutes (server) {
             scope: ['editor']
           }
         },
-        handler (req, reply) {
-          reply(req.auth.credentials.scope)
+        handler (req) {
+          return req.auth.credentials.scope
         }
       }
     },
@@ -140,8 +140,8 @@ function registerRoutes (server) {
             scope: ['guest']
           }
         },
-        handler (req, reply) {
-          reply(req.auth.credentials.scope)
+        handler (req) {
+          return req.auth.credentials.scope
         }
       }
     },
@@ -155,8 +155,8 @@ function registerRoutes (server) {
             scope: ['scope:foo.READ']
           }
         },
-        handler (req, reply) {
-          reply(req.auth.credentials.scope)
+        handler (req) {
+          return req.auth.credentials.scope
         }
       }
     }
@@ -173,15 +173,16 @@ function registerRoutes (server) {
  * @param {Object} options The plugin related options
  * @param {Function} done The success callback handler
  */
-function registerPlugin (server, options = defaults, done = () => {}) {
-  server.register({
-    register: authKeycloak,
+async function registerPlugin (server, options = defaults) {
+  await server.register({
+    plugin: authKeycloak,
     options
-  }, () => {
-    server.auth.strategy('keycloak-jwt', 'keycloak-jwt')
-    registerRoutes(server)
-    done(server)
   })
+
+  server.auth.strategy('keycloak-jwt', 'keycloak-jwt')
+  registerRoutes(server)
+
+  return server
 }
 
 /**
@@ -191,21 +192,17 @@ function registerPlugin (server, options = defaults, done = () => {}) {
  * Create server with routes, plugin and error handler
  *
  * @param {Object|false} options The plugin related options
- * @param {Function} done The success callback handler
  */
-function getServer (options, done) {
-  const server = new hapi.Server()
+async function getServer (options) {
+  const server = hapi.server()
 
-  server.connection()
-  server.initialize((err) => {
-    if (err) throw err
+  await server.initialize()
 
-    if (options === false) {
-      return done(server)
-    }
+  if (options === false) {
+    return server
+  }
 
-    return registerPlugin(server, options, done)
-  })
+  return registerPlugin(server, options)
 }
 
 module.exports = {

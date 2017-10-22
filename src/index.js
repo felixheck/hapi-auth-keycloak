@@ -3,7 +3,7 @@ const { GrantManager } = require('keycloak-auth-utils')
 const KeycloakToken = require('keycloak-auth-utils/lib/token')
 const cache = require('./cache')
 const token = require('./token')
-const { error, fakeReply, verify } = require('./utils')
+const { error, fakeToolkit, verify } = require('./utils')
 const pkg = require('../package.json')
 
 /**
@@ -27,9 +27,11 @@ let store
  * @param {string} tkn The token to be validated
  * @returns {Promise} The error-handled promise
  */
-function verifySignedJwt (tkn) {
+async function verifySignedJwt (tkn) {
   const kcTkn = new KeycloakToken(tkn, options.clientId)
-  return manager.validateToken(kcTkn).then(() => tkn)
+  await manager.validateToken(kcTkn)
+
+  return tkn
 }
 
 /**
@@ -45,14 +47,14 @@ function verifySignedJwt (tkn) {
  *
  * @throws {Error} If token is invalid
  */
-function introspect (tkn) {
-  return manager.validateAccessToken(tkn).then((res) => {
-    if (res === false) {
-      throw Error(error.msg.invalid)
-    }
+async function introspect (tkn) {
+  const res = await manager.validateAccessToken(tkn)
 
-    return tkn
-  })
+  if (res === false) {
+    throw Error(error.msg.invalid)
+  }
+
+  return tkn
 }
 
 /**
@@ -66,14 +68,12 @@ function introspect (tkn) {
  *
  * @throws {Error} If request failed or token is invalid
  */
-function getRpt (tkn) {
-  return axios.get(`${options.realmUrl}/authz/entitlement/${options.clientId}`, {
-    headers: {
-      authorization: `bearer ${tkn}`
-    }
-  }).then(({ data }) => data.rpt).catch(() => {
-    throw Error(error.msg.invalid)
+async function getRpt (tkn) {
+  const { data } = await axios.get(`${options.realmUrl}/authz/entitlement/${options.clientId}`, {
+    headers: { authorization: `bearer ${tkn}` }
   })
+
+  return data.rpt
 }
 
 /**
@@ -100,18 +100,19 @@ function getValidateFn () {
  * cache if enabled.
  *
  * @param {string} tkn The token to be validated
- * @param {Function} reply The callback handler
+ * @param {Function} h The toolkit
  */
-function handleKeycloakValidation (tkn, reply) {
-  getValidateFn()(tkn).then((info) => {
+async function handleKeycloakValidation (tkn, h) {
+  try {
+    const info = await getValidateFn()(tkn)
     const { expiresIn, credentials } = token.getData(info || tkn, options)
     const userData = { credentials }
 
-    cache.set(store, tkn, userData, expiresIn)
-    reply.continue(userData)
-  }).catch((err) => {
-    reply(error('unauthorized', err, error.msg.invalid))
-  })
+    await cache.set(store, tkn, userData, expiresIn)
+    return h.authenticated(userData)
+  } catch (err) {
+    throw error('unauthorized', null, error.msg.invalid)
+  }
 }
 
 /**
@@ -123,20 +124,18 @@ function handleKeycloakValidation (tkn, reply) {
  * handle validation with help of Keycloak.
  *
  * @param {string} d The authorization field, e.g. the value of `Authorization`
- * @param {Function} done The callback handler
+ * @param {Object} h The reply toolkit
  */
-function validate (field, done) {
+async function validate (field, h = (data) => data) {
   const tkn = token.create(field)
-  const reply = fakeReply(done)
+  const reply = fakeToolkit(h)
 
   if (!tkn) {
-    return reply(error('unauthorized', error.msg.missing))
+    throw error('unauthorized', error.msg.missing)
   }
 
-  cache.get(store, tkn, (err, cached) => {
-    const isCached = cached && !err
-    isCached ? reply.continue(cached) : handleKeycloakValidation(tkn, reply)
-  })
+  const cached = await cache.get(store, tkn)
+  return cached ? reply.authenticated(cached) : handleKeycloakValidation(tkn, reply)
 }
 
 /**
@@ -153,8 +152,8 @@ function validate (field, done) {
  */
 function strategy (server) {
   return {
-    authenticate (request, reply) {
-      return validate(request.raw.req.headers.authorization, reply)
+    async authenticate (request, h) {
+      return validate(request.raw.req.headers.authorization, h)
     }
   }
 }
@@ -169,20 +168,17 @@ function strategy (server) {
  *
  * @param {Hapi.Server} server The created server instance
  * @param {Object} opts The plugin related options
- * @param {Function} next The callback handler
  */
-function plugin (server, opts, next) {
+async function plugin (server, opts) {
   options = verify(opts)
   manager = new GrantManager(options)
   store = cache.create(server, options.cache)
 
   server.auth.scheme('keycloak-jwt', strategy)
   server.decorate('server', 'kjwt', { validate })
-
-  next()
 }
 
-module.exports = plugin
-module.exports.attributes = {
+module.exports = {
+  register: plugin,
   pkg
 }
