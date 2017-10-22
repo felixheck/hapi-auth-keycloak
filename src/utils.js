@@ -93,8 +93,8 @@ error.msg = {
  *
  * Fake `Hapi` reply toolkit to provide an `authenticated` method.
  *
- * @param {Function} h The original toolkit
- * @returns {Function} The decorated function
+ * @param {Object|Function} h The original toolkit/mock
+ * @returns {Object|Function} The decorated toolkit/mock
  */
 function fakeToolkit (h) {
   if (!h.authenticated && typeof h === 'function') {

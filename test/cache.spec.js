@@ -26,6 +26,14 @@ test.serial('set and get value – no cache', async (t) => {
   t.is(await cache.get(store, 'bar'), false)
 })
 
+test.serial('set and get value – no cache/default', async (t) => {
+  const server = await helpers.getServer(undefined)
+  const store = cache.create(server)
+
+  await cache.set(store, 'bar', 42, 10000)
+  t.is(await cache.get(store, 'bar'), false)
+})
+
 test.serial('set and get value – expired', async (t) => {
   const server = await helpers.getServer(undefined)
   const store = cache.create(server, { segment: 'foo' })

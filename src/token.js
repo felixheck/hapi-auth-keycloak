@@ -26,7 +26,7 @@ function getToken (field) {
  * @returns {Function} The composed prefixing function
  */
 function prefixRole (clientId, key) {
-  return (role) => key === clientId ? role : `${key}:${role}`
+  return (role) => clientId === key ? role : `${key}:${role}`
 }
 
 /**
@@ -39,8 +39,9 @@ function prefixRole (clientId, key) {
  * with their name.
  *
  * @param {string} clientId The current client its identifier
- * @param {Object} [realm] The realm access data
- * @param {Object} [resource] The resource access data
+ * @param {Object} [realm={ roles: [] }] The realm access data
+ * @param {Object} [resources={}] The resource access data
+ * @param {Object} [auth={ permissions: [] }] The fine-grained access data
  * @returns {Array.<?string>} The list of roles
  */
 function getRoles (clientId, {
@@ -79,7 +80,7 @@ function getExpiration ({ exp, iat }) {
  * Get necessary user information out of token content.
  *
  * @param {Object} content The token its content
- * @param {Array.<?string>} [fields] The necessary fields
+ * @param {Array.<?string>} [fields=[]] The necessary fields
  * @returns {Object} The collection of requested user info
  */
 function getUserInfo (content, fields = []) {
