@@ -2,7 +2,7 @@ const test = require('ava')
 const helpers = require('./_helpers')
 const cache = require('../src/cache')
 
-test.serial('set and get value', async (t) => {
+test('set and get value', async (t) => {
   const server = await helpers.getServer(undefined)
   const store = cache.create(server, { segment: 'foo' })
 
@@ -10,7 +10,7 @@ test.serial('set and get value', async (t) => {
   t.is(await cache.get(store, 'bar'), 42)
 })
 
-test.serial('set and get value – true/defaults', async (t) => {
+test('set and get value – true/defaults', async (t) => {
   const server = await helpers.getServer(undefined)
   const store = cache.create(server, true)
 
@@ -18,7 +18,7 @@ test.serial('set and get value – true/defaults', async (t) => {
   t.is(await cache.get(store, 'bar'), 42)
 })
 
-test.serial('set and get value – no cache', async (t) => {
+test('set and get value – no cache', async (t) => {
   const server = await helpers.getServer(undefined)
   const store = cache.create(server, false)
 
@@ -26,7 +26,7 @@ test.serial('set and get value – no cache', async (t) => {
   t.is(await cache.get(store, 'bar'), false)
 })
 
-test.serial('set and get value – no cache/default', async (t) => {
+test('set and get value – no cache/default', async (t) => {
   const server = await helpers.getServer(undefined)
   const store = cache.create(server)
 
@@ -34,7 +34,7 @@ test.serial('set and get value – no cache/default', async (t) => {
   t.is(await cache.get(store, 'bar'), false)
 })
 
-test.serial('set and get value – expired', async (t) => {
+test('set and get value – expired', async (t) => {
   const server = await helpers.getServer(undefined)
   const store = cache.create(server, { segment: 'foo' })
 

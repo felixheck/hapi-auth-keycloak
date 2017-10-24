@@ -4,7 +4,7 @@ const fixtures = require('./fixtures')
 
 const cfg = helpers.getOptions({ publicKey: fixtures.common.publicKeyRsa })
 
-test.serial('authentication does succeed', async (t) => {
+test('authentication does succeed', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('current')}`)
   const server = await helpers.getServer(cfg)
   const res = await server.inject(mockReq)
@@ -13,7 +13,7 @@ test.serial('authentication does succeed', async (t) => {
   t.is(res.statusCode, 200)
 })
 
-test.serial('authentication does succeed – cached', async (t) => {
+test('authentication does succeed – cached', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('current')}`)
   const server = await helpers.getServer(Object.assign({ cache: true }, cfg))
   await server.inject(mockReq)
@@ -23,7 +23,7 @@ test.serial('authentication does succeed – cached', async (t) => {
   t.is(res.statusCode, 200)
 })
 
-test.serial('authentication does success – valid roles', async (t) => {
+test('authentication does success – valid roles', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('current')}`, '/role')
   const server = await helpers.getServer(cfg)
   const res = await server.inject(mockReq)
@@ -32,7 +32,7 @@ test.serial('authentication does success – valid roles', async (t) => {
   t.is(res.statusCode, 200)
 })
 
-test.serial('authentication does fail – invalid roles', async (t) => {
+test('authentication does fail – invalid roles', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('current')}`, '/role/guest')
   const server = await helpers.getServer(cfg)
   const res = await server.inject(mockReq)
@@ -41,7 +41,7 @@ test.serial('authentication does fail – invalid roles', async (t) => {
   t.is(res.statusCode, 403)
 })
 
-test.serial('authentication does fail – expired token', async (t) => {
+test('authentication does fail – expired token', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('expired')}`)
 
   const server = await helpers.getServer(cfg)
@@ -52,7 +52,7 @@ test.serial('authentication does fail – expired token', async (t) => {
   t.is(res.headers['www-authenticate'], 'Bearer error="Invalid credentials"')
 })
 
-test.serial('authentication does fail – invalid header', async (t) => {
+test('authentication does fail – invalid header', async (t) => {
   const mockReq = helpers.mockRequest(fixtures.common.token)
   const server = await helpers.getServer(cfg)
   const res = await server.inject(mockReq)

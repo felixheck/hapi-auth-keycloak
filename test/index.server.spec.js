@@ -9,7 +9,7 @@ test.afterEach.always('reset instances and prototypes', () => {
   nock.cleanAll()
 })
 
-test.serial('server method – authentication does succeed', async (t) => {
+test('server method – authentication does succeed', async (t) => {
   helpers.mockIntrospect(200, fixtures.content.current)
 
   const server = await helpers.getServer(cfg)
@@ -19,7 +19,7 @@ test.serial('server method – authentication does succeed', async (t) => {
   t.truthy(res.credentials)
 })
 
-test.serial('server method – authentication does succeed – cache', async (t) => {
+test('server method – authentication does succeed – cache', async (t) => {
   helpers.mockIntrospect(200, fixtures.content.current)
   helpers.mockIntrospect(200, fixtures.content.current)
 
@@ -33,7 +33,7 @@ test.serial('server method – authentication does succeed – cache', async (t
   t.truthy(res.credentials)
 })
 
-test.serial('server method – authentication does fail – invalid token', async (t) => {
+test('server method – authentication does fail – invalid token', async (t) => {
   helpers.mockIntrospect(200, { active: false })
 
   const server = await helpers.getServer(cfg)
@@ -45,7 +45,7 @@ test.serial('server method – authentication does fail – invalid token', asyn
   t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="Invalid credentials"')
 })
 
-test.serial('server method – authentication does fail – invalid header', async (t) => {
+test('server method – authentication does fail – invalid header', async (t) => {
   const server = await helpers.getServer(cfg)
   const err = await t.throws(server.kjwt.validate(fixtures.composeJwt('current')))
 
@@ -55,7 +55,7 @@ test.serial('server method – authentication does fail – invalid header', asy
   t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="Missing or invalid authorization header"')
 })
 
-test.serial('server method – authentication does fail – error', async (t) => {
+test('server method – authentication does fail – error', async (t) => {
   helpers.mockIntrospect(400, 'an error', true)
 
   const server = await helpers.getServer(cfg)

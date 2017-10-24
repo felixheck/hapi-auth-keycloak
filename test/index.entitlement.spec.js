@@ -10,7 +10,7 @@ test.afterEach.always('reset instances and prototypes', () => {
   nock.cleanAll()
 })
 
-test.serial('authentication does succeed', async (t) => {
+test('authentication does succeed', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`)
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
@@ -23,7 +23,7 @@ test.serial('authentication does succeed', async (t) => {
   t.deepEqual(JSON.parse(res.payload).sort(), targetScope)
 })
 
-test.serial('authentication does succeed – cached', async (t) => {
+test('authentication does succeed – cached', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`)
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
@@ -36,7 +36,7 @@ test.serial('authentication does succeed – cached', async (t) => {
   t.deepEqual(JSON.parse(res.payload).sort(), targetScope)
 })
 
-test.serial('authentication does success – valid roles', async (t) => {
+test('authentication does success – valid roles', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`, '/role')
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
@@ -49,7 +49,7 @@ test.serial('authentication does success – valid roles', async (t) => {
   t.deepEqual(JSON.parse(res.payload).sort(), targetScope)
 })
 
-test.serial('authentication does success – valid roles', async (t) => {
+test('authentication does success – valid roles', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`, '/role/rpt')
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
@@ -62,7 +62,7 @@ test.serial('authentication does success – valid roles', async (t) => {
   t.deepEqual(JSON.parse(res.payload).sort(), targetScope)
 })
 
-test.serial('authentication does fail – invalid roles', async (t) => {
+test('authentication does fail – invalid roles', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`, '/role/guest')
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
@@ -74,7 +74,7 @@ test.serial('authentication does fail – invalid roles', async (t) => {
   t.is(res.statusCode, 403)
 })
 
-test.serial('authentication does fail – invalid token', async (t) => {
+test('authentication does fail – invalid token', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`)
 
   helpers.mockEntitlement(400, fixtures.content.rpt)
@@ -87,7 +87,7 @@ test.serial('authentication does fail – invalid token', async (t) => {
   t.is(res.headers['www-authenticate'], 'Bearer error="Invalid credentials"')
 })
 
-test.serial('authentication does fail – invalid header', async (t) => {
+test('authentication does fail – invalid header', async (t) => {
   const mockReq = helpers.mockRequest(fixtures.common.token)
 
   const server = await helpers.getServer(cfg)
