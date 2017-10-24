@@ -22,7 +22,7 @@ function create (server, opts = false) {
  * @param {Object} The cache instance
  * @param {*} key The key to be searched
  */
-async function get (cache, key) {
+function get (cache, key) {
   return cache ? cache.get(key) : false
 }
 

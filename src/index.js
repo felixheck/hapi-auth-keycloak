@@ -152,7 +152,7 @@ async function validate (field, h = (data) => data) {
  */
 function strategy (server) {
   return {
-    async authenticate (request, h) {
+    authenticate (request, h) {
       return validate(request.raw.req.headers.authorization, h)
     }
   }
@@ -169,7 +169,7 @@ function strategy (server) {
  * @param {Hapi.Server} server The created server instance
  * @param {Object} opts The plugin related options
  */
-async function plugin (server, opts) {
+function plugin (server, opts) {
   options = verify(opts)
   manager = new GrantManager(options)
   store = cache.create(server, options.cache)
