@@ -123,7 +123,7 @@ async function handleKeycloakValidation (tkn, h) {
  * If yes, return cached user data. Otherwise
  * handle validation with help of Keycloak.
  *
- * @param {string} d The authorization field, e.g. the value of `Authorization`
+ * @param {string} field The authorization field, e.g. the value of `Authorization`
  * @param {Object} h The reply toolkit
  */
 async function validate (field, h = (data) => data) {
