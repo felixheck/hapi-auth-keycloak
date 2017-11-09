@@ -9,76 +9,60 @@ test.afterEach.always('reset instances and prototypes', () => {
   nock.cleanAll()
 })
 
-test.cb.serial('server method – authentication does succeed', (t) => {
+test('server method – authentication does succeed', async (t) => {
   helpers.mockIntrospect(200, fixtures.content.current)
 
-  helpers.getServer(cfg, (server) => {
-    server.kjwt.validate(`bearer ${fixtures.composeJwt('current')}`, (err, res) => {
-      t.falsy(err)
-      t.truthy(res)
-      t.truthy(res.credentials)
-      t.end()
-    })
-  })
+  const server = await helpers.getServer(cfg)
+  const res = await server.kjwt.validate(`bearer ${fixtures.composeJwt('current')}`)
+
+  t.truthy(res)
+  t.truthy(res.credentials)
 })
 
-test.cb.serial('server method – authentication does succeed – cache', (t) => {
+test('server method – authentication does succeed – cache', async (t) => {
   helpers.mockIntrospect(200, fixtures.content.current)
   helpers.mockIntrospect(200, fixtures.content.current)
 
   const mockTkn = `bearer ${fixtures.composeJwt('current')}`
 
-  helpers.getServer(cfg, (server) => {
-    server.kjwt.validate(mockTkn, () => {
-      server.kjwt.validate(mockTkn, (err, res) => {
-        t.falsy(err)
-        t.truthy(res)
-        t.truthy(res.credentials)
-        t.end()
-      })
-    })
-  })
+  const server = await helpers.getServer(cfg)
+  await server.kjwt.validate(mockTkn)
+  const res = await server.kjwt.validate(mockTkn)
+
+  t.truthy(res)
+  t.truthy(res.credentials)
 })
 
-test.cb.serial('server method – authentication does fail – invalid token', (t) => {
+test('server method – authentication does fail – invalid token', async (t) => {
   helpers.mockIntrospect(200, { active: false })
 
-  helpers.getServer(cfg, (server) => {
-    server.kjwt.validate(`bearer ${fixtures.composeJwt('current')}`, (err, res) => {
-      t.falsy(res)
-      t.truthy(err)
-      t.truthy(err.isBoom)
-      t.is(err.output.statusCode, 401)
-      t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="Invalid credentials"')
-      t.end()
-    })
-  })
+  const server = await helpers.getServer(cfg)
+  const err = await t.throws(server.kjwt.validate(`bearer ${fixtures.composeJwt('current')}`))
+
+  t.truthy(err)
+  t.truthy(err.isBoom)
+  t.is(err.output.statusCode, 401)
+  t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="Invalid credentials"')
 })
 
-test.cb.serial('server method – authentication does fail – invalid header', (t) => {
-  helpers.getServer(cfg, (server) => {
-    server.kjwt.validate(fixtures.composeJwt('current'), (err, res) => {
-      t.falsy(res)
-      t.truthy(err)
-      t.truthy(err.isBoom)
-      t.is(err.output.statusCode, 401)
-      t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="Missing or invalid authorization header"')
-      t.end()
-    })
-  })
+test('server method – authentication does fail – invalid header', async (t) => {
+  const server = await helpers.getServer(cfg)
+  const err = await t.throws(server.kjwt.validate(fixtures.composeJwt('current')))
+
+  t.truthy(err)
+  t.truthy(err.isBoom)
+  t.is(err.output.statusCode, 401)
+  t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="Missing or invalid authorization header"')
 })
 
-test.cb.serial('server method – authentication does fail – error', (t) => {
+test('server method – authentication does fail – error', async (t) => {
   helpers.mockIntrospect(400, 'an error', true)
 
-  helpers.getServer(cfg, (server) => {
-    server.kjwt.validate(`bearer ${fixtures.composeJwt('current')}`, (err, res) => {
-      t.falsy(res)
-      t.truthy(err)
-      t.truthy(err.isBoom)
-      t.is(err.output.statusCode, 401)
-      t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="an error"')
-      t.end()
-    })
-  })
+  const server = await helpers.getServer(cfg)
+  const err = await t.throws(server.kjwt.validate(`bearer ${fixtures.composeJwt('current')}`))
+
+  t.truthy(err)
+  t.truthy(err.isBoom)
+  t.is(err.output.statusCode, 401)
+  t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="Invalid credentials"')
 })

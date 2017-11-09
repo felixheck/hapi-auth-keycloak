@@ -5,13 +5,11 @@
  * Initiate a cache
  *
  * @param {Hapi.Server} server The created server instance
- * @param {Object|boolean} opts The instance its options
+ * @param {Object|boolean} [opts=false] The instance its options
  * @returns {Object|false} The cache instance
  */
-function create (server, opts) {
-  return opts
-    ? server.cache(opts === true ? { segment: 'keycloakJwt' } : opts)
-    : false
+function create (server, opts = false) {
+  return opts && server.cache(opts === true ? { segment: 'keycloakJwt' } : opts)
 }
 
 /**
@@ -23,10 +21,9 @@ function create (server, opts) {
  *
  * @param {Object} The cache instance
  * @param {*} key The key to be searched
- * @param {Function} done The callback handler
  */
-function get (cache, key, done) {
-  cache ? cache.get(key, done) : done(null, false)
+function get (cache, key) {
+  return cache ? cache.get(key) : false
 }
 
 /**
@@ -37,13 +34,10 @@ function get (cache, key, done) {
  * Just if cache is initiated.
  *
  * @param {Object} The cache instance
- * @param {*} key The key to be indexed
- * @param {*} value The value to be stored
- * @param {number} ttl The time to live
- * @param {Function} done The callback handler
+ * @param {Array} rest The arguments passed to hapi its `cache.set`
  */
-function set (cache, key, value, ttl, done) {
-  cache && cache.set(key, value, ttl, done)
+async function set (cache, ...rest) {
+  cache && await cache.set(...rest)
 }
 
 module.exports = {

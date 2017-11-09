@@ -17,8 +17,8 @@
 ## Introduction
 **hapi-auth-keycloak** is a plugin for [hapi.js][hapijs] which enables to protect your endpoints in a smart but professional manner using [Keycloak][keycloak] as authentication service. It is inspired by the related [express.js middleware][keycloak-node]. The plugin validates the passed [`Bearer` token][bearer] offline with a provided public key or online with help of the [Keycloak][keycloak] server. Optionally, the successfully validated tokens and the related user data get cached using [`catbox`][catbox]. The caching enables a fast processing although the user data don't get changed until the token expires. It plays well with the [hapi.js][hapijs]-integrated [authentication/authorization feature][hapi-route-options]. Besides the authentication strategy it is possible to validate tokens by yourself, e.g. to authenticate incoming websocket or queue messages.
 
-This plugin is implemented in ECMAScript 6 without any transpilers like [`babel`][babel].<br/>
-Additionally [`standard`][standardjs] and [`ava`][avajs] are used to grant a high quality implementation.<br/>
+The modules [`standard`][standardjs] and [`ava`][avajs] are used to grant a high quality implementation.<br/>
+This major release supports just [hapi.js](https://github.com/hapijs/hapi) `>=v17.0.0` and node `>=v8.0.0` — to support older versions please use `v2.1.0`.
 
 ## Installation
 For installation use the [Node Package Manager][npm]:
@@ -31,11 +31,6 @@ or clone the repository:
 $ git clone https://github.com/felixheck/hapi-auth-keycloak
 ```
 
-Alternatively use the [Yarn Package Manager][yarn]:
-```
-$ yarn add hapi-auth-keycloak
-```
-
 ## Usage
 #### Import
 First you have to import the module:
@@ -44,11 +39,11 @@ const authKeycloak = require('hapi-auth-keycloak');
 ```
 
 #### Create hapi server
-Afterwards create your hapi server and the corresponding connection if not already done:
+Afterwards create your hapi server if not already done:
 ``` js
-const server = new Hapi.Server();
+const hapi = require('hapi');
 
-server.connection({
+const server = hapi.server({
   port: 8888,
   host: 'localhost',
 });
@@ -57,8 +52,8 @@ server.connection({
 #### Registration
 Finally register the plugin, set the correct options and the authentication strategy:
 ``` js
-server.register({
-  register: authKeycloak,
+await server.register({
+  plugin: authKeycloak,
   options: {
     realmUrl: 'https://localhost:8080/auth/realms/testme',
     clientId: 'foobar',
@@ -66,13 +61,9 @@ server.register({
     cache: true,
     userInfo: ['name', 'email']
   }
-}, function(err) {
-  if (err) {
-    throw err;
-  }
-
-  server.auth.strategy('keycloak-jwt', 'keycloak-jwt');
 });
+
+server.auth.strategy('keycloak-jwt', 'keycloak-jwt');
 ```
 
 #### Route Configuration & Scope
@@ -96,8 +87,8 @@ server.route([
           scope: ['realm:admin', 'editor', 'other-resource:creator', 'scope:foo.READ']
         }
       },
-      handler (req, reply) {
-        reply('hello world')
+      handler () {
+        return 'hello world';
       }
     }
   },
@@ -148,19 +139,19 @@ Optional. Default: `[]`.<br/>
 If `false` the cache is disabled. Use `true` or an empty object (`{}`) to use the built-in default cache.<br/>
 Optional. Default: `false`.
 
-#### `server.kjwt.validate(field {string}, done {Function})`
+#### `await server.kjwt.validate(field {string})`
 - `field {string}` — The `Bearer` field, including the scheme (`bearer`) itself.<br/>
 Example: `bearer 12345.abcde.67890`.<br/>
 Required.
 
-- `done {Function}` — The callback handler is passed `err {Error}, result {Object|false}` (error-first approach).<br/>If an error occurs, `err` is not `null`.  If the token is invalid, the `result` is `false`. Otherwise it is an object containing all relevant credentials.<br/>
-Required.
+If an error occurs, it get thrown — so take care and implement a kind of catching.<br/>
+If the token is invalid, the `result` is `false`. Otherwise it is an object containing all relevant credentials.
 
 ## Example
 #### `routes.js`
 
 ``` js
-exports.register = function (server, options, next) {
+async function register (server, options) {
   server.route([
     {
       method: 'GET',
@@ -178,11 +169,10 @@ exports.register = function (server, options, next) {
       }
     }
   ])
-
-  next()
 }
 
-exports.register.attributes = {
+module.exports = {
+  register,
   name: 'example-routes',
   version: '0.0.1'
 }
@@ -190,12 +180,11 @@ exports.register.attributes = {
 
 #### `index.js`
 ``` js
-const Hapi = require('hapi')
+const hapi = require('hapi')
 const authKeycloak = require('hapi-auth-keycloak')
 const routes = require('./routes')
 
-const server = new Hapi.Server()
-server.connection({ port: 3000, host: 'localhost' })
+const server = hapi.server({ port: 3000, host: 'localhost' })
 
 const options = {
   realmUrl: 'https://localhost:8080/auth/realms/testme',
@@ -209,15 +198,17 @@ process.on('SIGINT', () => {
   server.stop().then((err) => process.exit(err ? 1 : 0))
 })
 
-server.register({ register: authKeycloak, options }).then(() => {
-  server.auth.strategy('keycloak-jwt', 'keycloak-jwt')
-}).then(() => (
-  server.register({ register: routes })
-)).then(() => (
-  server.start()
-)).then(() => {
-  console.log('Server started successfully')
-}).catch(console.error)
+(async () => {
+  try {
+    await server.register({ plugin: authKeycloak, options });
+    server.auth.strategy('keycloak-jwt', 'keycloak-jwt');
+    await server.register({ plugin: routes });
+    await server.start();
+    console.log('Server started successfully');
+  } catch (err) {
+    console.error(err);
+  }
+})()
 ```
 
 ## Developing and Testing
@@ -254,7 +245,6 @@ For further information read the [contributing guideline](CONTRIBUTING.md).
 [standardjs]: https://standardjs.com/
 [babel]: https://babeljs.io/
 [npm]: https://github.com/npm/npm
-[yarn]: https://yarnpkg.com
 [jwt]: https://jwt.io/
 [catbox]: https://github.com/hapijs/catbox
 [bearer]: https://tools.ietf.org/html/rfc6750

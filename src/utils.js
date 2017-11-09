@@ -91,22 +91,21 @@ error.msg = {
  * @function
  * @public
  *
- * Fake `Hapi` reply interface to provide an
- * error-first but error-less `continue` method.
+ * Fake `Hapi` reply toolkit to provide an `authenticated` method.
  *
- * @param {Function} reply
- * @returns {Function} The decorated function
+ * @param {Object|Function} h The original toolkit/mock
+ * @returns {Object|Function} The decorated toolkit/mock
  */
-function fakeReply (reply) {
-  if (!reply.continue) {
-    reply.continue = reply.bind(undefined, null)
+function fakeToolkit (h) {
+  if (!h.authenticated && typeof h === 'function') {
+    h.authenticated = h
   }
 
-  return reply
+  return h
 }
 
 module.exports = {
   error,
-  fakeReply,
+  fakeToolkit,
   verify
 }
