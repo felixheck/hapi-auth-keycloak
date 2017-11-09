@@ -40,7 +40,7 @@
   "devDependencies": {
     "ava": "^0.22.0",
     "coveralls": "^3.0.0",
-    "hapi": "^17.0.0-rc8",
+    "hapi": "^17.0.1",
     "nock": "^9.0.24",
     "nyc": "^11.2.1",
     "standard": "^10.0.3"
@@ -54,10 +54,10 @@
     "lodash": "^4.17.4"
   },
   "peerDependencies": {
-    "hapi": ">= 17.0.0"
+    "hapi": "^17.0.0"
   },
   "engines": {
-    "node": ">=8.0.0",
-    "npm": ">=5.0.0"
+    "node": "^8.0.0",
+    "npm": "^5.0.0"
   }
 }
