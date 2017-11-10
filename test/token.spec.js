@@ -1,4 +1,5 @@
 const test = require('ava')
+const _ = require('lodash')
 const fixtures = require('./fixtures')
 const token = require('../src/token')
 
@@ -54,7 +55,7 @@ test('get user data of token', (t) => {
   const data = token.getData(tkn, { clientId: fixtures.common.clientId })
 
   t.truthy(tkn)
-  t.is(data.expiresIn, 2700000)
+  t.truthy(_.inRange(data.expiresIn, 3590000, 3600000))
   t.is(data.credentials.sub, fixtures.content.current.sub)
   t.falsy(data.credentials.name)
   t.deepEqual(data.credentials.scope.sort(), fixtures.targetScope)
@@ -65,7 +66,7 @@ test('get user data of token – rpt', (t) => {
   const data = token.getData(tkn, { clientId: fixtures.common.clientId })
 
   t.truthy(tkn)
-  t.is(data.expiresIn, 4000)
+  t.truthy(_.inRange(-1 * data.expiresIn, Date.now()))
   t.is(data.credentials.sub, fixtures.content.rpt.sub)
   t.falsy(data.credentials.name)
   t.deepEqual(data.credentials.scope.sort(), [...fixtures.targetScope, 'scope:foo.READ', 'scope:foo.WRITE'])
@@ -79,7 +80,7 @@ test('get user data of token – additional fields', (t) => {
   })
 
   t.truthy(tkn)
-  t.is(data.expiresIn, 2700000)
+  t.truthy(_.inRange(data.expiresIn, 3590000, 3600000))
   t.is(data.credentials.sub, fixtures.content.current.sub)
   t.is(data.credentials.name, fixtures.content.current.name)
   t.deepEqual(data.credentials.scope.sort(), fixtures.targetScope)
@@ -101,7 +102,7 @@ test('get user data of token – default scopes', (t) => {
   const data = token.getData(tkn, { clientId: fixtures.common.clientId })
 
   t.truthy(tkn)
-  t.is(data.expiresIn, 4000)
+  t.truthy(_.inRange(-1 * data.expiresIn, Date.now()))
   t.is(data.credentials.sub, fixtures.content.expired.sub)
   t.falsy(data.credentials.name)
   t.deepEqual(data.credentials.scope, [])

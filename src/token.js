@@ -62,15 +62,13 @@ function getRoles (clientId, {
  * @private
  *
  * Get expiration out of token content.
- * If `exp` or `iat` is undefined just 60
- * seconds as default expiration time.
+ * If `exp` is undefined just use 60 seconds as default.
  *
  * @param {number} exp The `expiration` timestamp in seconds
- * @param {number} iat The `issued at` timestamp in seconds
  * @returns {number} The expiration delta in milliseconds
  */
-function getExpiration ({ exp, iat }) {
-  return [exp, iat].includes(undefined) ? 60 * 1000 : (exp - iat) * 1000
+function getExpiration ({ exp }) {
+  return exp ? (exp * 1000) - Date.now() : 60 * 1000
 }
 
 /**

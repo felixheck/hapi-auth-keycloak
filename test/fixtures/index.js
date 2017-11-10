@@ -127,8 +127,7 @@ const content = {
   noExp: composeContent(true, false),
   noScope: composeContent(false, true),
   current: composeContent(true, false, {
-    exp: parseInt(Date.now() / 1000) + 60 * 60,
-    iat: parseInt(Date.now() / 1000) + 60 * 15
+    exp: parseInt(Date.now() / 1000) + 60 * 60
   }),
   rpt: composeContent(true, true, {
     authorization: {
