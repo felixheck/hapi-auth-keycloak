@@ -45,7 +45,7 @@ async function verifySignedJwt (tkn) {
  * @param {string} tkn The token to be validated
  * @returns {Promise} The error-handled promise
  *
- * @throws {Error} If token is invalid
+ * @throws {Error} If token is invalid or request fails
  */
 async function introspect (tkn) {
   try {
@@ -108,6 +108,8 @@ function getValidateFn () {
  *
  * @param {string} tkn The token to be validated
  * @param {Function} h The toolkit
+ *
+ * @throws {Boom.unauthorized} If validation fails
  */
 async function handleKeycloakValidation (tkn, h) {
   try {
@@ -132,6 +134,8 @@ async function handleKeycloakValidation (tkn, h) {
  *
  * @param {string} field The authorization field, e.g. the value of `Authorization`
  * @param {Object} h The reply toolkit
+ *
+ * @throws {Boom.unauthorized} If header is missing or has an invalid format
  */
 async function validate (field, h = (data) => data) {
   const tkn = token.create(field)

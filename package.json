@@ -50,7 +50,7 @@
     "boom": "^6.0.0",
     "joi": "^13.0.0",
     "jsonwebtoken": "^8.1.0",
-    "keycloak-auth-utils": "^3.3.0-cr.2",
+    "keycloak-auth-utils": "^3.3.0",
     "lodash": "^4.17.4"
   },
   "peerDependencies": {
