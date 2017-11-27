@@ -73,18 +73,14 @@ function verify (opts) {
  * @param {string} msg The error message
  * @returns {Boom} The created `Boom` error
  */
-function error (type, err, msg) {
-  return boom[type](err ? err.message || err.toString() : msg, 'Bearer')
+function raiseError (type, err, msg) {
+  return boom[type](err ? err.message : msg, 'Bearer')
 }
 
-/**
- * @type Object
- *
- * Error messages
- */
-error.msg = {
+const errors = {
+  invalid: 'Invalid credentials',
   missing: 'Missing or invalid authorization header',
-  invalid: 'Invalid credentials'
+  rpt: 'Retrieving the RPT failed'
 }
 
 /**
@@ -105,7 +101,8 @@ function fakeToolkit (h) {
 }
 
 module.exports = {
-  error,
+  raiseError,
+  errors,
   fakeToolkit,
   verify
 }

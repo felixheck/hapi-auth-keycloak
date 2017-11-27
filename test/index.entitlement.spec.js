@@ -84,7 +84,7 @@ test('authentication does fail – invalid token', async (t) => {
 
   t.truthy(res)
   t.is(res.statusCode, 401)
-  t.is(res.headers['www-authenticate'], 'Bearer error="Invalid credentials"')
+  t.is(res.headers['www-authenticate'], 'Bearer error="Retrieving the RPT failed"')
 })
 
 test('authentication does fail – invalid header', async (t) => {

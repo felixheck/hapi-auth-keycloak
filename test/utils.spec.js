@@ -3,20 +3,20 @@ const test = require('ava')
 const utils = require('../src/utils')
 
 test('get boom error with default message', (t) => {
-  const result = utils.error('badRequest')
+  const result = utils.raiseError('badRequest')
   t.truthy(result)
   t.deepEqual(result, boom.badRequest(undefined, 'Bearer'))
 })
 
 test('get boom error with default message', (t) => {
-  const result = utils.error('badRequest', undefined, 'foobar')
+  const result = utils.raiseError('badRequest', undefined, 'foobar')
   t.truthy(result)
   t.deepEqual(result, boom.badRequest('foobar', 'Bearer'))
 })
 
 test('get boom error with error message', (t) => {
   const mockErr = new Error('barfoo')
-  const result = utils.error('badRequest', mockErr, 'foobar')
+  const result = utils.raiseError('badRequest', mockErr, 'foobar')
   t.truthy(result)
   t.deepEqual(result, boom.badRequest(mockErr.message, 'Bearer'))
 })

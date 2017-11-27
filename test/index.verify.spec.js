@@ -49,7 +49,7 @@ test('authentication does fail – expired token', async (t) => {
 
   t.truthy(res)
   t.is(res.statusCode, 401)
-  t.is(res.headers['www-authenticate'], 'Bearer error="Invalid credentials"')
+  t.is(res.headers['www-authenticate'], 'Bearer error="invalid token (expired)"')
 })
 
 test('authentication does fail – invalid header', async (t) => {
