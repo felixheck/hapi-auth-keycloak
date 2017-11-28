@@ -121,7 +121,7 @@ Defining this option enables the traditional method described in the OAuth2 spec
 Optional. Example: `1234-bar-4321-foo`<br/>
 
 - `publicKey {string}` – The realm its public key related to the private key used to sign the token.<br/>
-Defining this option enables the offline and non-live validation. The public key has to be in [PEM][pem] or [JWK][jwk] format.<br/>
+Defining this option enables the offline and non-live validation. The public key has to be in [PEM][pem] format.<br/>
 Optional.
 
 - `entitlement {boolean=true}` – The token should be validated with the entitlement API to enable fine-grained authorization. Enabling this option decelerates the process marginally. Mind that `false` is an invalid value.<br/>
