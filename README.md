@@ -15,7 +15,7 @@
 ---
 
 ## Introduction
-**hapi-auth-keycloak** is a plugin for [hapi.js][hapijs] which enables to protect your endpoints in a smart but professional manner using [Keycloak][keycloak] as authentication service. It is inspired by the related [express.js middleware][keycloak-node]. The plugin validates the passed [`Bearer` token][bearer] offline with a provided public key or online with help of the [Keycloak][keycloak] server. Optionally, the successfully validated tokens and the related user data get cached using [`catbox`][catbox]. The caching enables a fast processing although the user data don't get changed until the token expires. It plays well with the [hapi.js][hapijs]-integrated [authentication/authorization feature][hapi-route-options]. Besides the authentication strategy it is possible to validate tokens by yourself, e.g. to authenticate incoming websocket or queue messages.
+**hapi-auth-keycloak** is a plugin for [hapi.js][hapijs] which enables to protect your endpoints in a smart but professional manner using [Keycloak][keycloak] as authentication service. It is inspired by the related [express.js middleware][keycloak-node]. The plugin validates the passed [`Bearer` token][bearer] offline with a provided public key or online with help of the [Keycloak][keycloak] server. Optionally, the successfully validated tokens and the related user data get cached using [`catbox`][catbox]. The caching enables a fast processing even though the user data don't get changed until the token expires. It plays well with the [hapi.js][hapijs]-integrated [authentication/authorization feature][hapi-route-options]. Besides the authentication strategy it is possible to validate tokens by yourself, e.g. to authenticate incoming websocket or queue messages.
 
 The modules [`standard`][standardjs] and [`ava`][avajs] are used to grant a high quality implementation.<br/>
 This major release supports just [hapi.js](https://github.com/hapijs/hapi) `>=v17.0.0` and node `>=v8.0.0` — to support older versions please use `v2.1.0`.
@@ -43,10 +43,7 @@ Afterwards create your hapi server if not already done:
 ``` js
 const hapi = require('hapi');
 
-const server = hapi.server({
-  port: 8888,
-  host: 'localhost',
-});
+const server = hapi.server({ port: 8888 });
 ```
 
 #### Registration
@@ -92,7 +89,7 @@ server.route([
       }
     }
   },
-])
+]);
 ```
 
 ## API
@@ -100,12 +97,15 @@ server.route([
 
 > By default, the Keycloak server has built-in [two ways to authenticate][client-auth] the client: client ID and client secret **(1)**, or with a signed JWT **(2)**. This plugin supports both. If a non-live strategy is used, ensure that the identifier of the related realm key is included in their header as `kid`. Check the description of `secret`/`publicKey`/`entitlement` and the [terminology][rpt-terms] for further information.
 >
-> | Strategies | Online | Live |[Scopes][rpt]  | Truthy Option | Note         |
+> | Strategies | Online* | Live** |[Scopes][rpt]  | Truthy Option | Note         |
 > |:-----------|:------:|:----:|:-------------:|:---------------|:-------------|
 > | (1) + (2)  |        |      |               | `publicKey`    | fast         |
 > | (1) + (2)  | x      |      |               |                | flexible     |
 > | (1)        | x      | x    |               | `secret`       | accurate     |
 > | (1) + (2)  | x      | x    | x             | `entitlement`  | fine-grained |
+>
+> **\***: Plugin interacts with the Keycloak API<br/>
+> **\*\***: Plugin validates token with help of the Keycloak API<br/>
 >
 > Please mind that the accurate strategy is 4-5x faster than the fine-grained one.<br/>
 > **Hint:** If you define neither `secret` nor `public` nor `entitlement`, the plugin retrieves the public key itself from `{realmUrl}/protocol/openid-connect/certs`.
@@ -135,8 +135,9 @@ Optional. Default: `0`.
 - `userInfo {Array.<?string>}` — List of properties which should be included in the `request.auth.credentials` object besides `scope` and `sub`.<br/>
 Optional. Default: `[]`.<br/>
 
-- `cache {Object|boolean}` — The configuration of the [hapi.js cache](https://hapijs.com/api#servercacheoptions) powered by [catbox][catbox]. If the property `exp` (expiresAt) is undefined, the plugin uses 60 seconds as default TTL. Otherwise the cache entry expires as soon as the token itself expires.<br/>
-If `false` the cache is disabled. Use `true` or an empty object (`{}`) to use the built-in default cache.<br/>
+- `cache {Object|boolean}` — The configuration of the [hapi.js cache](https://hapijs.com/api#servercacheoptions) powered by [catbox][catbox]. If the property `exp` (= 'expires at') is undefined, the plugin uses 60 seconds as default TTL. Otherwise the cache entry expires as soon as the token itself expires.<br/>
+Please mind that an enabled cache leads to disabled live validation after the related token is cached once.<br/>
+If `false` the cache is disabled. Use `true` or an empty object (`{}`) to use the built-in default cache. Otherwise just drop in your own cache configuration.<br/>
 Optional. Default: `false`.
 
 #### `await server.kjwt.validate(field {string})`
@@ -144,7 +145,7 @@ Optional. Default: `false`.
 Example: `bearer 12345.abcde.67890`.<br/>
 Required.
 
-If an error occurs, it get thrown — so take care and implement a kind of catching.<br/>
+If an error occurs, it gets thrown — so take care and implement a kind of catching.<br/>
 If the token is invalid, the `result` is `false`. Otherwise it is an object containing all relevant credentials.
 
 ## Example
@@ -164,27 +165,27 @@ async function register (server, options) {
           }
         },
         handler (req, reply) {
-          reply(req.auth.credentials)
+          reply(req.auth.credentials);
         }
       }
     }
-  ])
+  ]);
 }
 
 module.exports = {
   register,
   name: 'example-routes',
   version: '0.0.1'
-}
+};
 ```
 
 #### `index.js`
 ``` js
-const hapi = require('hapi')
-const authKeycloak = require('hapi-auth-keycloak')
-const routes = require('./routes')
+const hapi = require('hapi');
+const authKeycloak = require('hapi-auth-keycloak');
+const routes = require('./routes');
 
-const server = hapi.server({ port: 3000, host: 'localhost' })
+const server = hapi.server({ port: 3000 });
 
 const options = {
   realmUrl: 'https://localhost:8080/auth/realms/testme',
@@ -192,11 +193,15 @@ const options = {
   minTimeBetweenJwksRequests: 15,
   cache: true,
   userInfo: ['name', 'email']
-}
+};
 
-process.on('SIGINT', () => {
-  server.stop().then((err) => process.exit(err ? 1 : 0))
-})
+process.on('SIGINT', async () => {
+  try { 
+    await server.stop();
+  } catch (err) {
+    process.exit(err ? 1 : 0);
+  }
+});
 
 (async () => {
   try {
@@ -208,7 +213,7 @@ process.on('SIGINT', () => {
   } catch (err) {
     console.error(err);
   }
-})()
+})();
 ```
 
 ## Developing and Testing
