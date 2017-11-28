@@ -3,22 +3,28 @@ const test = require('ava')
 const utils = require('../src/utils')
 
 test('get boom error with default message', (t) => {
-  const result = utils.raiseError('badRequest')
+  const result = utils.raiseUnauthorized()
   t.truthy(result)
-  t.deepEqual(result, boom.badRequest(undefined, 'Bearer'))
+  t.deepEqual(result, boom.unauthorized(undefined, 'Bearer', {
+    strategy: 'keycloak-jwt'
+  }))
 })
 
 test('get boom error with default message', (t) => {
-  const result = utils.raiseError('badRequest', undefined, 'foobar')
+  const result = utils.raiseUnauthorized(undefined, 'foobar')
   t.truthy(result)
-  t.deepEqual(result, boom.badRequest('foobar', 'Bearer'))
+  t.deepEqual(result, boom.unauthorized('foobar', 'Bearer', {
+    strategy: 'keycloak-jwt'
+  }))
 })
 
 test('get boom error with error message', (t) => {
   const mockErr = new Error('barfoo')
-  const result = utils.raiseError('badRequest', mockErr, 'foobar')
+  const result = utils.raiseUnauthorized(mockErr, 'foobar')
   t.truthy(result)
-  t.deepEqual(result, boom.badRequest(mockErr.message, 'Bearer'))
+  t.deepEqual(result, boom.unauthorized(mockErr.message, 'Bearer', {
+    strategy: 'keycloak-jwt'
+  }))
 })
 
 test('decorate callback function with `authenticated`', (t) => {

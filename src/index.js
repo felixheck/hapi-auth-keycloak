@@ -3,7 +3,7 @@ const { GrantManager } = require('keycloak-auth-utils')
 const KeycloakToken = require('keycloak-auth-utils/lib/token')
 const cache = require('./cache')
 const token = require('./token')
-const { raiseError, errors, fakeToolkit, verify } = require('./utils')
+const { raiseUnauthorized, errors, fakeToolkit, verify } = require('./utils')
 const pkg = require('../package.json')
 
 /**
@@ -45,7 +45,7 @@ async function verifySignedJwt (tkn) {
  * @param {string} tkn The token to be validated
  * @returns {Promise} The error-handled promise
  *
- * @throws {Error} If token is invalid or request fails
+ * @throws {Error} If token is invalid or request failed
  */
 async function introspect (tkn) {
   try {
@@ -67,7 +67,7 @@ async function introspect (tkn) {
  * @param {string} tkn The token to be used for authentication
  * @returns {Promise} The modified, non-error-handling promise
  *
- * @throws {Error} If request failed or token is invalid
+ * @throws {Error} If token is invalid or request failed
  */
 async function getRpt (tkn) {
   let data = {}
@@ -109,7 +109,7 @@ function getValidateFn () {
  * @param {string} tkn The token to be validated
  * @param {Function} h The toolkit
  *
- * @throws {Boom.unauthorized} If validation fails
+ * @throws {Boom.unauthorized} If previous validation fails
  */
 async function handleKeycloakValidation (tkn, h) {
   try {
@@ -120,7 +120,7 @@ async function handleKeycloakValidation (tkn, h) {
     await cache.set(store, tkn, userData, expiresIn)
     return h.authenticated(userData)
   } catch (err) {
-    throw raiseError('unauthorized', err, errors.invalid)
+    throw raiseUnauthorized(err, errors.invalid)
   }
 }
 
@@ -142,7 +142,7 @@ async function validate (field, h = (data) => data) {
   const reply = fakeToolkit(h)
 
   if (!tkn) {
-    throw raiseError('unauthorized', null, errors.missing)
+    throw raiseUnauthorized(null, errors.missing)
   }
 
   const cached = await cache.get(store, tkn)
@@ -180,7 +180,7 @@ function strategy (server) {
  * @param {Hapi.Server} server The created server instance
  * @param {Object} opts The plugin related options
  */
-function plugin (server, opts) {
+function register (server, opts) {
   options = verify(opts)
   manager = new GrantManager(options)
   store = cache.create(server, options.cache)
@@ -189,7 +189,4 @@ function plugin (server, opts) {
   server.decorate('server', 'kjwt', { validate })
 }
 
-module.exports = {
-  register: plugin,
-  pkg
-}
+module.exports = { register, pkg }

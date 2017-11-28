@@ -42,7 +42,7 @@ test('server method – authentication does fail – invalid token', async (t) =
   t.truthy(err)
   t.truthy(err.isBoom)
   t.is(err.output.statusCode, 401)
-  t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="Invalid credentials"')
+  t.is(err.output.headers['WWW-Authenticate'], 'Bearer strategy="keycloak-jwt", error="Invalid credentials"')
 })
 
 test('server method – authentication does fail – invalid header', async (t) => {
@@ -52,7 +52,7 @@ test('server method – authentication does fail – invalid header', async (t) 
   t.truthy(err)
   t.truthy(err.isBoom)
   t.is(err.output.statusCode, 401)
-  t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="Missing or invalid authorization header"')
+  t.is(err.output.headers['WWW-Authenticate'], 'Bearer strategy="keycloak-jwt", error="Missing or invalid authorization header"')
 })
 
 test('server method – authentication does fail – error', async (t) => {
@@ -64,5 +64,5 @@ test('server method – authentication does fail – error', async (t) => {
   t.truthy(err)
   t.truthy(err.isBoom)
   t.is(err.output.statusCode, 401)
-  t.is(err.output.headers['WWW-Authenticate'], 'Bearer error="Invalid credentials"')
+  t.is(err.output.headers['WWW-Authenticate'], 'Bearer strategy="keycloak-jwt", error="Invalid credentials"')
 })

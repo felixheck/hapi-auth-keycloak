@@ -64,17 +64,18 @@ function verify (opts) {
  * @function
  * @public
  *
- * Get `Boom` error with bound scheme.
- * If error is available, use its message.
- * Otherwise the provided message.
+ * Get `Boom.unauthorized` error with bound scheme and
+ * further attributes If error is available, use its
+ * message. Otherwise the provided message.
  *
- * @param {string} type The `Boom` error type
  * @param {Error|null} err The error object
  * @param {string} msg The error message
  * @returns {Boom} The created `Boom` error
  */
-function raiseError (type, err, msg) {
-  return boom[type](err ? err.message : msg, 'Bearer')
+function raiseUnauthorized (err, msg) {
+  return boom.unauthorized(err ? err.message : msg, 'Bearer', {
+    strategy: 'keycloak-jwt'
+  })
 }
 
 const errors = {
@@ -101,7 +102,7 @@ function fakeToolkit (h) {
 }
 
 module.exports = {
-  raiseError,
+  raiseUnauthorized,
   errors,
   fakeToolkit,
   verify
