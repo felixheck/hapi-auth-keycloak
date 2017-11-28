@@ -3,7 +3,7 @@ const { GrantManager } = require('keycloak-auth-utils')
 const KeycloakToken = require('keycloak-auth-utils/lib/token')
 const cache = require('./cache')
 const token = require('./token')
-const { raiseUnauthorized, errors, fakeToolkit, verify } = require('./utils')
+const { raiseUnauthorized, errorMessages, fakeToolkit, verify } = require('./utils')
 const pkg = require('../package.json')
 
 /**
@@ -50,9 +50,9 @@ async function verifySignedJwt (tkn) {
 async function introspect (tkn) {
   try {
     const isValid = await manager.validateAccessToken(tkn)
-    if (isValid === false) throw Error(errors.invalid)
+    if (isValid === false) throw Error(errorMessages.invalid)
   } catch (err) {
-    throw Error(errors.invalid)
+    throw Error(errorMessages.invalid)
   }
 
   return tkn
@@ -77,7 +77,7 @@ async function getRpt (tkn) {
       headers: { authorization: `bearer ${tkn}` }
     }))
   } catch (err) {
-    throw Error(errors.rpt)
+    throw Error(errorMessages.rpt)
   }
 
   return data.rpt
@@ -120,7 +120,7 @@ async function handleKeycloakValidation (tkn, h) {
     await cache.set(store, tkn, userData, expiresIn)
     return h.authenticated(userData)
   } catch (err) {
-    throw raiseUnauthorized(err, errors.invalid)
+    throw raiseUnauthorized(err, errorMessages.invalid)
   }
 }
 
@@ -142,7 +142,7 @@ async function validate (field, h = (data) => data) {
   const reply = fakeToolkit(h)
 
   if (!tkn) {
-    throw raiseUnauthorized(null, errors.missing)
+    throw raiseUnauthorized(null, errorMessages.missing)
   }
 
   const cached = await cache.get(store, tkn)

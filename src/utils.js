@@ -68,17 +68,18 @@ function verify (opts) {
  * further attributes If error is available, use its
  * message. Otherwise the provided message.
  *
- * @param {Error|null} err The error object
+ * @param {Error|null|undefined} err The error object
  * @param {string} msg The error message
- * @returns {Boom} The created `Boom` error
+ * @param {string} [scheme = 'Bearer'] The related scheme
+ * @returns {Boom.unauthorized} The created `Boom` error
  */
-function raiseUnauthorized (err, msg) {
-  return boom.unauthorized(err ? err.message : msg, 'Bearer', {
+function raiseUnauthorized (err, msg, scheme = 'Bearer') {
+  return boom.unauthorized(err ? err.message : msg, scheme, {
     strategy: 'keycloak-jwt'
   })
 }
 
-const errors = {
+const errorMessages = {
   invalid: 'Invalid credentials',
   missing: 'Missing or invalid authorization header',
   rpt: 'Retrieving the RPT failed'
@@ -103,7 +104,7 @@ function fakeToolkit (h) {
 
 module.exports = {
   raiseUnauthorized,
-  errors,
+  errorMessages,
   fakeToolkit,
   verify
 }
