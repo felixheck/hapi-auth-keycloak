@@ -135,7 +135,7 @@ Optional. Default: `0`.
 - `userInfo {Array.<?string>}` — List of properties which should be included in the `request.auth.credentials` object besides `scope` and `sub`.<br/>
 Optional. Default: `[]`.<br/>
 
-- `cache {Object|boolean}` — The configuration of the [hapi.js cache](https://hapijs.com/api#servercacheoptions) powered by [catbox][catbox]. If the property `exp` (= 'expires at') is undefined, the plugin uses 60 seconds as default TTL. Otherwise the cache entry expires as soon as the token itself expires.<br/>
+- `cache {Object|boolean}` — The configuration of the [hapi.js cache][hapi-server-cache] powered by [catbox][catbox]. If the property `exp` ('expires at') is undefined, the plugin uses 60 seconds as default TTL. Otherwise the cache entry expires as soon as the token itself expires.<br/>
 Please mind that an enabled cache leads to disabled live validation after the related token is cached once.<br/>
 If `false` the cache is disabled. Use `true` or an empty object (`{}`) to use the built-in default cache. Otherwise just drop in your own cache configuration.<br/>
 Optional. Default: `false`.
@@ -253,6 +253,7 @@ For further information read the [contributing guideline](CONTRIBUTING.md).
 [jwt]: https://jwt.io/
 [catbox]: https://github.com/hapijs/catbox
 [bearer]: https://tools.ietf.org/html/rfc6750
+[hapi-server-cache]: https://hapijs.com/api#-servercacheoptions
 [hapi-route-options]: https://hapijs.com/api#route-options
 [jwk]: https://tools.ietf.org/html/rfc7517
 [pem]: https://tools.ietf.org/html/rfc1421
