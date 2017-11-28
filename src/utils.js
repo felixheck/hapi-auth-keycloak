@@ -79,6 +79,12 @@ function raiseUnauthorized (err, msg, scheme = 'Bearer') {
   })
 }
 
+/**
+ * @type Object
+ * @public
+ *
+ * Used pre-defined error messages
+ */
 const errorMessages = {
   invalid: 'Invalid credentials',
   missing: 'Missing or invalid authorization header',
