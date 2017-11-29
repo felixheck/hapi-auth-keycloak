@@ -104,7 +104,9 @@ test('throw error if options are invalid – publicKey', (t) => {
     {},
     {
       foobar: 42
-    }
+    },
+    fixtures.common.publicKey,
+    fixtures.common.publicKeyCert
   ]
 
   t.plan(invalids.length)
@@ -258,18 +260,6 @@ test('throw no error if options are valid – offline', (t) => {
   })
 })
 
-test('throw no error if options are valid – publicKey', (t) => {
-  t.plan(valids.length)
-
-  valids.forEach((valid) => {
-    t.notThrows(
-      () => utils.verify(helpers.getOptions(Object.assign({
-        publicKey: fixtures.common.publicKey
-      }, valid))),
-      Error, helpers.log('valid.publicKey', valid))
-  })
-})
-
 test('throw no error if options are valid – publicKey/Rsa', (t) => {
   t.plan(valids.length)
 
@@ -279,18 +269,6 @@ test('throw no error if options are valid – publicKey/Rsa', (t) => {
         publicKey: fixtures.common.publicKeyRsa
       }, valid))),
       Error, helpers.log('valid.publicKey/Rsa', valid))
-  })
-})
-
-test('throw no error if options are valid – publicKey/Cert', (t) => {
-  t.plan(valids.length)
-
-  valids.forEach((valid) => {
-    t.notThrows(
-      () => utils.verify(helpers.getOptions(Object.assign({
-        publicKey: fixtures.common.publicKeyCert
-      }, valid))),
-      Error, helpers.log('valid.publicKey/Cert', valid))
   })
 })
 

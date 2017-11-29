@@ -1,5 +1,6 @@
 const boom = require('boom')
 const joi = require('joi')
+const jwkToPem = require('jwk-to-pem')
 
 /**
  * @type Object
@@ -18,7 +19,7 @@ const scheme = joi.object({
     .description('The related secret of the Keycloak client/application')
     .example('1234-bar-4321-foo'),
   publicKey: joi.alternatives().try(
-    joi.string().regex(/^-----BEGIN((( RSA)? PUBLIC KEY)| CERTIFICATE)-----[\s\S]*-----END((( RSA)? PUBLIC KEY)| CERTIFICATE)-----\s?$/ig, 'PEM'),
+    joi.string().regex(/^-----BEGIN RSA PUBLIC KEY-----[\s\S]*-----END RSA PUBLIC KEY-----\s?$/ig, 'PEM'),
     joi.object().type(Buffer),
     joi.object({
       kty: joi.string().required()
@@ -47,16 +48,35 @@ const scheme = joi.object({
 
 /**
  * @function
+ * @private
+ *
+ * Check whether the passed in value is a JSON Web Key.
+ *
+ * @param {*} key The value to be tested
+ * @returns {boolean} Whether the value is a JWK
+ */
+function isJwk (key) {
+  return !!(key && key.kty)
+}
+
+/**
+ * @function
  * @public
  *
  * Validate the plugin related options.
+ * If `publicKey` is JWK transform to PEM.
  *
  * @param {Object} opts The plugin related options
  * @returns {Object} The validated options
  *
- * @throws {Error} Options are invalid
+ * @throws {TypeError} If JWK is malformed or invalid
+ * @throws {Error} If options are invalid
  */
 function verify (opts) {
+  if (isJwk(opts.publicKey)) {
+    opts.publicKey = jwkToPem(opts.publicKey)
+  }
+
   return joi.attempt(opts, scheme)
 }
 
@@ -109,6 +129,7 @@ function fakeToolkit (h) {
 }
 
 module.exports = {
+  isJwk,
   raiseUnauthorized,
   errorMessages,
   fakeToolkit,
