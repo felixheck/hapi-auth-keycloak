@@ -70,6 +70,7 @@ function isJwk (key) {
  * @returns {Object} The validated options
  *
  * @throws {TypeError} If JWK is malformed or invalid
+ * @throws {Error} If JWK has an unsupported key type
  * @throws {Error} If options are invalid
  */
 function verify (opts) {
