@@ -1,4 +1,4 @@
-const axios = require('axios')
+const got = require('got')
 const { GrantManager } = require('keycloak-auth-utils')
 const KeycloakToken = require('keycloak-auth-utils/lib/token')
 const cache = require('./cache')
@@ -70,17 +70,17 @@ async function introspect (tkn) {
  * @throws {Error} If token is invalid or request failed
  */
 async function getRpt (tkn) {
-  let data = {}
+  let body = {}
 
   try {
-    ({ data } = await axios.get(`${options.realmUrl}/authz/entitlement/${options.clientId}`, {
+    ({ body } = await got.get(`${options.realmUrl}/authz/entitlement/${options.clientId}`, {
       headers: { authorization: `bearer ${tkn}` }
     }))
   } catch (err) {
     throw Error(errorMessages.rpt)
   }
 
-  return data.rpt
+  return body.rpt
 }
 
 /**

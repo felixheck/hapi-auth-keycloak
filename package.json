@@ -46,8 +46,8 @@
     "standard": "^10.0.3"
   },
   "dependencies": {
-    "axios": "^0.17.0",
     "boom": "^6.0.0",
+    "got": "^8.0.0",
     "joi": "^13.0.0",
     "jsonwebtoken": "^8.1.0",
     "jwk-to-pem": "^1.2.6",
