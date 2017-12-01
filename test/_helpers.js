@@ -65,6 +65,19 @@ function mockEntitlement (code, data, isError = false) {
  * @function
  * @public
  *
+ * Mock request to the api key service.
+ *
+ * @param {number} code The status code to be returned
+ * @param {Object} data The response object to be returned
+ */
+function mockApiKey (code, data) {
+  nock('http://barfoo.com').get('/foo/bar').reply(code, data)
+}
+
+/**
+ * @function
+ * @public
+ *
  * Mock request object to be injected.
  *
  * @param {string} field The `authorization` header its value
@@ -108,7 +121,7 @@ function registerRoutes (server) {
     {
       method: 'GET',
       path: '/',
-      config: {
+      options: {
         auth: 'keycloak-jwt',
         handler (req) {
           return req.auth.credentials.scope
@@ -118,7 +131,7 @@ function registerRoutes (server) {
     {
       method: 'GET',
       path: '/role',
-      config: {
+      options: {
         auth: {
           strategies: ['keycloak-jwt'],
           access: {
@@ -133,7 +146,7 @@ function registerRoutes (server) {
     {
       method: 'GET',
       path: '/role/guest',
-      config: {
+      options: {
         auth: {
           strategies: ['keycloak-jwt'],
           access: {
@@ -148,7 +161,7 @@ function registerRoutes (server) {
     {
       method: 'GET',
       path: '/role/rpt',
-      config: {
+      options: {
         auth: {
           strategies: ['keycloak-jwt'],
           access: {
@@ -157,6 +170,18 @@ function registerRoutes (server) {
         },
         handler (req) {
           return req.auth.credentials.scope
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/proxy',
+      options: {
+        handler (req) {
+          return {
+            headers: req.headers,
+            query: req.query
+          }
         }
       }
     }
@@ -199,6 +224,7 @@ async function getServer (options) {
   await server.initialize()
 
   if (options === false) {
+    registerRoutes(server)
     return server
   }
 
@@ -210,6 +236,7 @@ module.exports = {
   mockIntrospect,
   mockEntitlement,
   mockRequest,
+  mockApiKey,
   log,
   getServer,
   registerPlugin
