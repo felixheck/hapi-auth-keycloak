@@ -12,7 +12,10 @@
     "jwt",
     "jsonwebtoken",
     "json web token",
-    "plugin"
+    "plugin",
+    "apikey",
+    "api key",
+    "api-key"
   ],
   "version": "3.1.0",
   "license": "MIT",

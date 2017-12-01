@@ -15,7 +15,7 @@
 ---
 
 ## Introduction
-**hapi-auth-keycloak** is a plugin for [hapi.js][hapijs] which enables to protect your endpoints in a smart but professional manner using [Keycloak][keycloak] as authentication service. It is inspired by the related [express.js middleware][keycloak-node]. The plugin validates the passed [`Bearer` token][bearer] offline with a provided public key or online with help of the [Keycloak][keycloak] server. Optionally, the successfully validated tokens and the related user data get cached using [`catbox`][catbox]. The caching enables a fast processing even though the user data don't get changed until the token expires. It plays well with the [hapi.js][hapijs]-integrated [authentication/authorization feature][hapi-route-options]. Besides the authentication strategy it is possible to validate tokens by yourself, e.g. to authenticate incoming websocket or queue messages.
+**hapi-auth-keycloak** is a plugin for [hapi.js][hapijs] which enables to protect your endpoints in a smart but professional manner using [Keycloak][keycloak] as authentication service. It is inspired by the related [express.js middleware][keycloak-node]. The plugin validates the passed [`Bearer` token][bearer] offline with a provided public key or online with help of the [Keycloak][keycloak] server. Optionally, the successfully validated tokens and the related user data get cached using [`catbox`][catbox]. The caching enables a fast processing even though the user data don't get changed until the token expires. Furthermore it is possible to enable an api key interceptor proxying the request to an api key service which returns the temporary bearer token. It plays well with the [hapi.js][hapijs]-integrated [authentication/authorization feature][hapi-route-options]. Besides the authentication strategy it is possible to validate tokens by yourself, e.g. to authenticate incoming websocket or queue messages.
 
 The modules [`standard`][standardjs] and [`ava`][avajs] are used to grant a high quality implementation.<br/>
 This major release supports just [hapi.js](https://github.com/hapijs/hapi) `>=v17.0.0` and node `>=v8.0.0` — to support older versions please use `v2.1.0`.
@@ -133,12 +133,33 @@ The value have to be a positive integer.<br/>
 Optional. Default: `0`.
 
 - `userInfo {Array.<?string>}` — List of properties which should be included in the `request.auth.credentials` object besides `scope` and `sub`.<br/>
-Optional. Default: `[]`.<br/>
+Optional. Default: `[]`.
 
 - `cache {Object|boolean}` — The configuration of the [hapi.js cache][hapi-server-cache] powered by [catbox][catbox]. If the property `exp` ('expires at') is undefined, the plugin uses 60 seconds as default TTL. Otherwise the cache entry expires as soon as the token itself expires.<br/>
 Please mind that an enabled cache leads to disabled live validation after the related token is cached once.<br/>
 If `false` the cache is disabled. Use `true` or an empty object (`{}`) to use the built-in default cache. Otherwise just drop in your own cache configuration.<br/>
 Optional. Default: `false`.
+
+- `apiKey {Object}` — <br/>
+Optional. Default: `undefined`.
+
+  - `url {string}` — <br/>
+  Required.
+
+  - `in {string}` — <br/>
+  Optional. Default: `headers`.
+
+  - `name {string}` — <br/>
+  Optional. Default: `authorization`.
+
+  - `prefix {string}` — <br/>
+  Optional. Default: `Api-Key `.
+
+  - `tokenPath {string}` — <br/>
+  Optional. Default: `access_token`.
+
+  - `options {Object}` – <br/>
+  Optional. Default: `{}`
 
 #### `await server.kjwt.validate(field {string})`
 - `field {string}` — The `Bearer` field, including the scheme (`bearer`) itself.<br/>
