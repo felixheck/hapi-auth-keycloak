@@ -1,6 +1,7 @@
 const got = require('got')
 const { GrantManager } = require('keycloak-auth-utils')
 const KeycloakToken = require('keycloak-auth-utils/lib/token')
+const apiKey = require('./apiKey')
 const cache = require('./cache')
 const token = require('./token')
 const { raiseUnauthorized, errorMessages, fakeToolkit, verify } = require('./utils')
@@ -185,6 +186,7 @@ function register (server, opts) {
   manager = new GrantManager(options)
   store = cache.create(server, options.cache)
 
+  apiKey.init(server, opts)
   server.auth.scheme('keycloak-jwt', strategy)
   server.decorate('server', 'kjwt', { validate })
 }
