@@ -38,7 +38,28 @@ const scheme = joi.object({
     .example('true'),
   userInfo: joi.array().items(joi.string().min(1))
     .description('List of properties which should be included in the `request.auth.credentials` object')
-    .example(['name', 'email'])
+    .example(['name', 'email']),
+  apiKey: joi.object({
+    in: joi.string().valid('headers', 'query').default('headers')
+      .description('Whether the api key is placed in the header or query')
+      .example('query'),
+    name: joi.string().min(1).default('authorization')
+      .description('The name of the related header field or query key')
+      .example('x-api-key'),
+    prefix: joi.string().min(1).default('Api-Key ')
+      .description('An optional prefix of the related api key value')
+      .example('Apikey '),
+    url: joi.string().min(1).required()
+        .description('The absolute url to be requested')
+        .example('https://foobar.com/api'),
+    request: joi.object().default({})
+        .description('The detailed request options for `got`')
+        .example({ retries: 2 }),
+    tokenPath: joi.string().min(1).default('access_token')
+        .description('The path to the access token in the response its body')
+        .example('foo.bar')
+  }).unknown(false)
+    .description('The configuration of an optional api key strategy interaction with another service')
 })
 .without('entitlement', ['secret', 'publicKey'])
 .without('secret', ['entitlement', 'publicKey'])
@@ -94,9 +115,10 @@ function verify (opts) {
  * @param {string} [scheme = 'Bearer'] The related scheme
  * @returns {Boom.unauthorized} The created `Boom` error
  */
-function raiseUnauthorized (err, msg, scheme = 'Bearer') {
+function raiseUnauthorized (err, msg, reason, scheme = 'Bearer') {
   return boom.unauthorized(err ? err.message : msg, scheme, {
-    strategy: 'keycloak-jwt'
+    strategy: 'keycloak-jwt',
+    ...(reason ? { reason } : {})
   })
 }
 
@@ -109,7 +131,8 @@ function raiseUnauthorized (err, msg, scheme = 'Bearer') {
 const errorMessages = {
   invalid: 'Invalid credentials',
   missing: 'Missing or invalid authorization header',
-  rpt: 'Retrieving the RPT failed'
+  rpt: 'Retrieving the RPT failed',
+  apiKey: 'Retrieving the token with the api key failed'
 }
 
 /**
