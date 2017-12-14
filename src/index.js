@@ -1,6 +1,6 @@
 const got = require('got')
-const { GrantManager } = require('keycloak-auth-utils')
-const KeycloakToken = require('keycloak-auth-utils/lib/token')
+const GrantManager = require('keycloak-connect/middleware/auth-utils/grant-manager')
+const KeycloakToken = require('keycloak-connect/middleware/auth-utils/token')
 const apiKey = require('./apiKey')
 const cache = require('./cache')
 const token = require('./token')
