@@ -118,7 +118,7 @@ function verify (opts) {
 function raiseUnauthorized (err, msg, reason, scheme = 'Bearer') {
   return boom.unauthorized(err ? err.message : msg, scheme, {
     strategy: 'keycloak-jwt',
-    ...(reason ? { reason } : {})
+    ...(reason && !err ? { reason } : {})
   })
 }
 
