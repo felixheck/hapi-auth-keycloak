@@ -41,10 +41,10 @@ const scheme = joi.object({
     .example(['name', 'email']),
   apiKey: joi.object({
     in: joi.string().valid('headers', 'query').default('headers')
-      .description('Whether the api key is placed in the header or query')
+      .description('Whether the api key is placed in the headers or query')
       .example('query'),
     name: joi.string().min(1).default('authorization')
-      .description('The name of the related header field or query key')
+      .description('The name of the related headers field or query key')
       .example('x-api-key'),
     prefix: joi.string().min(1).default('Api-Key ')
       .description('An optional prefix of the related api key value')
@@ -56,7 +56,7 @@ const scheme = joi.object({
         .description('The detailed request options for `got`')
         .example({ retries: 2 }),
     tokenPath: joi.string().min(1).default('access_token')
-        .description('The path to the access token in the response its body')
+        .description('The path to the access token in the response its body as dot notation')
         .example('foo.bar')
   }).unknown(false)
     .description('The configuration of an optional api key strategy interaction with another service')

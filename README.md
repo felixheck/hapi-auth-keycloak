@@ -143,22 +143,24 @@ Optional. Default: `false`.
 - `apiKey {Object}` — <br/>
 Optional. Default: `undefined`.
 
-  - `url {string}` — <br/>
+  - `url {string}` — The absolute url to be requested. It's possible to use a [`pupa` template][pupa] with placeholders called `realm` and `clientId` getting rendered based on the passed options.<br/>
+  Example: `http://barfoo.com/foo/{clientId}`<br/>
   Required.
 
-  - `in {string}` — <br/>
+  - `in {string}` — Whether the api key is placed in the headers or query.<br/>
+  Allowed values: `headers` & 'query'<br/>
   Optional. Default: `headers`.
 
-  - `name {string}` — <br/>
+  - `name {string}` — The name of the related headers field or query key.<br/>
   Optional. Default: `authorization`.
 
-  - `prefix {string}` — <br/>
+  - `prefix {string}` — An optional prefix of the related api key value. Mind a trailing space if necessary.<br/>
   Optional. Default: `Api-Key `.
 
-  - `tokenPath {string}` — <br/>
+  - `tokenPath {string}` — The path to the access token in the response its body as dot notation.<br/>
   Optional. Default: `access_token`.
 
-  - `options {Object}` – <br/>
+  - `request {Object}` – The detailed request options for [`got`][got].<br/>
   Optional. Default: `{}`
 
 #### `await server.kjwt.validate(field {string})`
@@ -282,3 +284,5 @@ For further information read the [contributing guideline](CONTRIBUTING.md).
 [introspect]: http://www.keycloak.org/docs/2.4/authorization_services_guide/topics/service/protection/token-introspection.html
 [rpt]: http://www.keycloak.org/docs/2.4/authorization_services_guide/topics/service/entitlement/entitlement-api-aapi.html
 [rpt-terms]: http://www.keycloak.org/docs/2.4/authorization_services_guide/topics/overview/terminology.html
+[got]: https://github.com/sindresorhus/got
+[pupa]: https://github.com/sindresorhus/pupa
