@@ -12,7 +12,37 @@ const valids = [
   { userInfo: [] },
   { userInfo: ['string'] },
   { minTimeBetweenJwksRequests: 0 },
-  { minTimeBetweenJwksRequests: 42 }
+  { minTimeBetweenJwksRequests: 42 },
+  { apiKey: {
+    url: 'http://foobar.com/foo/bar'
+  }},
+  { apiKey: {
+    url: 'http://foobar.com/foo/bar',
+    in: 'headers'
+  }},
+  { apiKey: {
+    url: 'http://foobar.com/foo/bar',
+    in: 'query'
+  }},
+  { apiKey: {
+    url: 'http://foobar.com/foo/bar',
+    name: 'foobar'
+  }},
+  { apiKey: {
+    url: 'http://foobar.com/foo/bar',
+    prefix: 'barfoo '
+  }},
+  { apiKey: {
+    url: 'http://foobar.com/foo/bar',
+    request: {}
+  }},
+  { apiKey: {
+    url: 'http://foobar.com/foo/bar',
+    tokenPath: 'foo.bar'
+  }},
+  { apiKey: {
+    url: 'http://foobar.com/{client}/bar'
+  }}
 ]
 
 test('throw error if options are empty', (t) => {
@@ -216,6 +246,178 @@ test('throw error if options are invalid – entitlement', (t) => {
     t.throws(() => utils.verify(helpers.getOptions({
       entitlement: invalid
     })), Error, helpers.log('entitlement', invalid))
+  })
+})
+
+test('throw error if options are invalid – apiKey', (t) => {
+  const invalids = [
+    null,
+    NaN,
+    '',
+    'foobar',
+    fixtures.common.baseUrl,
+    42,
+    [],
+    true,
+    false,
+    {}
+  ]
+
+  t.plan(invalids.length)
+
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      apiKey: invalid
+    })), Error, helpers.log('apiKey', invalid))
+  })
+})
+
+test('throw error if options are invalid – apiKey.url', (t) => {
+  const invalids = [
+    null,
+    NaN,
+    '',
+    42,
+    true,
+    false,
+    [],
+    new RegExp(),
+    {}
+  ]
+
+  t.plan(invalids.length)
+
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      apiKey: {
+        url: invalid
+      }
+    })), Error, helpers.log('apiKey.url', invalid))
+  })
+})
+
+test('throw error if options are invalid – apiKey.name', (t) => {
+  const invalids = [
+    null,
+    NaN,
+    '',
+    42,
+    true,
+    false,
+    [],
+    new RegExp(),
+    {}
+  ]
+
+  t.plan(invalids.length)
+
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      apiKey: {
+        url: 'http://foobar.com/foo/bar',
+        name: invalid
+      }
+    })), Error, helpers.log('apiKey.name', invalid))
+  })
+})
+
+test('throw error if options are invalid – apiKey.prefix', (t) => {
+  const invalids = [
+    null,
+    NaN,
+    '',
+    42,
+    true,
+    false,
+    [],
+    new RegExp(),
+    {}
+  ]
+
+  t.plan(invalids.length)
+
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      apiKey: {
+        url: 'http://foobar.com/foo/bar',
+        prefix: invalid
+      }
+    })), Error, helpers.log('apiKey.prefix', invalid))
+  })
+})
+
+test('throw error if options are invalid – apiKey.tokenPath', (t) => {
+  const invalids = [
+    null,
+    NaN,
+    '',
+    42,
+    true,
+    false,
+    [],
+    new RegExp(),
+    {}
+  ]
+
+  t.plan(invalids.length)
+
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      apiKey: {
+        url: 'http://foobar.com/foo/bar',
+        tokenPath: invalid
+      }
+    })), Error, helpers.log('apiKey.tokenPath', invalid))
+  })
+})
+
+test('throw error if options are invalid – apiKey.in', (t) => {
+  const invalids = [
+    null,
+    NaN,
+    '',
+    42,
+    true,
+    false,
+    [],
+    new RegExp(),
+    {},
+    'foo'
+  ]
+
+  t.plan(invalids.length)
+
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      apiKey: {
+        url: 'http://foobar.com/foo/bar',
+        in: invalid
+      }
+    })), Error, helpers.log('apiKey.in', invalid))
+  })
+})
+
+test('throw error if options are invalid – apiKey.options', (t) => {
+  const invalids = [
+    null,
+    NaN,
+    '',
+    'foobar',
+    fixtures.common.baseUrl,
+    42,
+    [],
+    {}
+  ]
+
+  t.plan(invalids.length)
+
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      apiKey: {
+        url: 'http://foobar.com/foo/bar',
+        options: invalid
+      }
+    })), Error, helpers.log('apiKey.options', invalid))
   })
 })
 

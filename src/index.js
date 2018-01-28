@@ -1,6 +1,7 @@
-const axios = require('axios')
-const { GrantManager } = require('keycloak-auth-utils')
-const KeycloakToken = require('keycloak-auth-utils/lib/token')
+const got = require('got')
+const GrantManager = require('keycloak-connect/middleware/auth-utils/grant-manager')
+const KeycloakToken = require('keycloak-connect/middleware/auth-utils/token')
+const apiKey = require('./apiKey')
 const cache = require('./cache')
 const token = require('./token')
 const { raiseUnauthorized, errorMessages, fakeToolkit, verify } = require('./utils')
@@ -70,17 +71,17 @@ async function introspect (tkn) {
  * @throws {Error} If token is invalid or request failed
  */
 async function getRpt (tkn) {
-  let data = {}
+  let body = {}
 
   try {
-    ({ data } = await axios.get(`${options.realmUrl}/authz/entitlement/${options.clientId}`, {
+    ({ body } = await got.get(`${options.realmUrl}/authz/entitlement/${options.clientId}`, {
       headers: { authorization: `bearer ${tkn}` }
     }))
   } catch (err) {
     throw Error(errorMessages.rpt)
   }
 
-  return data.rpt
+  return body.rpt
 }
 
 /**
@@ -120,7 +121,7 @@ async function handleKeycloakValidation (tkn, h) {
     await cache.set(store, tkn, userData, expiresIn)
     return h.authenticated(userData)
   } catch (err) {
-    throw raiseUnauthorized(err, errorMessages.invalid)
+    throw raiseUnauthorized(err, errorMessages.invalid, err.message)
   }
 }
 
@@ -185,6 +186,7 @@ function register (server, opts) {
   manager = new GrantManager(options)
   store = cache.create(server, options.cache)
 
+  apiKey.init(server, opts)
   server.auth.scheme('keycloak-jwt', strategy)
   server.decorate('server', 'kjwt', { validate })
 }

@@ -10,8 +10,17 @@ test('get boom error with default message', (t) => {
   }))
 })
 
+test('get boom error with reason', (t) => {
+  const result = utils.raiseUnauthorized(null, null, 'foobar')
+  t.truthy(result)
+  t.deepEqual(result, boom.unauthorized(undefined, 'Bearer', {
+    strategy: 'keycloak-jwt',
+    reason: 'foobar'
+  }))
+})
+
 test('get boom error with custom scheme', (t) => {
-  const result = utils.raiseUnauthorized(null, null, 'custom')
+  const result = utils.raiseUnauthorized(null, null, null, 'custom')
   t.truthy(result)
   t.deepEqual(result, boom.unauthorized(undefined, 'custom', {
     strategy: 'keycloak-jwt'
