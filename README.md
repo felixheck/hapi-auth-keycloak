@@ -148,7 +148,7 @@ Optional. Default: `undefined`.
   Required.
 
   - `in {string}` — Whether the api key is placed in the headers or query.<br/>
-  Allowed values: `headers` & 'query'<br/>
+  Allowed values: `headers` & `query`<br/>
   Optional. Default: `headers`.
 
   - `name {string}` — The name of the related headers field or query key.<br/>
