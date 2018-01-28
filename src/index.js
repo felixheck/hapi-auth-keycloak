@@ -121,7 +121,7 @@ async function handleKeycloakValidation (tkn, h) {
     await cache.set(store, tkn, userData, expiresIn)
     return h.authenticated(userData)
   } catch (err) {
-    throw raiseUnauthorized(err, errorMessages.invalid)
+    throw raiseUnauthorized(err, errorMessages.invalid, err.message)
   }
 }
 
