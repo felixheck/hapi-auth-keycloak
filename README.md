@@ -140,7 +140,7 @@ Please mind that an enabled cache leads to disabled live validation after the re
 If `false` the cache is disabled. Use `true` or an empty object (`{}`) to use the built-in default cache. Otherwise just drop in your own cache configuration.<br/>
 Optional. Default: `false`.
 
-- `apiKey {Object}` — <br/>
+- `apiKey {Object}` — The options object enabling an intercepted api key service<br/>
 Optional. Default: `undefined`.
 
   - `url {string}` — The absolute url to be requested. It's possible to use a [`pupa` template][pupa] with placeholders called `realm` and `clientId` getting rendered based on the passed options.<br/>
