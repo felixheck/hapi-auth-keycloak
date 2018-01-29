@@ -186,7 +186,7 @@ function register (server, opts) {
   manager = new GrantManager(options)
   store = cache.create(server, options.cache)
 
-  apiKey.init(server, opts)
+  apiKey.init(server, options)
   server.auth.scheme('keycloak-jwt', strategy)
   server.decorate('server', 'kjwt', { validate })
 }
