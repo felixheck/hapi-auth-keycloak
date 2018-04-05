@@ -49,7 +49,7 @@ test('authentication does fail – expired token', async (t) => {
 
   t.truthy(res)
   t.is(res.statusCode, 401)
-  t.is(res.headers['www-authenticate'], 'Bearer strategy="keycloak-jwt", error="Invalid credentials", reason="invalid token (expired)"')
+  t.is(res.headers['www-authenticate'], 'Bearer strategy="keycloak-jwt", reason="invalid token (expired)", error="Invalid credentials"')
 })
 
 test('authentication does fail – invalid header', async (t) => {
@@ -59,5 +59,5 @@ test('authentication does fail – invalid header', async (t) => {
 
   t.truthy(res)
   t.is(res.statusCode, 401)
-  t.is(res.headers['www-authenticate'], 'Bearer strategy="keycloak-jwt", error="Missing or invalid authorization header"')
+  t.is(res.headers['www-authenticate'], 'Bearer strategy="keycloak-jwt", error="Invalid credentials"')
 })
