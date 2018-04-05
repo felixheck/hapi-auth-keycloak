@@ -139,11 +139,15 @@ async function handleKeycloakValidation (tkn, h) {
  * @throws {Boom.unauthorized} If header is missing or has an invalid format
  */
 async function validate (field, h = (data) => data) {
+  if (!field) {
+    throw raiseUnauthorized(errorMessages.missing)
+  }
+
   const tkn = token.create(field)
   const reply = fakeToolkit(h)
 
   if (!tkn) {
-    throw raiseUnauthorized(errorMessages.missing)
+    throw raiseUnauthorized(errorMessages.invalid)
   }
 
   const cached = await cache.get(store, tkn)

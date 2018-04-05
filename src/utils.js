@@ -117,11 +117,15 @@ function verify (opts) {
  * @returns {Boom.unauthorized} The created `Boom` error
  */
 function raiseUnauthorized (error, reason, scheme = 'Bearer') {
-  return boom.unauthorized(null, scheme, {
-    strategy: 'keycloak-jwt',
-    ...(error ? { error } : {}),
-    ...(reason && error !== reason ? { reason } : {})
-  })
+  return boom.unauthorized(
+    error !== errorMessages.missing ? error : null,
+    scheme,
+    {
+      strategy: 'keycloak-jwt',
+      ...(error === errorMessages.missing ? { error } : {}),
+      ...(reason && error !== reason ? { reason } : {})
+    }
+  )
 }
 
 /**
@@ -132,7 +136,7 @@ function raiseUnauthorized (error, reason, scheme = 'Bearer') {
  */
 const errorMessages = {
   invalid: 'Invalid credentials',
-  missing: 'Missing or invalid authorization header',
+  missing: 'Missing authorization header',
   rpt: 'Retrieving the RPT failed',
   apiKey: 'Retrieving the token with the api key failed'
 }

@@ -11,10 +11,9 @@ test.afterEach.always('reset instances and prototypes', () => {
 
 test('server method – authentication supports mode: "optional" - will succeed without auth', async (t) => {
   const server = await helpers.getServer(cfg)
-
   const res = await server.inject({
     method: 'GET',
-    url: '/mode-optional',
+    url: '/mode-optional'
   })
 
   t.truthy(res)
@@ -22,31 +21,18 @@ test('server method – authentication supports mode: "optional" - will succeed 
 })
 
 test('server method – authentication supports mode: "optional" - will fail with invalid auth', async (t) => {
+  const mockReq = helpers.mockRequest(fixtures.common.token, '/mode-optional')
   const server = await helpers.getServer(cfg)
-
-  const res = await server.inject({
-    method: 'GET',
-    url: '/mode-optional',
-    headers: {
-      authorization: `bearer invalid-token`
-    }
-  })
+  const res = await server.inject(mockReq)
 
   t.truthy(res)
   t.is(res.statusCode, 401)
-  t.is(err.output.headers['WWW-Authenticate'], 'Bearer strategy="keycloak-jwt", error="Invalid credentials"')
 })
 
 test('server method – authentication supports mode: "try" - will succeed with invalid auth', async (t) => {
+  const mockReq = helpers.mockRequest(fixtures.common.token, '/mode-try')
   const server = await helpers.getServer(cfg)
-
-  const res = await server.inject({
-    method: 'GET',
-    url: '/mode-try',
-    headers: {
-      authorization: `bearer ${fixtures.composeJwt('expired')}`
-    }
-  })
+  const res = await server.inject(mockReq)
 
   t.truthy(res)
   t.is(res.statusCode, 200)
