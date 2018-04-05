@@ -184,6 +184,32 @@ function registerRoutes (server) {
           }
         }
       }
+    },
+    {
+      method: 'GET',
+      path: '/mode-optional',
+      options: {
+        auth: { strategy: 'keycloak-jwt', mode: 'optional' },
+        handler (req) {
+          return {
+            headers: req.headers,
+            query: req.query
+          }
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/mode-try',
+      options: {
+        auth: { strategy: 'keycloak-jwt', mode: 'try' },
+        handler (req) {
+          return {
+            headers: req.headers,
+            query: req.query
+          }
+        }
+      }
     }
   ])
 }
