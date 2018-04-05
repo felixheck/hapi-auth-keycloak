@@ -121,7 +121,7 @@ async function handleKeycloakValidation (tkn, h) {
     await cache.set(store, tkn, userData, expiresIn)
     return h.authenticated(userData)
   } catch (err) {
-    throw raiseUnauthorized(err, errorMessages.invalid, err.message)
+    throw raiseUnauthorized(errorMessages.invalid, err.message)
   }
 }
 
@@ -143,7 +143,7 @@ async function validate (field, h = (data) => data) {
   const reply = fakeToolkit(h)
 
   if (!tkn) {
-    throw raiseUnauthorized(null, errorMessages.missing)
+    throw raiseUnauthorized(errorMessages.missing)
   }
 
   const cached = await cache.get(store, tkn)

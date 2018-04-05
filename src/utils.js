@@ -111,14 +111,16 @@ function verify (opts) {
  * message. Otherwise the provided message.
  *
  * @param {Error|null|undefined} err The error object
- * @param {string} msg The error message
+ * @param {string} message The error message
+ * @param {string} reason The reason for the thrown error
  * @param {string} [scheme = 'Bearer'] The related scheme
  * @returns {Boom.unauthorized} The created `Boom` error
  */
-function raiseUnauthorized (err, msg, reason, scheme = 'Bearer') {
-  return boom.unauthorized(err ? err.message : msg, scheme, {
+function raiseUnauthorized (error, reason, scheme = 'Bearer') {
+  return boom.unauthorized(null, scheme, {
     strategy: 'keycloak-jwt',
-    ...(reason && !err ? { reason } : {})
+    ...(error ? { error } : {}),
+    ...(reason && error !== reason ? { reason } : {})
   })
 }
 
