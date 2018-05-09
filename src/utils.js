@@ -50,22 +50,22 @@ const scheme = joi.object({
       .description('An optional prefix of the related api key value')
       .example('Apikey '),
     url: joi.string().min(1).required()
-        .description('The absolute url to be requested')
-        .example('https://foobar.com/api'),
+      .description('The absolute url to be requested')
+      .example('https://foobar.com/api'),
     request: joi.object().default({})
-        .description('The detailed request options for `got`')
-        .example({ retries: 2 }),
+      .description('The detailed request options for `got`')
+      .example({ retries: 2 }),
     tokenPath: joi.string().min(1).default('access_token')
-        .description('The path to the access token in the response its body as dot notation')
-        .example('foo.bar')
+      .description('The path to the access token in the response its body as dot notation')
+      .example('foo.bar')
   }).unknown(false)
     .description('The configuration of an optional api key strategy interaction with another service')
 })
-.without('entitlement', ['secret', 'publicKey'])
-.without('secret', ['entitlement', 'publicKey'])
-.without('publicKey', ['entitlement', 'secret'])
-.unknown(false)
-.required()
+  .without('entitlement', ['secret', 'publicKey'])
+  .without('secret', ['entitlement', 'publicKey'])
+  .without('publicKey', ['entitlement', 'secret'])
+  .unknown(false)
+  .required()
 
 /**
  * @function

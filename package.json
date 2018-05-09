@@ -42,20 +42,20 @@
   },
   "devDependencies": {
     "ava": "^0.25.0",
-    "coveralls": "^3.0.0",
-    "hapi": "^17.2.0",
-    "nock": "^9.1.6",
-    "nyc": "^11.4.1",
-    "standard": "^10.0.3"
+    "coveralls": "^3.0.1",
+    "hapi": "^17.4.0",
+    "nock": "^9.2.5",
+    "nyc": "^11.7.2",
+    "standard": "^11.0.1"
   },
   "dependencies": {
-    "boom": "^7.1.1",
-    "got": "^8.0.3",
-    "joi": "^13.1.1",
-    "jsonwebtoken": "^8.1.1",
+    "boom": "^7.2.0",
+    "got": "^8.3.1",
+    "joi": "^13.3.0",
+    "jsonwebtoken": "^8.2.1",
     "jwk-to-pem": "^1.2.6",
-    "keycloak-connect": "^3.4.3",
-    "lodash": "^4.17.4",
+    "keycloak-connect": "^4.0.0-beta.2",
+    "lodash": "^4.17.10",
     "pupa": "^1.0.0"
   },
   "peerDependencies": {
