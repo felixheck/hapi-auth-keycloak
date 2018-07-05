@@ -171,6 +171,13 @@ Required.
 If an error occurs, it gets thrown — so take care and implement a kind of catching.<br/>
 If the token is invalid, the `result` is `false`. Otherwise it is an object containing all relevant credentials.
 
+#### `route.options.plugins.kjwt`
+Plugin-specific options for routes:
+
+- `bearerOnly {boolean}` – Whether the if it should deny access immediately or redirect to the Keycloak login page.<br/>
+If `true`, it denies access immediately with a proper error object and further informations.<br/>
+Optional. Default: `true`.
+
 ## Example
 #### `routes.js`
 
