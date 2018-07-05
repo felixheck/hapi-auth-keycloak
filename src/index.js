@@ -1,4 +1,6 @@
 const got = require('got')
+const qs = require('querystring')
+const _ = require('lodash')
 const GrantManager = require('keycloak-connect/middleware/auth-utils/grant-manager')
 const KeycloakToken = require('keycloak-connect/middleware/auth-utils/token')
 const apiKey = require('./apiKey')
@@ -16,6 +18,64 @@ const pkg = require('../package.json')
 let options
 let manager
 let store
+
+/**
+ *
+ * @param {Hapi.Request|undefined} request The related request object
+ * @param {Object} h The reply toolkit
+ * @param {Array} errorDetails Several error details to be used to throw an error
+ * @returns {Hapi.Reponse} The response object due to the redirect
+ *
+ * @throws {Error} If `bearerOnly` is enable or `request` is undefined
+ */
+function denyAccess (request, h, ...errorDetails) {
+  const bearerOnly = _.get(request, 'route.options.plugins.kjwt', true)
+
+  if (!bearerOnly && request) {
+    return forceLogin(request, h)
+  }
+
+  throw raiseUnauthorized(...errorDetails)
+}
+
+/**
+ * @function
+ * @private
+ *
+ * Force login by redirecting to the Keycloak login page.
+ * It enables to redirect back to the platform afterwards.
+ *
+ * @param {Hapi.Request|undefined} request The related request object
+ * @param {Object} h The reply toolkit
+ * @returns {Hapi.Reponse} The response object due to the redirect
+ */
+function forceLogin (request, h) {
+  const host = request.info.host
+  const protocol = request.info.protocol
+  const url = request.url.path
+  const loginUrl = getLoginUrl(`${protocol}://${host}${url}?auth_callback=1`)
+
+  return h.redirect(loginUrl)
+}
+
+/**
+ * @function
+ * @private
+ *
+ * Get the url to enable Keycloak to redirect back
+ * to the platform after login has succeeded.
+ *
+ * @param {string} redirectUrl The redirect url to the current platform
+ * @returns {string} The composed redirect url
+ */
+function getLoginUrl (redirectUrl) {
+  return `${options.realmUrl}/protocol/openid-connect/auth?${qs.stringify({
+    scope: 'openid',
+    response_type: 'code',
+    client_id: options.clientId,
+    redirect_uri: redirectUrl
+  })}`
+}
 
 /**
  * @function
@@ -109,10 +169,11 @@ function getValidateFn () {
  *
  * @param {string} tkn The token to be validated
  * @param {Function} h The toolkit
+ * @param {Hapi.Request|undefined} request The related request object
  *
  * @throws {Boom.unauthorized} If previous validation fails
  */
-async function handleKeycloakValidation (tkn, h) {
+async function handleKeycloakValidation (tkn, h, request) {
   try {
     const info = await getValidateFn()(tkn)
     const { expiresIn, credentials } = token.getData(info || tkn, options)
@@ -121,7 +182,7 @@ async function handleKeycloakValidation (tkn, h) {
     await cache.set(store, tkn, userData, expiresIn)
     return h.authenticated(userData)
   } catch (err) {
-    throw raiseUnauthorized(errorMessages.invalid, err.message)
+    return denyAccess(request, h, errorMessages.invalid, err.message)
   }
 }
 
@@ -135,23 +196,24 @@ async function handleKeycloakValidation (tkn, h) {
  *
  * @param {string} field The authorization field, e.g. the value of `Authorization`
  * @param {Object} h The reply toolkit
+ * @param {Hapi.Request|undefined} request The related request object
  *
  * @throws {Boom.unauthorized} If header is missing or has an invalid format
  */
-async function validate (field, h = (data) => data) {
+async function validate (field, h = (data) => data, request = undefined) {
   if (!field) {
-    throw raiseUnauthorized(errorMessages.missing)
+    return denyAccess(request, h, errorMessages.missing)
   }
 
   const tkn = token.create(field)
   const reply = fakeToolkit(h)
 
   if (!tkn) {
-    throw raiseUnauthorized(errorMessages.invalid)
+    return denyAccess(request, h, errorMessages.invalid)
   }
 
   const cached = await cache.get(store, tkn)
-  return cached ? reply.authenticated(cached) : handleKeycloakValidation(tkn, reply)
+  return cached ? reply.authenticated(cached) : handleKeycloakValidation(tkn, reply, request)
 }
 
 /**
@@ -169,7 +231,7 @@ async function validate (field, h = (data) => data) {
 function strategy (server) {
   return {
     authenticate (request, h) {
-      return validate(request.raw.req.headers.authorization, h)
+      return validate(request.raw.req.headers.authorization, h, request)
     }
   }
 }
