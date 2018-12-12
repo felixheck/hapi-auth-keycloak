@@ -15,34 +15,34 @@ const valids = [
   { minTimeBetweenJwksRequests: 42 },
   { apiKey: {
     url: 'http://foobar.com/foo/bar'
-  }},
+  } },
   { apiKey: {
     url: 'http://foobar.com/foo/bar',
     in: 'headers'
-  }},
+  } },
   { apiKey: {
     url: 'http://foobar.com/foo/bar',
     in: 'query'
-  }},
+  } },
   { apiKey: {
     url: 'http://foobar.com/foo/bar',
     name: 'foobar'
-  }},
+  } },
   { apiKey: {
     url: 'http://foobar.com/foo/bar',
     prefix: 'barfoo '
-  }},
+  } },
   { apiKey: {
     url: 'http://foobar.com/foo/bar',
     request: {}
-  }},
+  } },
   { apiKey: {
     url: 'http://foobar.com/foo/bar',
     tokenPath: 'foo.bar'
-  }},
+  } },
   { apiKey: {
     url: 'http://foobar.com/{client}/bar'
-  }}
+  } }
 ]
 
 test('throw error if options are empty', (t) => {
