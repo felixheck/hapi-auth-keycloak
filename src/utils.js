@@ -19,7 +19,7 @@ const scheme = joi.object({
     .description('The related secret of the Keycloak client/application')
     .example('1234-bar-4321-foo'),
   publicKey: joi.alternatives().try(
-    joi.string().regex(/^-----BEGIN RSA PUBLIC KEY-----[\s\S]*-----END RSA PUBLIC KEY-----\s?$/ig, 'PEM'),
+    joi.string().regex(/^-----BEGIN RSA PUBLIC KEY-----[\s\S]*-----END RSA PUBLIC KEY-----\s?$/im, 'PEM'),
     joi.object().type(Buffer),
     joi.object({
       kty: joi.string().required()
@@ -38,7 +38,7 @@ const scheme = joi.object({
     .example('true'),
   userInfo: joi.array().items(joi.string().min(1))
     .description('List of properties which should be included in the `request.auth.credentials` object')
-    .example(['name', 'email']),
+    .example([['name', 'email']]),
   apiKey: joi.object({
     in: joi.string().valid('headers', 'query').default('headers')
       .description('Whether the api key is placed in the headers or query')
