@@ -17,7 +17,7 @@ const defaults = {
 }
 
 test('Do not replace api key with bearer token because of missing options', async (t) => {
-  const server = await helpers.getServer(cfg, false)
+  const server = await helpers.getServer(cfg)
 
   apiKey.init(server, cfg)
 
@@ -33,7 +33,7 @@ test('Do not replace api key with bearer token because of missing options', asyn
 })
 
 test('Do not replace api key with bearer token because of missing api key', async (t) => {
-  const server = await helpers.getServer(cfg, false)
+  const server = await helpers.getServer(cfg)
 
   apiKey.init(server, Object.assign({
     apiKey: defaults
@@ -49,7 +49,7 @@ test('Do not replace api key with bearer token because of missing api key', asyn
 
 test('Do not replace api key with bearer token because of failing request', async (t) => {
   helpers.mockApiKey(401, mockResponse, false)
-  const server = await helpers.getServer(cfg, false)
+  const server = await helpers.getServer(cfg)
 
   apiKey.init(server, Object.assign({
     apiKey: defaults
@@ -68,7 +68,7 @@ test('Do not replace api key with bearer token because of failing request', asyn
 
 test('Replace api key with bearer token', async (t) => {
   helpers.mockApiKey(200, mockResponse, false)
-  const server = await helpers.getServer(cfg, false)
+  const server = await helpers.getServer(cfg)
 
   apiKey.init(server, Object.assign({
     apiKey: defaults
