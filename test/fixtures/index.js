@@ -100,6 +100,7 @@ const targetScope = ['account:manage-account', 'editor', 'otherApp:creator', 're
  */
 const contentBase = {
   iss: realmUrl,
+  typ: 'Bearer',
   sub: '1234567890',
   name: 'John Doe',
   email: 'john.doe@mail.com',
