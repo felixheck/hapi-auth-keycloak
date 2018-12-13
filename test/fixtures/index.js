@@ -29,10 +29,7 @@ const composeContent = (access, dates, customs = {}) => (
  * @returns {string} The composed JWT
  */
 const composeJwt = (key) => (
-  jsonwebtoken.sign(
-    Object.assign({ }, content[key]),
-    fs.readFileSync('./test/fixtures/private-rsa.pem'),
-    { algorithm: 'RS256' }
+  jsonwebtoken.sign(content[key], fs.readFileSync('./test/fixtures/private-rsa.pem'), { algorithm: 'RS256' }
   )
 )
 
