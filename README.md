@@ -280,7 +280,7 @@ For further information read the [contributing guideline](CONTRIBUTING.md).
 [hapi-route-options]: https://hapijs.com/api#route-options
 [jwk]: https://tools.ietf.org/html/rfc7517
 [pem]: https://tools.ietf.org/html/rfc1421
-[client-auth]: https://keycloak.gitbooks.io/documentation/securing_apps/topics/oidc/java/client-authentication.html
+[client-auth]: https://www.keycloak.org/docs/3.1/securing_apps/topics/oidc/java/client-authentication.html
 [introspect]: https://www.keycloak.org/docs/3.2/authorization_services/topics/service/protection/token-introspection.html
 [rpt]: https://www.keycloak.org/docs/3.2/authorization_services/topics/service/entitlement/entitlement-api-aapi.html
 [rpt-terms]: https://www.keycloak.org/docs/3.2/authorization_services/topics/overview/terminology.html
