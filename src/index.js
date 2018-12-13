@@ -30,7 +30,7 @@ let store
  */
 async function verifySignedJwt (tkn) {
   const kcTkn = new KeycloakToken(tkn, options.clientId)
-  await manager.validateToken(kcTkn)
+  await manager.validateToken(kcTkn, 'Bearer')
 
   return tkn
 }

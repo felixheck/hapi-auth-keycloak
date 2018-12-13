@@ -29,7 +29,11 @@ const composeContent = (access, dates, customs = {}) => (
  * @returns {string} The composed JWT
  */
 const composeJwt = (key) => (
-  jsonwebtoken.sign(content[key], fs.readFileSync('./test/fixtures/private-rsa.pem'), { algorithm: 'RS256' })
+  jsonwebtoken.sign(
+    Object.assign({ }, content[key]),
+    fs.readFileSync('./test/fixtures/private-rsa.pem'),
+    { algorithm: 'RS256' }
+  )
 )
 
 /**
@@ -100,6 +104,7 @@ const targetScope = ['account:manage-account', 'editor', 'otherApp:creator', 're
  */
 const contentBase = {
   iss: realmUrl,
+  typ: 'Bearer',
   sub: '1234567890',
   name: 'John Doe',
   email: 'john.doe@mail.com',
