@@ -37,7 +37,7 @@ test('server method – authentication does fail – invalid token', async (t) =
   helpers.mockIntrospect(200, { active: false })
 
   const server = await helpers.getServer(cfg)
-  const err = await t.throws(server.kjwt.validate(`bearer ${fixtures.composeJwt('current')}`))
+  const err = await t.throwsAsync(server.kjwt.validate(`bearer ${fixtures.composeJwt('current')}`))
 
   t.truthy(err)
   t.truthy(err.isBoom)
@@ -47,7 +47,7 @@ test('server method – authentication does fail – invalid token', async (t) =
 
 test('server method – authentication does fail – invalid header', async (t) => {
   const server = await helpers.getServer(cfg)
-  const err = await t.throws(server.kjwt.validate(fixtures.composeJwt('current')))
+  const err = await t.throwsAsync(server.kjwt.validate(fixtures.composeJwt('current')))
 
   t.truthy(err)
   t.truthy(err.isBoom)
@@ -59,7 +59,7 @@ test('server method – authentication does fail – error', async (t) => {
   helpers.mockIntrospect(400, 'an error', true)
 
   const server = await helpers.getServer(cfg)
-  const err = await t.throws(server.kjwt.validate(`bearer ${fixtures.composeJwt('current')}`))
+  const err = await t.throwsAsync(server.kjwt.validate(`bearer ${fixtures.composeJwt('current')}`))
 
   t.truthy(err)
   t.truthy(err.isBoom)

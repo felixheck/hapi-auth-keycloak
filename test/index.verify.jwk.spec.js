@@ -5,7 +5,7 @@ const fixtures = require('./fixtures')
 const cfg = helpers.getOptions({ publicKey: fixtures.common.publicKeyJwk })
 
 test('registration does fail – invalid JWK', async (t) => {
-  await t.throws(helpers.getServer(helpers.getOptions({ publicKey: fixtures.common.invalidJwk })))
+  await t.throwsAsync(helpers.getServer(helpers.getOptions({ publicKey: fixtures.common.invalidJwk })))
 })
 
 test('authentication does succeed', async (t) => {

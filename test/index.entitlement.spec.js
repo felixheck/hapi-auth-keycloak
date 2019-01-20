@@ -49,7 +49,7 @@ test('authentication does success – valid roles', async (t) => {
   t.deepEqual(JSON.parse(res.payload).sort(), targetScope)
 })
 
-test('authentication does success – valid roles', async (t) => {
+test('authentication does success – valid roles – rpt', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`, '/role/rpt')
 
   helpers.mockEntitlement(200, fixtures.content.rpt)
