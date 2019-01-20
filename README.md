@@ -18,7 +18,13 @@
 **hapi-auth-keycloak** is a plugin for [hapi.js][hapijs] which enables to protect your endpoints in a smart but professional manner using [Keycloak][keycloak] as authentication service. It is inspired by the related [express.js middleware][keycloak-node]. The plugin validates the passed [`Bearer` token][bearer] offline with a provided public key or online with help of the [Keycloak][keycloak] server. Optionally, the successfully validated tokens and the related user data get cached using [`catbox`][catbox]. The caching enables a fast processing even though the user data don't get changed until the token expires. Furthermore it is possible to enable an api key interceptor proxying the request to an api key service which returns the temporary bearer token. It plays well with the [hapi.js][hapijs]-integrated [authentication/authorization feature][hapi-route-options]. Besides the authentication strategy it is possible to validate tokens by yourself, e.g. to authenticate incoming websocket or queue messages.
 
 The modules [`standard`][standardjs] and [`ava`][avajs] are used to grant a high quality implementation.<br/>
-This major release supports just [hapi.js](https://github.com/hapijs/hapi) `>=v17.0.0` and node `>=v8.0.0` — to support older versions please use `v2.1.0`.
+
+#### Compatibility
+| Major Release | [hapi.js](https://github.com/hapijs/hapi) version | node version |
+| --- | --- | --- |
+| `v4` | `>=18` | `>=10` |
+| `v3` | `>=17` | `>=8` |
+| `v2` | `>=12` | `>=6` |
 
 ## Installation
 For installation use the [Node Package Manager][npm]:
