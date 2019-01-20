@@ -22,7 +22,7 @@ The modules [`standard`][standardjs] and [`ava`][avajs] are used to grant a high
 #### Compatibility
 | Major Release | [hapi.js](https://github.com/hapijs/hapi) version | node version |
 | --- | --- | --- |
-| `v4` | `>=18` | `>=10` |
+| `v4` | `>=18` | `>=8` |
 | `v3` | `>=17` | `>=8` |
 | `v2` | `>=12` | `>=6` |
 
