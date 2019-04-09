@@ -146,6 +146,10 @@ Please mind that an enabled cache leads to disabled live validation after the re
 If `false` the cache is disabled. Use `true` or an empty object (`{}`) to use the built-in default cache. Otherwise just drop in your own cache configuration.<br/>
 Optional. Default: `false`.
 
+- `schemeName {string}` — The name used for the authentication scheme of the hapi server. Optional. Default: `keycloak-jwt`.
+
+- `decoratorName {string}` — The name used for the server decorator to validate the token, see below. Optional. Default: `kjwt`.
+
 - `apiKey {Object}` — The options object enabling an api key service as middleware<br/>
 Optional. Default: `undefined`.
 
