@@ -191,8 +191,8 @@ function register (server, opts) {
   store = cache.create(server, options.cache)
 
   apiKey.init(server, options)
-  server.auth.scheme('keycloak-jwt', strategy)
-  server.decorate('server', 'kjwt', { validate })
+  server.auth.scheme(options.schemeName, strategy)
+  server.decorate('server', options.decoratorName, { validate })
 }
 
 module.exports = { register, pkg }

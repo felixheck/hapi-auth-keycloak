@@ -28,6 +28,10 @@ const scheme = joi.object({
   entitlement: joi.boolean().invalid(false)
     .description('The token should be validated with the entitlement API')
     .example('true'),
+  schemeName: joi.string().allow('', null).empty(['', null]).default('keycloak-jwt')
+    .description('The name for the auth scheme for the hapi server'),
+  decoratorName: joi.string().allow('', null).empty(['', null]).default('kjwt')
+    .description('The name for the server decorator to validate tokens'),
   minTimeBetweenJwksRequests: joi.number().integer().positive().allow(0).default(0)
     .description('The minimum time between JWKS requests in seconds')
     .example(15),
