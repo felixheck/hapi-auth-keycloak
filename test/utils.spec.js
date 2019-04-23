@@ -1,4 +1,4 @@
-const boom = require('boom')
+const boom = require('@hapi/boom')
 const test = require('ava')
 const utils = require('../src/utils')
 

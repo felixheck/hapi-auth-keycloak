@@ -1,4 +1,4 @@
-const hapi = require('hapi')
+const hapi = require('@hapi/hapi')
 const nock = require('nock')
 const authKeycloak = require('../src')
 const fixtures = require('./fixtures')
