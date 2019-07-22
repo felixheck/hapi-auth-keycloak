@@ -117,6 +117,10 @@ server.route([
 > Please mind that the accurate strategy is 4-5x faster than the fine-grained one.<br/>
 > **Hint:** If you define neither `secret` nor `public` nor `entitlement`, the plugin retrieves the public key itself from `{realmUrl}/protocol/openid-connect/certs`.
 
+- `schemeName {string}` — The name used for the authentication scheme of the hapi server. Optional. Default: `keycloak-jwt`.
+
+- `decoratorName {string}` — The name used for the server decorator to validate the token, see below. Optional. Default: `kjwt`.
+
 - `realmUrl {string}` – The absolute uri of the Keycloak realm.<br/>
 Required. Example: `https://localhost:8080/auth/realms/testme`<br/>
 

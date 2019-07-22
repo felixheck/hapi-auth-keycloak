@@ -50,6 +50,48 @@ test('throw error if options are empty', (t) => {
   t.throws(() => utils.verify({}))
 })
 
+test('throw error if options are invalid – schemeName', (t) => {
+  const invalids = [
+    null,
+    NaN,
+    42,
+    true,
+    false,
+    [],
+    new RegExp(),
+    {}
+  ]
+
+  t.plan(invalids.length)
+
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      schemeName: invalid
+    })))
+  })
+})
+
+test('throw error if options are invalid – decoratorName', (t) => {
+  const invalids = [
+    null,
+    NaN,
+    42,
+    true,
+    false,
+    [],
+    new RegExp(),
+    {}
+  ]
+
+  t.plan(invalids.length)
+
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verify(helpers.getOptions({
+      decoratorName: invalid
+    })))
+  })
+})
+
 test('throw error if options are invalid – realmUrl', (t) => {
   const invalids = [
     null,
@@ -436,6 +478,40 @@ test('throw error if options are invalid – publicKey/secret/entitlement confli
     secret: fixtures.common.secret,
     entitlement: true
   })))
+})
+
+test('throw no error if options are valid – schemeName', (t) => {
+  const customValids = [
+    ...valids,
+    { schemeName: '' },
+    { schemeName: 'foobar' },
+    { schemeName: undefined }
+  ]
+
+  t.plan(customValids.length)
+
+  customValids.forEach((valid) => {
+    t.notThrows(
+      () => utils.verify(helpers.getOptions(valid))
+    )
+  })
+})
+
+test('throw no error if options are valid – decoratorName', (t) => {
+  const customValids = [
+    ...valids,
+    { decoratorName: '' },
+    { decoratorName: 'foobar' },
+    { decoratorName: undefined }
+  ]
+
+  t.plan(customValids.length)
+
+  customValids.forEach((valid) => {
+    t.notThrows(
+      () => utils.verify(helpers.getOptions(valid))
+    )
+  })
 })
 
 test('throw no error if options are valid – secret', (t) => {
