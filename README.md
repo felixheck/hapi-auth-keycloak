@@ -28,7 +28,7 @@ The modules [`standard`][standardjs] and [`ava`][avajs] are used to grant a high
 | `v2` | `>=12 hapi` | `>=6` |
 
 ## Installation
-For installation use the [Node Package Manager][npm]:
+For installation use [npm][npm]:
 ```
 $ npm install --save hapi-auth-keycloak
 ```

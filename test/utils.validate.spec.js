@@ -46,8 +46,8 @@ const valids = [
 ]
 
 test('throw error if options are empty', (t) => {
-  t.throws(() => utils.verify(), Error)
-  t.throws(() => utils.verify({}), Error)
+  t.throws(() => utils.verify())
+  t.throws(() => utils.verify({}))
 })
 
 test('throw error if options are invalid – realmUrl', (t) => {
@@ -70,7 +70,7 @@ test('throw error if options are invalid – realmUrl', (t) => {
   invalids.forEach((invalid) => {
     t.throws(() => utils.verify(helpers.getOptions({
       realmUrl: invalid
-    })), Error, helpers.log('realmUrl', invalid))
+    })))
   })
 })
 
@@ -93,7 +93,7 @@ test('throw error if options are invalid – clientId', (t) => {
   invalids.forEach((invalid) => {
     t.throws(() => utils.verify(helpers.getOptions({
       clientId: invalid
-    })), Error, helpers.log('clientId', invalid))
+    })))
   })
 })
 
@@ -115,7 +115,7 @@ test('throw error if options are invalid – secret', (t) => {
   invalids.forEach((invalid) => {
     t.throws(() => utils.verify(helpers.getOptions({
       secret: invalid
-    })), Error, helpers.log('secret', invalid))
+    })))
   })
 })
 
@@ -144,7 +144,7 @@ test('throw error if options are invalid – publicKey', (t) => {
   invalids.forEach((invalid) => {
     t.throws(() => utils.verify(helpers.getOptions({
       publicKey: invalid
-    })), Error, helpers.log('publicKey', invalid))
+    })))
   })
 })
 
@@ -164,7 +164,7 @@ test('throw error if options are invalid – cache', (t) => {
   invalids.forEach((invalid) => {
     t.throws(() => utils.verify(helpers.getOptions({
       cache: invalid
-    })), Error, helpers.log('cache', invalid))
+    })))
   })
 })
 
@@ -180,16 +180,16 @@ test('throw error if options are invalid – userInfo', (t) => {
     false,
     new RegExp(),
     {},
-    [ null ],
-    [ undefined ],
-    [ NaN ],
-    [ '' ],
-    [ 42 ],
-    [ true ],
-    [ false ],
-    [ [] ],
-    [ new RegExp() ],
-    [ {} ]
+    [null],
+    [undefined],
+    [NaN],
+    [''],
+    [42],
+    [true],
+    [false],
+    [[]],
+    [new RegExp()],
+    [{}]
   ]
 
   t.plan(invalids.length)
@@ -197,7 +197,7 @@ test('throw error if options are invalid – userInfo', (t) => {
   invalids.forEach((invalid) => {
     t.throws(() => utils.verify(helpers.getOptions({
       userInfo: invalid
-    })), Error, helpers.log('userInfo', invalid))
+    })))
   })
 })
 
@@ -222,7 +222,7 @@ test('throw error if options are invalid – minTimeBetweenJwksRequests', (t) =>
   invalids.forEach((invalid) => {
     t.throws(() => utils.verify(helpers.getOptions({
       minTimeBetweenJwksRequests: invalid
-    })), Error, helpers.log('minTimeBetweenJwksRequests', invalid))
+    })))
   })
 })
 
@@ -245,7 +245,7 @@ test('throw error if options are invalid – entitlement', (t) => {
   invalids.forEach((invalid) => {
     t.throws(() => utils.verify(helpers.getOptions({
       entitlement: invalid
-    })), Error, helpers.log('entitlement', invalid))
+    })))
   })
 })
 
@@ -268,7 +268,7 @@ test('throw error if options are invalid – apiKey', (t) => {
   invalids.forEach((invalid) => {
     t.throws(() => utils.verify(helpers.getOptions({
       apiKey: invalid
-    })), Error, helpers.log('apiKey', invalid))
+    })))
   })
 })
 
@@ -292,7 +292,7 @@ test('throw error if options are invalid – apiKey.url', (t) => {
       apiKey: {
         url: invalid
       }
-    })), Error, helpers.log('apiKey.url', invalid))
+    })))
   })
 })
 
@@ -317,7 +317,7 @@ test('throw error if options are invalid – apiKey.name', (t) => {
         url: 'http://foobar.com/foo/bar',
         name: invalid
       }
-    })), Error, helpers.log('apiKey.name', invalid))
+    })))
   })
 })
 
@@ -342,7 +342,7 @@ test('throw error if options are invalid – apiKey.prefix', (t) => {
         url: 'http://foobar.com/foo/bar',
         prefix: invalid
       }
-    })), Error, helpers.log('apiKey.prefix', invalid))
+    })))
   })
 })
 
@@ -367,7 +367,7 @@ test('throw error if options are invalid – apiKey.tokenPath', (t) => {
         url: 'http://foobar.com/foo/bar',
         tokenPath: invalid
       }
-    })), Error, helpers.log('apiKey.tokenPath', invalid))
+    })))
   })
 })
 
@@ -393,7 +393,7 @@ test('throw error if options are invalid – apiKey.in', (t) => {
         url: 'http://foobar.com/foo/bar',
         in: invalid
       }
-    })), Error, helpers.log('apiKey.in', invalid))
+    })))
   })
 })
 
@@ -417,7 +417,7 @@ test('throw error if options are invalid – apiKey.options', (t) => {
         url: 'http://foobar.com/foo/bar',
         options: invalid
       }
-    })), Error, helpers.log('apiKey.options', invalid))
+    })))
   })
 })
 
@@ -425,17 +425,17 @@ test('throw error if options are invalid – publicKey/secret/entitlement confli
   t.throws(() => utils.verify(helpers.getOptions({
     publicKey: fixtures.common.publicKeyRsa,
     secret: fixtures.common.secret
-  })), Error, 'publicKey/secret: both defined')
+  })))
 
   t.throws(() => utils.verify(helpers.getOptions({
     publicKey: fixtures.common.publicKeyRsa,
     entitlement: true
-  })), Error, 'publicKey/entitlement: both defined')
+  })))
 
   t.throws(() => utils.verify(helpers.getOptions({
     secret: fixtures.common.secret,
     entitlement: true
-  })), Error, 'secret/entitlement: both defined')
+  })))
 })
 
 test('throw no error if options are valid – secret', (t) => {
@@ -445,8 +445,8 @@ test('throw no error if options are valid – secret', (t) => {
     t.notThrows(
       () => utils.verify(helpers.getOptions(Object.assign({
         secret: fixtures.common.secret
-      }, valid))),
-      Error, helpers.log('valid.secret', valid))
+      }, valid)))
+    )
   })
 })
 
@@ -457,8 +457,8 @@ test('throw no error if options are valid – offline', (t) => {
 
   customValids.forEach((valid) => {
     t.notThrows(
-      () => utils.verify(helpers.getOptions(valid)),
-      Error, helpers.log('valid.offline', valid))
+      () => utils.verify(helpers.getOptions(valid))
+    )
   })
 })
 
@@ -469,8 +469,8 @@ test('throw no error if options are valid – publicKey/Rsa', (t) => {
     t.notThrows(
       () => utils.verify(helpers.getOptions(Object.assign({
         publicKey: fixtures.common.publicKeyRsa
-      }, valid))),
-      Error, helpers.log('valid.publicKey/Rsa', valid))
+      }, valid)))
+    )
   })
 })
 
@@ -481,8 +481,8 @@ test('throw no error if options are valid – publicKey/Buffer', (t) => {
     t.notThrows(
       () => utils.verify(helpers.getOptions(Object.assign({
         publicKey: fixtures.common.publicKeyBuffer
-      }, valid))),
-      Error, helpers.log('valid.publicKey/Buffer', valid))
+      }, valid)))
+    )
   })
 })
 
@@ -493,7 +493,7 @@ test('throw no error if options are valid – publicKey/JWK', (t) => {
     t.notThrows(
       () => utils.verify(helpers.getOptions(Object.assign({
         publicKey: fixtures.common.publicKeyJwk
-      }, valid))),
-      Error, helpers.log('valid.publicKey/JWK', valid))
+      }, valid)))
+    )
   })
 })
