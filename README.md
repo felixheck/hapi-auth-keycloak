@@ -174,7 +174,7 @@ Optional. Default: `undefined`.
   - `request {Object}` – The detailed request options for [`got`][got].<br/>
   Optional. Default: `{}`
 
-#### `await server.kjwt.validate(field {string})`
+#### `await server[decoratorName = 'kjwt'].validate(field {string})`
 - `field {string}` — The `Bearer` field, including the scheme (`bearer`) itself.<br/>
 Example: `bearer 12345.abcde.67890`.<br/>
 Required.
