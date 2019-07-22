@@ -13,7 +13,7 @@ test('throw error if plugin gets registered twice with different scheme names', 
     schemeName: 'foobar'
   }, true))
 
-  t.is(Object.keys(server.auth._schemes).length, 2)
+  t.is(Object.keys(server.auth._schemes).length, 1)
 })
 
 test('throw error if plugin gets registered twice with different decorator names', async (t) => {

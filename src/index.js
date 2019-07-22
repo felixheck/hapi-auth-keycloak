@@ -192,6 +192,14 @@ function register (server, opts) {
 
   apiKey.init(server, options)
 
+  if (options.schemeName in server.auth._schemes) {
+    throw Error(`Authentication strategy named ${options.schemeName} already exists.`)
+  }
+
+  if (options.decoratorName in server._core._decorations['server']) {
+    throw Error(`Server decorator named ${options.decoratorName} already exists.`)
+  }
+
   server.auth.scheme(options.schemeName, strategy)
   server.decorate('server', options.decoratorName, { validate })
 }
