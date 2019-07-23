@@ -10,6 +10,8 @@ const fixtures = require('./fixtures')
  * The default plugin configuration
  */
 const defaults = {
+  schemeName: 'keycloak-jwt',
+  decoratorName: 'kjwt',
   realmUrl: fixtures.common.realmUrl,
   clientId: fixtures.common.clientId
 }
@@ -221,17 +223,22 @@ function registerRoutes (server) {
  * Register the plugin with passed options
  *
  * @param {Hapi.Server} server The server to be decorated
- * @param {Object} options The plugin related options
- * @param {Function} done The success callback handler
+ * @param {Object} opts The plugin related options
+ * @param {boolean} skipRoutes Whether to skip route definition
  */
-async function registerPlugin (server, options = defaults) {
+async function registerPlugin (server, opts = {}, skipRoutes = false) {
+  const options = { ...defaults, ...opts }
+
   await server.register({
     plugin: authKeycloak,
     options
   })
 
-  server.auth.strategy('keycloak-jwt', 'keycloak-jwt')
-  registerRoutes(server)
+  server.auth.strategy(options.schemeName, options.schemeName)
+
+  if (!skipRoutes) {
+    registerRoutes(server)
+  }
 
   return server
 }

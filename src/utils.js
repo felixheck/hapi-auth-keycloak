@@ -9,6 +9,10 @@ const jwkToPem = require('jwk-to-pem')
  * The plugin options scheme
  */
 const scheme = joi.object({
+  schemeName: joi.string().empty(['']).default('keycloak-jwt')
+    .description('The name for the auth scheme for the hapi server'),
+  decoratorName: joi.string().empty(['']).default('kjwt')
+    .description('The name for the server decorator to validate tokens'),
   realmUrl: joi.string().uri().required()
     .description('The absolute uri of the Keycloak realm')
     .example('https://localhost:8080/auth/realms/testme'),

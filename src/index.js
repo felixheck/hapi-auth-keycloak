@@ -191,8 +191,17 @@ function register (server, opts) {
   store = cache.create(server, options.cache)
 
   apiKey.init(server, options)
-  server.auth.scheme('keycloak-jwt', strategy)
-  server.decorate('server', 'kjwt', { validate })
+
+  if (options.schemeName in server.auth._schemes) {
+    throw Error(`Authentication strategy named ${options.schemeName} already exists.`)
+  }
+
+  if (options.decoratorName in server._core._decorations['server']) {
+    throw Error(`Server decorator named ${options.decoratorName} already exists.`)
+  }
+
+  server.auth.scheme(options.schemeName, strategy)
+  server.decorate('server', options.decoratorName, { validate })
 }
 
-module.exports = { register, pkg }
+module.exports = { register, pkg, multiple: true }
