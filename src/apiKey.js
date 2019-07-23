@@ -70,12 +70,13 @@ function getRequestOptions (request, options) {
  * additional api key interceptor.
  *
  * @param {Hapi.server} server The related hapi server object
+ * @param {Object} pluginOptions The plugin related options
  * @param {Object} options The api key related options
  * @param {string} url The url to be requested
  *
  * @throws {Boom.unauthorized} If requesting the access token failed
  */
-function extendLifeCycle (server, options, url) {
+function extendLifeCycle (server, pluginOptions, options, url) {
   server.ext('onRequest', async (request, h) => {
     const requestOptions = getRequestOptions(request, options)
 
@@ -87,7 +88,12 @@ function extendLifeCycle (server, options, url) {
 
         request.headers.authorization = `Bearer ${token}`
       } catch (err) {
-        throw raiseUnauthorized(errorMessages.apiKey, err.message, options.prefix.trim())
+        throw raiseUnauthorized(
+          errorMessages.apiKey,
+          err.message,
+          pluginOptions.schemeName,
+          options.prefix.trim()
+        )
       }
     }
 
@@ -111,7 +117,7 @@ function init (server, pluginOptions) {
   const url = parseUrl(pluginOptions)
 
   if (options) {
-    extendLifeCycle(server, options, url)
+    extendLifeCycle(server, pluginOptions, options, url)
   }
 }
 

@@ -121,7 +121,7 @@ async function handleKeycloakValidation (tkn, h) {
     await cache.set(store, tkn, userData, expiresIn)
     return h.authenticated(userData)
   } catch (err) {
-    throw raiseUnauthorized(errorMessages.invalid, err.message)
+    throw raiseUnauthorized(errorMessages.invalid, err.message, options.schemeName)
   }
 }
 
@@ -140,14 +140,14 @@ async function handleKeycloakValidation (tkn, h) {
  */
 async function validate (field, h = (data) => data) {
   if (!field) {
-    throw raiseUnauthorized(errorMessages.missing)
+    throw raiseUnauthorized(errorMessages.missing, null, options.schemeName)
   }
 
   const tkn = token.create(field)
   const reply = fakeToolkit(h)
 
   if (!tkn) {
-    throw raiseUnauthorized(errorMessages.invalid)
+    throw raiseUnauthorized(errorMessages.invalid, null, options.schemeName)
   }
 
   const cached = await cache.get(store, tkn)
