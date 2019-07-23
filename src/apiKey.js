@@ -87,7 +87,7 @@ function extendLifeCycle (server, options, url) {
 
         request.headers.authorization = `Bearer ${token}`
       } catch (err) {
-        throw raiseUnauthorized(null, errorMessages.apiKey, err.message)
+        throw raiseUnauthorized(errorMessages.apiKey, err.message, options.prefix.trim())
       }
     }
 
