@@ -573,3 +573,13 @@ test('throw no error if options are valid – publicKey/JWK', (t) => {
     )
   })
 })
+
+test('sets default correctly – schemeName', (t) => {
+  const opts = utils.verify(helpers.getOptions({ schemeName: undefined }))
+  t.is(opts.schemeName, 'keycloak-jwt')
+})
+
+test('sets default correctly – decoratorName', (t) => {
+  const opts = utils.verify(helpers.getOptions({ decoratorName: undefined }))
+  t.is(opts.decoratorName, 'kjwt')
+})
