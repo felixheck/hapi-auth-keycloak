@@ -1,6 +1,25 @@
 const _ = require('lodash')
 const got = require('got')
+const pupa = require('pupa')
 const { raiseUnauthorized, errorMessages } = require('./utils')
+
+/**
+ * @function
+ * @public
+ *
+ * Get api key endpoint its url with replaced placeholders.
+ *
+ * @param {Object} pluginOptions The plugin related options
+ * @returns {string|false} The rendered url if available
+ */
+function parseUrl (pluginOptions) {
+  const { apiKey, clientId, realmUrl } = pluginOptions
+
+  return !!apiKey && pupa(apiKey.url, {
+    ...(realmUrl ? { realm: realmUrl.split('/').slice(-1) } : {}),
+    ...(clientId ? { clientId } : {})
+  })
+}
 
 /**
  * @function
@@ -48,20 +67,21 @@ function getRequestOptions (request, options) {
  * @public
  *
  * Extend the hapi request life cycle with an
- * additional api key interceptor.
+* additional api key interceptor.
  *
  * @param {Hapi.server} server The related hapi server object
  * @param {Object} options The api key related options
+ * @param {string} url The url to be requested
  *
  * @throws {Boom.unauthorized} If requesting the access token failed
  */
-function extendLifeCycle (server, options) {
+function extendLifeCycle (server, options, url) {
   server.ext('onRequest', async (request, h) => {
     const requestOptions = getRequestOptions(request, options)
 
     if (requestOptions) {
       try {
-        const res = await got(options.url, requestOptions)
+        const res = await got(url, requestOptions)
         const body = JSON.parse(res.body)
         const token = _.get(body, options.tokenPath)
 
@@ -93,13 +113,15 @@ function extendLifeCycle (server, options) {
  */
 function init (server, pluginOptions) {
   const options = pluginOptions.apiKey
+  const url = parseUrl(pluginOptions)
 
   if (options) {
-    extendLifeCycle(server, options)
+    extendLifeCycle(server, options, url)
   }
 }
 
 module.exports = {
+  parseUrl,
   getApiKey,
   getRequestOptions,
   extendLifeCycle,

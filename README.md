@@ -102,8 +102,8 @@ server.route([
 - `apiKey {Object}` — The options object enabling an api key service as middleware<br/>
 Optional. Default: `undefined`.
 
-  - `url {string}` — The absolute url to be requested.<br/>
-  Example: `http://barfoo.com/foo/foobar`<br/>
+  - `url {string}` — The absolute url to be requested. It's possible to use a [`pupa` template][pupa] with placeholders called `realm` and `clientId` getting rendered based on the passed plugin-related options.<br/>
+  Example: `http://barfoo.com/foo/{clientId}`<br/>
   Required.
 
   - `in {string}` — Whether the api key is placed in the headers or query.<br/>
@@ -122,7 +122,7 @@ Optional. Default: `undefined`.
   - `request {Object}` – The detailed request options for [`got`][got].<br/>
   Optional. Default: `{}`
 
-#### Strategy Options
+#### Plugin + Strategy Options
 > By default, the Keycloak server has built-in [two ways to authenticate][client-auth] the client: client ID and client secret **(1)**, or with a signed JWT **(2)**. This plugin supports both. If a non-live strategy is used, ensure that the identifier of the related realm key is included in their header as `kid`. Check the description of `secret`/`publicKey`/`entitlement` and the [terminology][rpt-terms] for further information.
 >
 > | Strategies | Online* | Live** |[Scopes][rpt]  | Truthy Option | Note         |
@@ -260,7 +260,7 @@ process.on('SIGINT', async () => {
 ```
 
 ## Migration Guides
-#### `v4.x` to `v5.x`
+#### `v4.2` to `v4.3`
 **Features**
 - It's now possible to register multiple strategies with the same scheme `keycloak-jwt`
 
@@ -318,4 +318,5 @@ For further information read the [contributing guideline](CONTRIBUTING.md).
 [rpt]: https://www.keycloak.org/docs/3.2/authorization_services/topics/service/entitlement/entitlement-api-aapi.html
 [rpt-terms]: https://www.keycloak.org/docs/3.2/authorization_services/topics/overview/terminology.html
 [got]: https://github.com/sindresorhus/got
+[pupa]: https://github.com/sindresorhus/pupa
 [strategy-options]: https://hapijs.com/api#-serverauthstrategyname-scheme-options

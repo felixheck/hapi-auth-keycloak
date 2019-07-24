@@ -1,6 +1,38 @@
 const test = require('ava')
 const apiKey = require('../src/apiKey')
 
+test('Get endpoint url without any changes', (t) => {
+  t.is(apiKey.parseUrl({
+    apiKey: { url: 'http://barfoo.com/foo/bar' },
+    clientId: 'bar',
+    realmUrl: 'http://foobar.com/foo/bar'
+  }), 'http://barfoo.com/foo/bar')
+})
+
+test('Get endpoint url with replaced `clientId`', (t) => {
+  t.is(apiKey.parseUrl({
+    apiKey: { url: 'http://barfoo.com/foo/{clientId}' },
+    clientId: 'bar',
+    realmUrl: 'http://foobar.com/foo/bar'
+  }), 'http://barfoo.com/foo/bar')
+})
+
+test('Get endpoint url with replaced `realm`', (t) => {
+  t.is(apiKey.parseUrl({
+    apiKey: { url: 'http://barfoo.com/foo/{realm}' },
+    clientId: 'bar',
+    realmUrl: 'http://foobar.com/foo/bar'
+  }), 'http://barfoo.com/foo/bar')
+})
+
+test('Get endpoint url with replaced unknown placeholder', (t) => {
+  t.is(apiKey.parseUrl({
+    apiKey: { url: 'http://barfoo.com/foo/{foobar}' },
+    clientId: 'bar',
+    realmUrl: 'http://foobar.com/foo/bar'
+  }), 'http://barfoo.com/foo/')
+})
+
 test('Get no api key if there is neither header nor query', (t) => {
   const req = {
     headers: {},

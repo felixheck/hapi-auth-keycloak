@@ -55,7 +55,8 @@
     "jsonwebtoken": "^8.5.1",
     "jwk-to-pem": "^1.2.6",
     "keycloak-connect": "^6.0.1",
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.15",
+    "pupa": "^2.0.0"
   },
   "peerDependencies": {
     "@hapi/hapi": "^18.3.1"
