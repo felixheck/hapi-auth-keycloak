@@ -10,8 +10,7 @@ const fixtures = require('./fixtures')
  * The default plugin configuration
  */
 const defaults = {
-  schemeName: 'keycloak-jwt',
-  decoratorName: 'kjwt',
+  name: 'BizApps',
   realmUrl: fixtures.common.realmUrl,
   clientId: fixtures.common.clientId
 }
@@ -25,7 +24,7 @@ const defaults = {
  * @param {Object} customs The options to be changed
  * @returns {Object} The customized options
  */
-function getOptions (customs) {
+function getStrategyOptions (customs) {
   return Object.assign({}, defaults, customs)
 }
 
@@ -212,6 +211,19 @@ function registerRoutes (server) {
           }
         }
       }
+    },
+    {
+      method: 'GET',
+      path: '/multi',
+      options: {
+        auth: { strategies: ['keycloak-jwt', 'keycloak-jwt2'] },
+        handler (req) {
+          return {
+            headers: req.headers,
+            query: req.query
+          }
+        }
+      }
     }
   ])
 }
@@ -223,18 +235,20 @@ function registerRoutes (server) {
  * Register the plugin with passed options
  *
  * @param {Hapi.Server} server The server to be decorated
- * @param {Object} opts The plugin related options
- * @param {boolean} skipRoutes Whether to skip route definition
+ * @param {Object} [strategyOpts = {}] The strategy related options
+ * @param {boolean} [skipRoutes = false] Whether to skip route definition
  */
-async function registerPlugin (server, opts = {}, skipRoutes = false) {
-  const options = { ...defaults, ...opts }
+async function registerPlugin (server, strategyOpts = {}, skipRoutes = false) {
+  const strategyOptions = { ...defaults, ...strategyOpts }
 
-  await server.register({
-    plugin: authKeycloak,
-    options
+  await server.register({ plugin: authKeycloak })
+  server.auth.strategy('keycloak-jwt', 'keycloak-jwt', strategyOptions)
+
+  server.auth.strategy('keycloak-jwt2', 'keycloak-jwt', {
+    ...strategyOptions,
+    name: 'CuApps',
+    cache: false
   })
-
-  server.auth.strategy(options.schemeName, options.schemeName)
 
   if (!skipRoutes) {
     registerRoutes(server)
@@ -249,23 +263,26 @@ async function registerPlugin (server, opts = {}, skipRoutes = false) {
  *
  * Create server with routes, plugin and error handler
  *
- * @param {Object|false} options The plugin related options
+ * @param {Object} strategyOpts The strategy related options
+ * @param {boolean} [skipPlugin = false] Whether to skip plugin registration
  */
-async function getServer (options) {
-  const server = hapi.server()
+async function getServer (strategyOpts, skipPlugin = false) {
+  const server = hapi.server({
+    port: 1337
+  })
 
   await server.initialize()
 
-  if (options === false) {
+  if (skipPlugin) {
     registerRoutes(server)
     return server
   }
 
-  return registerPlugin(server, options)
+  return registerPlugin(server, strategyOpts)
 }
 
 module.exports = {
-  getOptions,
+  getStrategyOptions,
   mockIntrospect,
   mockEntitlement,
   mockRequest,

@@ -3,7 +3,7 @@ const test = require('ava')
 const helpers = require('./_helpers')
 const fixtures = require('./fixtures')
 
-const cfg = helpers.getOptions({ secret: fixtures.common.secret })
+const cfg = helpers.getStrategyOptions({ secret: fixtures.common.secret })
 
 test.afterEach.always('reset instances and prototypes', () => {
   nock.cleanAll()
@@ -66,7 +66,7 @@ test('authentication does fail – invalid token', async (t) => {
 
   t.truthy(res)
   t.is(res.statusCode, 401)
-  t.is(res.headers['www-authenticate'], 'Bearer strategy="keycloak-jwt", error="Invalid credentials"')
+  t.is(res.headers['www-authenticate'], 'Bearer strategy="keycloak-jwt (BizApps)", error="Invalid credentials"')
 })
 
 test('authentication does fail – invalid header', async (t) => {
@@ -77,5 +77,5 @@ test('authentication does fail – invalid header', async (t) => {
 
   t.truthy(res)
   t.is(res.statusCode, 401)
-  t.is(res.headers['www-authenticate'], 'Bearer strategy="keycloak-jwt", error="Invalid credentials"')
+  t.is(res.headers['www-authenticate'], 'Bearer strategy="keycloak-jwt (BizApps)", error="Invalid credentials"')
 })

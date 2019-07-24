@@ -3,7 +3,7 @@ const test = require('ava')
 const helpers = require('./_helpers')
 const fixtures = require('./fixtures')
 
-const cfg = helpers.getOptions({ secret: fixtures.common.secret })
+const cfg = helpers.getStrategyOptions({ secret: fixtures.common.secret })
 
 test.afterEach.always('reset instances and prototypes', () => {
   nock.cleanAll()
@@ -27,6 +27,17 @@ test('server method – authentication supports mode: "optional" - will fail wit
 
   t.truthy(res)
   t.is(res.statusCode, 401)
+})
+
+test('server method – authentication supports mode: "try" - will succeed without auth', async (t) => {
+  const server = await helpers.getServer(cfg)
+  const res = await server.inject({
+    method: 'GET',
+    url: '/mode-try'
+  })
+
+  t.truthy(res)
+  t.is(res.statusCode, 200)
 })
 
 test('server method – authentication supports mode: "try" - will succeed with invalid auth', async (t) => {

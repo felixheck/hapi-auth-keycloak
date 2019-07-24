@@ -3,7 +3,7 @@ const helpers = require('./_helpers')
 const fixtures = require('./fixtures')
 const utils = require('../src/utils')
 
-const valids = [
+const validStrategyOptions = [
   {},
   { cache: {} },
   { cache: { segment: 'foobar' } },
@@ -12,7 +12,10 @@ const valids = [
   { userInfo: [] },
   { userInfo: ['string'] },
   { minTimeBetweenJwksRequests: 0 },
-  { minTimeBetweenJwksRequests: 42 },
+  { minTimeBetweenJwksRequests: 42 }
+]
+
+const validPluginOptions = [
   { apiKey: {
     url: 'http://foobar.com/foo/bar'
   } },
@@ -46,50 +49,8 @@ const valids = [
 ]
 
 test('throw error if options are empty', (t) => {
-  t.throws(() => utils.verify())
-  t.throws(() => utils.verify({}))
-})
-
-test('throw error if options are invalid – schemeName', (t) => {
-  const invalids = [
-    null,
-    NaN,
-    42,
-    true,
-    false,
-    [],
-    new RegExp(),
-    {}
-  ]
-
-  t.plan(invalids.length)
-
-  invalids.forEach((invalid) => {
-    t.throws(() => utils.verify(helpers.getOptions({
-      schemeName: invalid
-    })))
-  })
-})
-
-test('throw error if options are invalid – decoratorName', (t) => {
-  const invalids = [
-    null,
-    NaN,
-    42,
-    true,
-    false,
-    [],
-    new RegExp(),
-    {}
-  ]
-
-  t.plan(invalids.length)
-
-  invalids.forEach((invalid) => {
-    t.throws(() => utils.verify(helpers.getOptions({
-      decoratorName: invalid
-    })))
-  })
+  t.throws(() => utils.verifyStrategyOptions())
+  t.throws(() => utils.verifyStrategyOptions({}))
 })
 
 test('throw error if options are invalid – realmUrl', (t) => {
@@ -110,8 +71,30 @@ test('throw error if options are invalid – realmUrl', (t) => {
   t.plan(invalids.length)
 
   invalids.forEach((invalid) => {
-    t.throws(() => utils.verify(helpers.getOptions({
+    t.throws(() => utils.verifyStrategyOptions(helpers.getStrategyOptions({
       realmUrl: invalid
+    })))
+  })
+})
+
+test('throw error if options are invalid – name', (t) => {
+  const invalids = [
+    null,
+    NaN,
+    '',
+    42,
+    true,
+    false,
+    [],
+    new RegExp(),
+    {}
+  ]
+
+  t.plan(invalids.length)
+
+  invalids.forEach((invalid) => {
+    t.throws(() => utils.verifyStrategyOptions(helpers.getStrategyOptions({
+      name: invalid
     })))
   })
 })
@@ -133,7 +116,7 @@ test('throw error if options are invalid – clientId', (t) => {
   t.plan(invalids.length)
 
   invalids.forEach((invalid) => {
-    t.throws(() => utils.verify(helpers.getOptions({
+    t.throws(() => utils.verifyStrategyOptions(helpers.getStrategyOptions({
       clientId: invalid
     })))
   })
@@ -155,7 +138,7 @@ test('throw error if options are invalid – secret', (t) => {
   t.plan(invalids.length)
 
   invalids.forEach((invalid) => {
-    t.throws(() => utils.verify(helpers.getOptions({
+    t.throws(() => utils.verifyStrategyOptions(helpers.getStrategyOptions({
       secret: invalid
     })))
   })
@@ -184,7 +167,7 @@ test('throw error if options are invalid – publicKey', (t) => {
   t.plan(invalids.length)
 
   invalids.forEach((invalid) => {
-    t.throws(() => utils.verify(helpers.getOptions({
+    t.throws(() => utils.verifyStrategyOptions(helpers.getStrategyOptions({
       publicKey: invalid
     })))
   })
@@ -204,7 +187,7 @@ test('throw error if options are invalid – cache', (t) => {
   t.plan(invalids.length)
 
   invalids.forEach((invalid) => {
-    t.throws(() => utils.verify(helpers.getOptions({
+    t.throws(() => utils.verifyStrategyOptions(helpers.getStrategyOptions({
       cache: invalid
     })))
   })
@@ -237,7 +220,7 @@ test('throw error if options are invalid – userInfo', (t) => {
   t.plan(invalids.length)
 
   invalids.forEach((invalid) => {
-    t.throws(() => utils.verify(helpers.getOptions({
+    t.throws(() => utils.verifyStrategyOptions(helpers.getStrategyOptions({
       userInfo: invalid
     })))
   })
@@ -262,7 +245,7 @@ test('throw error if options are invalid – minTimeBetweenJwksRequests', (t) =>
   t.plan(invalids.length)
 
   invalids.forEach((invalid) => {
-    t.throws(() => utils.verify(helpers.getOptions({
+    t.throws(() => utils.verifyStrategyOptions(helpers.getStrategyOptions({
       minTimeBetweenJwksRequests: invalid
     })))
   })
@@ -285,9 +268,86 @@ test('throw error if options are invalid – entitlement', (t) => {
   t.plan(invalids.length)
 
   invalids.forEach((invalid) => {
-    t.throws(() => utils.verify(helpers.getOptions({
+    t.throws(() => utils.verifyStrategyOptions(helpers.getStrategyOptions({
       entitlement: invalid
     })))
+  })
+})
+
+test('throw error if options are invalid – publicKey/secret/entitlement conflict', (t) => {
+  t.throws(() => utils.verifyStrategyOptions(helpers.getStrategyOptions({
+    publicKey: fixtures.common.publicKeyRsa,
+    secret: fixtures.common.secret
+  })))
+
+  t.throws(() => utils.verifyStrategyOptions(helpers.getStrategyOptions({
+    publicKey: fixtures.common.publicKeyRsa,
+    entitlement: true
+  })))
+
+  t.throws(() => utils.verifyStrategyOptions(helpers.getStrategyOptions({
+    secret: fixtures.common.secret,
+    entitlement: true
+  })))
+})
+
+test('throw no error if options are valid – secret', (t) => {
+  t.plan(validStrategyOptions.length)
+
+  validStrategyOptions.forEach((valid) => {
+    t.notThrows(
+      () => utils.verifyStrategyOptions(helpers.getStrategyOptions(Object.assign({
+        secret: fixtures.common.secret
+      }, valid)))
+    )
+  })
+})
+
+test('throw no error if options are valid – offline', (t) => {
+  const customValids = [...validStrategyOptions, { entitlement: true }]
+
+  t.plan(customValids.length)
+
+  customValids.forEach((valid) => {
+    t.notThrows(
+      () => utils.verifyStrategyOptions(helpers.getStrategyOptions(valid))
+    )
+  })
+})
+
+test('throw no error if options are valid – publicKey/Rsa', (t) => {
+  t.plan(validStrategyOptions.length)
+
+  validStrategyOptions.forEach((valid) => {
+    t.notThrows(
+      () => utils.verifyStrategyOptions(helpers.getStrategyOptions(Object.assign({
+        publicKey: fixtures.common.publicKeyRsa
+      }, valid)))
+    )
+  })
+})
+
+test('throw no error if options are valid – publicKey/Buffer', (t) => {
+  t.plan(validStrategyOptions.length)
+
+  validStrategyOptions.forEach((valid) => {
+    t.notThrows(
+      () => utils.verifyStrategyOptions(helpers.getStrategyOptions(Object.assign({
+        publicKey: fixtures.common.publicKeyBuffer
+      }, valid)))
+    )
+  })
+})
+
+test('throw no error if options are valid – publicKey/JWK', (t) => {
+  t.plan(validStrategyOptions.length)
+
+  validStrategyOptions.forEach((valid) => {
+    t.notThrows(
+      () => utils.verifyStrategyOptions(helpers.getStrategyOptions(Object.assign({
+        publicKey: fixtures.common.publicKeyJwk
+      }, valid)))
+    )
   })
 })
 
@@ -308,9 +368,9 @@ test('throw error if options are invalid – apiKey', (t) => {
   t.plan(invalids.length)
 
   invalids.forEach((invalid) => {
-    t.throws(() => utils.verify(helpers.getOptions({
+    t.throws(() => utils.verifyPluginOptions({
       apiKey: invalid
-    })))
+    }))
   })
 })
 
@@ -330,11 +390,11 @@ test('throw error if options are invalid – apiKey.url', (t) => {
   t.plan(invalids.length)
 
   invalids.forEach((invalid) => {
-    t.throws(() => utils.verify(helpers.getOptions({
+    t.throws(() => utils.verifyPluginOptions({
       apiKey: {
         url: invalid
       }
-    })))
+    }))
   })
 })
 
@@ -354,12 +414,12 @@ test('throw error if options are invalid – apiKey.name', (t) => {
   t.plan(invalids.length)
 
   invalids.forEach((invalid) => {
-    t.throws(() => utils.verify(helpers.getOptions({
+    t.throws(() => utils.verifyPluginOptions({
       apiKey: {
         url: 'http://foobar.com/foo/bar',
         name: invalid
       }
-    })))
+    }))
   })
 })
 
@@ -379,12 +439,12 @@ test('throw error if options are invalid – apiKey.prefix', (t) => {
   t.plan(invalids.length)
 
   invalids.forEach((invalid) => {
-    t.throws(() => utils.verify(helpers.getOptions({
+    t.throws(() => utils.verifyPluginOptions({
       apiKey: {
         url: 'http://foobar.com/foo/bar',
         prefix: invalid
       }
-    })))
+    }))
   })
 })
 
@@ -404,12 +464,12 @@ test('throw error if options are invalid – apiKey.tokenPath', (t) => {
   t.plan(invalids.length)
 
   invalids.forEach((invalid) => {
-    t.throws(() => utils.verify(helpers.getOptions({
+    t.throws(() => utils.verifyPluginOptions({
       apiKey: {
         url: 'http://foobar.com/foo/bar',
         tokenPath: invalid
       }
-    })))
+    }))
   })
 })
 
@@ -430,12 +490,12 @@ test('throw error if options are invalid – apiKey.in', (t) => {
   t.plan(invalids.length)
 
   invalids.forEach((invalid) => {
-    t.throws(() => utils.verify(helpers.getOptions({
+    t.throws(() => utils.verifyPluginOptions({
       apiKey: {
         url: 'http://foobar.com/foo/bar',
         in: invalid
       }
-    })))
+    }))
   })
 })
 
@@ -454,132 +514,21 @@ test('throw error if options are invalid – apiKey.options', (t) => {
   t.plan(invalids.length)
 
   invalids.forEach((invalid) => {
-    t.throws(() => utils.verify(helpers.getOptions({
+    t.throws(() => utils.verifyPluginOptions({
       apiKey: {
         url: 'http://foobar.com/foo/bar',
         options: invalid
       }
-    })))
+    }))
   })
 })
 
-test('throw error if options are invalid – publicKey/secret/entitlement conflict', (t) => {
-  t.throws(() => utils.verify(helpers.getOptions({
-    publicKey: fixtures.common.publicKeyRsa,
-    secret: fixtures.common.secret
-  })))
+test('throw no error if options are valid – apiKey', (t) => {
+  t.plan(validPluginOptions.length)
 
-  t.throws(() => utils.verify(helpers.getOptions({
-    publicKey: fixtures.common.publicKeyRsa,
-    entitlement: true
-  })))
-
-  t.throws(() => utils.verify(helpers.getOptions({
-    secret: fixtures.common.secret,
-    entitlement: true
-  })))
-})
-
-test('throw no error if options are valid – schemeName', (t) => {
-  const customValids = [
-    ...valids,
-    { schemeName: '' },
-    { schemeName: 'foobar' },
-    { schemeName: undefined }
-  ]
-
-  t.plan(customValids.length)
-
-  customValids.forEach((valid) => {
+  validPluginOptions.forEach((valid) => {
     t.notThrows(
-      () => utils.verify(helpers.getOptions(valid))
+      () => utils.verifyPluginOptions(valid)
     )
   })
-})
-
-test('throw no error if options are valid – decoratorName', (t) => {
-  const customValids = [
-    ...valids,
-    { decoratorName: '' },
-    { decoratorName: 'foobar' },
-    { decoratorName: undefined }
-  ]
-
-  t.plan(customValids.length)
-
-  customValids.forEach((valid) => {
-    t.notThrows(
-      () => utils.verify(helpers.getOptions(valid))
-    )
-  })
-})
-
-test('throw no error if options are valid – secret', (t) => {
-  t.plan(valids.length)
-
-  valids.forEach((valid) => {
-    t.notThrows(
-      () => utils.verify(helpers.getOptions(Object.assign({
-        secret: fixtures.common.secret
-      }, valid)))
-    )
-  })
-})
-
-test('throw no error if options are valid – offline', (t) => {
-  const customValids = [...valids, { entitlement: true }]
-
-  t.plan(customValids.length)
-
-  customValids.forEach((valid) => {
-    t.notThrows(
-      () => utils.verify(helpers.getOptions(valid))
-    )
-  })
-})
-
-test('throw no error if options are valid – publicKey/Rsa', (t) => {
-  t.plan(valids.length)
-
-  valids.forEach((valid) => {
-    t.notThrows(
-      () => utils.verify(helpers.getOptions(Object.assign({
-        publicKey: fixtures.common.publicKeyRsa
-      }, valid)))
-    )
-  })
-})
-
-test('throw no error if options are valid – publicKey/Buffer', (t) => {
-  t.plan(valids.length)
-
-  valids.forEach((valid) => {
-    t.notThrows(
-      () => utils.verify(helpers.getOptions(Object.assign({
-        publicKey: fixtures.common.publicKeyBuffer
-      }, valid)))
-    )
-  })
-})
-
-test('throw no error if options are valid – publicKey/JWK', (t) => {
-  t.plan(valids.length)
-
-  valids.forEach((valid) => {
-    t.notThrows(
-      () => utils.verify(helpers.getOptions(Object.assign({
-        publicKey: fixtures.common.publicKeyJwk
-      }, valid)))
-    )
-  })
-})
-
-test('sets default correctly – schemeName', (t) => {
-  const opts = utils.verify(helpers.getOptions({ schemeName: undefined }))
-  t.is(opts.schemeName, 'keycloak-jwt')
-})
-
-test('sets default correctly – decoratorName', (t) => {
-  const opts = utils.verify(helpers.getOptions({ decoratorName: undefined }))
-  t.is(opts.decoratorName, 'kjwt')
 })

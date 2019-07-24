@@ -16,8 +16,8 @@ function parseUrl (pluginOptions) {
   const { apiKey, clientId, realmUrl } = pluginOptions
 
   return !!apiKey && pupa(apiKey.url, {
-    realm: realmUrl.split('/').slice(-1),
-    clientId
+    ...(realmUrl ? { realm: realmUrl.split('/').slice(-1) } : {}),
+    ...(clientId ? { clientId } : {})
   })
 }
 
@@ -67,16 +67,15 @@ function getRequestOptions (request, options) {
  * @public
  *
  * Extend the hapi request life cycle with an
- * additional api key interceptor.
+* additional api key interceptor.
  *
  * @param {Hapi.server} server The related hapi server object
- * @param {Object} pluginOptions The plugin related options
  * @param {Object} options The api key related options
  * @param {string} url The url to be requested
  *
  * @throws {Boom.unauthorized} If requesting the access token failed
  */
-function extendLifeCycle (server, pluginOptions, options, url) {
+function extendLifeCycle (server, options, url) {
   server.ext('onRequest', async (request, h) => {
     const requestOptions = getRequestOptions(request, options)
 
@@ -91,7 +90,7 @@ function extendLifeCycle (server, pluginOptions, options, url) {
         throw raiseUnauthorized(
           errorMessages.apiKey,
           err.message,
-          pluginOptions.schemeName,
+          null,
           options.prefix.trim()
         )
       }
@@ -117,7 +116,7 @@ function init (server, pluginOptions) {
   const url = parseUrl(pluginOptions)
 
   if (options) {
-    extendLifeCycle(server, pluginOptions, options, url)
+    extendLifeCycle(server, options, url)
   }
 }
 

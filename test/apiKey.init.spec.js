@@ -3,7 +3,7 @@ const helpers = require('./_helpers')
 const fixtures = require('./fixtures')
 const apiKey = require('../src/apiKey')
 
-const cfg = helpers.getOptions({ publicKey: fixtures.common.publicKeyJwk })
+const cfg = helpers.getStrategyOptions({ publicKey: fixtures.common.publicKeyJwk })
 const mockResponse = {
   access_token: 'barfoo'
 }
@@ -19,7 +19,7 @@ const defaults = {
 test('Do not replace api key with bearer token because of missing options', async (t) => {
   const server = await helpers.getServer(cfg)
 
-  apiKey.init(server, cfg)
+  apiKey.init(server, {})
 
   const { result } = await server.inject({
     url: '/proxy',
@@ -35,9 +35,7 @@ test('Do not replace api key with bearer token because of missing options', asyn
 test('Do not replace api key with bearer token because of missing api key', async (t) => {
   const server = await helpers.getServer(cfg)
 
-  apiKey.init(server, Object.assign({
-    apiKey: defaults
-  }, cfg))
+  apiKey.init(server, { apiKey: defaults })
 
   const { result } = await server.inject({
     url: '/proxy'
@@ -51,9 +49,7 @@ test('Do not replace api key with bearer token because of failing request', asyn
   helpers.mockApiKey(401, mockResponse, false)
   const server = await helpers.getServer(cfg)
 
-  apiKey.init(server, Object.assign({
-    apiKey: defaults
-  }, cfg))
+  apiKey.init(server, { apiKey: defaults })
 
   const res = await server.inject({
     url: '/proxy',
@@ -70,9 +66,7 @@ test('Replace api key with bearer token', async (t) => {
   helpers.mockApiKey(200, mockResponse, false)
   const server = await helpers.getServer(cfg)
 
-  apiKey.init(server, Object.assign({
-    apiKey: defaults
-  }, cfg))
+  apiKey.init(server, { apiKey: defaults })
 
   const { result } = await server.inject({
     url: '/proxy',

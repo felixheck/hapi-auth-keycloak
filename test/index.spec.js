@@ -7,31 +7,28 @@ test('throw error if plugin gets registered twice', async (t) => {
   t.is(Object.keys(server.auth._schemes).length, 1)
 })
 
-test('throw error if plugin gets registered twice with different scheme names', async (t) => {
+test('throw error if scheme is used twice with same name', async (t) => {
   const server = await helpers.getServer(undefined)
-  await t.throwsAsync(helpers.registerPlugin(server, {
-    schemeName: 'foobar'
-  }, true))
+
+  t.throws(() => {
+    server.auth.strategy('keycloak-jwt', 'keycloak-jwt', helpers.getStrategyOptions({
+      name: 'Foobar'
+    }))
+  })
 
   t.is(Object.keys(server.auth._schemes).length, 1)
+  t.is(Object.keys(server.auth._strategies).length, 2)
 })
 
-test('throw error if plugin gets registered twice with different decorator names', async (t) => {
+test('throw no error if scheme is used twice', async (t) => {
   const server = await helpers.getServer(undefined)
-  await t.throwsAsync(helpers.registerPlugin(server, {
-    decoratorName: 'fb'
-  }, true))
+
+  t.notThrows(() => {
+    server.auth.strategy('keycloak-jwt3', 'keycloak-jwt', helpers.getStrategyOptions({
+      name: 'Foobar'
+    }))
+  })
 
   t.is(Object.keys(server.auth._schemes).length, 1)
-})
-
-test('throw no error if plugin gets registered twice with different names', async (t) => {
-  const server = await helpers.getServer(undefined)
-
-  await t.notThrowsAsync(helpers.registerPlugin(server, {
-    schemeName: 'foobar',
-    decoratorName: 'fb'
-  }, true))
-
-  t.is(Object.keys(server.auth._schemes).length, 2)
+  t.is(Object.keys(server.auth._strategies).length, 3)
 })

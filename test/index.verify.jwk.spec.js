@@ -2,10 +2,10 @@ const test = require('ava')
 const helpers = require('./_helpers')
 const fixtures = require('./fixtures')
 
-const cfg = helpers.getOptions({ publicKey: fixtures.common.publicKeyJwk })
+const cfg = helpers.getStrategyOptions({ publicKey: fixtures.common.publicKeyJwk })
 
 test('registration does fail – invalid JWK', async (t) => {
-  await t.throwsAsync(helpers.getServer(helpers.getOptions({ publicKey: fixtures.common.invalidJwk })))
+  await t.throwsAsync(helpers.getServer(helpers.getStrategyOptions({ publicKey: fixtures.common.invalidJwk })))
 })
 
 test('authentication does succeed', async (t) => {
@@ -53,7 +53,7 @@ test('authentication does fail – expired token', async (t) => {
 
   t.truthy(res)
   t.is(res.statusCode, 401)
-  t.is(res.headers['www-authenticate'], 'Bearer strategy="keycloak-jwt", reason="invalid token (expired)", error="Invalid credentials"')
+  t.is(res.headers['www-authenticate'], 'Bearer strategy="keycloak-jwt (BizApps)", reason="invalid token (expired)", error="Invalid credentials"')
 })
 
 test('authentication does fail – invalid header', async (t) => {
@@ -63,5 +63,5 @@ test('authentication does fail – invalid header', async (t) => {
 
   t.truthy(res)
   t.is(res.statusCode, 401)
-  t.is(res.headers['www-authenticate'], 'Bearer strategy="keycloak-jwt", error="Invalid credentials"')
+  t.is(res.headers['www-authenticate'], 'Bearer strategy="keycloak-jwt (BizApps)", error="Invalid credentials"')
 })

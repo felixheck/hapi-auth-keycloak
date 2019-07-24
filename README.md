@@ -9,8 +9,9 @@
 3. [Usage](#usage)
 4. [API](#api)
 5. [Example](#example)
-6. [Developing and Testing](#developing-and-testing)
-7. [Contribution](#contribution)
+6. [Migration Guides](#migration-guides)
+7. [Developing and Testing](#developing-and-testing)
+8. [Contribution](#contribution)
 
 ---
 
@@ -56,18 +57,15 @@ const server = hapi.server({ port: 8888 });
 #### Registration
 Finally register the plugin, set the correct options and the authentication strategy:
 ``` js
-await server.register({
-  plugin: authKeycloak,
-  options: {
-    realmUrl: 'https://localhost:8080/auth/realms/testme',
-    clientId: 'foobar',
-    minTimeBetweenJwksRequests: 15,
-    cache: true,
-    userInfo: ['name', 'email']
-  }
-});
+await server.register({ plugin: authKeycloak });
 
-server.auth.strategy('keycloak-jwt', 'keycloak-jwt');
+server.auth.strategy('keycloak-jwt', 'keycloak-jwt', {
+  realmUrl: 'https://localhost:8080/auth/realms/testme',
+  clientId: 'foobar',
+  minTimeBetweenJwksRequests: 15,
+  cache: true,
+  userInfo: ['name', 'email']
+});
 ```
 
 #### Route Configuration & Scope
@@ -101,7 +99,30 @@ server.route([
 
 ## API
 #### Plugin Options
+- `apiKey {Object}` — The options object enabling an api key service as middleware<br/>
+Optional. Default: `undefined`.
 
+  - `url {string}` — The absolute url to be requested. It's possible to use a [`pupa` template][pupa] with placeholders called `realm` and `clientId` getting rendered based on the passed plugin-related options.<br/>
+  Example: `http://barfoo.com/foo/{clientId}`<br/>
+  Required.
+
+  - `in {string}` — Whether the api key is placed in the headers or query.<br/>
+  Allowed values: `headers` & `query`<br/>
+  Optional. Default: `headers`.
+
+  - `name {string}` — The name of the related headers field or query key.<br/>
+  Optional. Default: `authorization`.
+
+  - `prefix {string}` — An optional prefix of the related api key value. Mind a trailing space if necessary.<br/>
+  Optional. Default: `Api-Key `.
+
+  - `tokenPath {string}` — The path to the access token in the response its body as dot notation.<br/>
+  Optional. Default: `access_token`.
+
+  - `request {Object}` – The detailed request options for [`got`][got].<br/>
+  Optional. Default: `{}`
+
+#### Plugin + Strategy Options
 > By default, the Keycloak server has built-in [two ways to authenticate][client-auth] the client: client ID and client secret **(1)**, or with a signed JWT **(2)**. This plugin supports both. If a non-live strategy is used, ensure that the identifier of the related realm key is included in their header as `kid`. Check the description of `secret`/`publicKey`/`entitlement` and the [terminology][rpt-terms] for further information.
 >
 > | Strategies | Online* | Live** |[Scopes][rpt]  | Truthy Option | Note         |
@@ -117,9 +138,8 @@ server.route([
 > Please mind that the accurate strategy is 4-5x faster than the fine-grained one.<br/>
 > **Hint:** If you define neither `secret` nor `public` nor `entitlement`, the plugin retrieves the public key itself from `{realmUrl}/protocol/openid-connect/certs`.
 
-- `schemeName {string}` — The name used for the authentication scheme of the hapi server. Optional. Default: `keycloak-jwt`.
-
-- `decoratorName {string}` — The name used for the server decorator to validate the token, [see below](#await-serverdecoratorname--kjwtvalidatefield-string). Optional. Default: `kjwt`.
+- `name {string}` – The unique name of the strategy<br/>
+Required. Example `BizApps`<br/>
 
 - `realmUrl {string}` – The absolute uri of the Keycloak realm.<br/>
 Required. Example: `https://localhost:8080/auth/realms/testme`<br/>
@@ -151,32 +171,12 @@ Please mind that an enabled cache leads to disabled live validation after the re
 If `false` the cache is disabled. Use `true` or an empty object (`{}`) to use the built-in default cache. Otherwise just drop in your own cache configuration.<br/>
 Optional. Default: `false`.
 
-- `apiKey {Object}` — The options object enabling an api key service as middleware<br/>
-Optional. Default: `undefined`.
-
-  - `url {string}` — The absolute url to be requested. It's possible to use a [`pupa` template][pupa] with placeholders called `realm` and `clientId` getting rendered based on the passed options.<br/>
-  Example: `http://barfoo.com/foo/{clientId}`<br/>
-  Required.
-
-  - `in {string}` — Whether the api key is placed in the headers or query.<br/>
-  Allowed values: `headers` & `query`<br/>
-  Optional. Default: `headers`.
-
-  - `name {string}` — The name of the related headers field or query key.<br/>
-  Optional. Default: `authorization`.
-
-  - `prefix {string}` — An optional prefix of the related api key value. Mind a trailing space if necessary.<br/>
-  Optional. Default: `Api-Key `.
-
-  - `tokenPath {string}` — The path to the access token in the response its body as dot notation.<br/>
-  Optional. Default: `access_token`.
-
-  - `request {Object}` – The detailed request options for [`got`][got].<br/>
-  Optional. Default: `{}`
-
-#### `await server[decoratorName = 'kjwt'].validate(field {string})`
+#### `await server.kjwt.validate(field {string}, name {string})`
 - `field {string}` — The `Bearer` field, including the scheme (`bearer`) itself.<br/>
 Example: `bearer 12345.abcde.67890`.<br/>
+Required.
+- `name {string}` — The `name` strategy option, to select the strategy to be used.<br/>
+Example: `BizApps`.<br/>
 Required.
 
 If an error occurs, it gets thrown — so take care and implement a kind of catching.<br/>
@@ -221,7 +221,13 @@ const routes = require('./routes');
 
 const server = hapi.server({ port: 3000 });
 
-const options = {
+const pluginOptions = {
+  apiKey: {
+    url: 'http://barfoo.com/foo/foobar'
+  }
+}
+
+const strategyOptions = {
   realmUrl: 'https://localhost:8080/auth/realms/testme',
   clientId: 'foobar',
   minTimeBetweenJwksRequests: 15,
@@ -239,8 +245,11 @@ process.on('SIGINT', async () => {
 
 (async () => {
   try {
-    await server.register({ plugin: authKeycloak, options });
-    server.auth.strategy('keycloak-jwt', 'keycloak-jwt');
+    await server.register({
+      plugin: authKeycloak,
+      options: pluginOptions
+    });
+    server.auth.strategy('keycloak-jwt', 'keycloak-jwt', strategyOptions);
     await server.register({ plugin: routes });
     await server.start();
     console.log('Server started successfully');
@@ -249,6 +258,21 @@ process.on('SIGINT', async () => {
   }
 })();
 ```
+
+## Migration Guides
+#### `v4.2` to `v4.3`
+**Features**
+- It's now possible to register multiple strategies with the same scheme `keycloak-jwt`
+
+**Changes**
+- `name` is a new unique strategy-related option.
+- `apiKey.url` not longer accepts placeholders
+- The [option](#api) setup changed. All plugin-related options are used as defaults for [strategy-related options][strategy-options].
+- Even though every strategy-related option can also set via the plugin options, `apiKey` can only be set once in the plugin options.
+
+In case of multiple registered strategies for this scheme:
+- Use at least a different `name` option in each strategy.
+- `server.kjwt.validate` requires `name` as second argument
 
 ## Developing and Testing
 First you have to install all dependencies:
@@ -297,3 +321,4 @@ For further information read the [contributing guideline](CONTRIBUTING.md).
 [rpt-terms]: https://www.keycloak.org/docs/3.2/authorization_services/topics/overview/terminology.html
 [got]: https://github.com/sindresorhus/got
 [pupa]: https://github.com/sindresorhus/pupa
+[strategy-options]: https://hapijs.com/api#-serverauthstrategyname-scheme-options
