@@ -269,13 +269,8 @@ process.on('SIGINT', async () => {
 
 **Changes**
 - `name` is a new unique strategy-related option. There's a default, so it's only required in case of multiple registered strategies.
-- All plugin-related options are used as defaults for strategy-related options. In case of multiple registered strategies, use at least a different `name` option in each strategy. `apiKey` options cannot be overridden.
+- The [option](#api) setup changed. All plugin-related options are used as defaults for [strategy-related options][strategy-options]. In case of multiple registered strategies, use at least a different `name` option in each strategy. `apiKey` options cannot be overridden.
 - `server.kjwt.validate` requires `name` as second argument in case of multiple registered strategies
-
-
-- [Options](#api) changed
-  - Only the `apiKey` options remain as plugin-related options
-  - All the other options are now [strategy-related options][strategy-options]
 
 ## Developing and Testing
 First you have to install all dependencies:
