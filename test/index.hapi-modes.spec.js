@@ -25,8 +25,6 @@ test('server method – authentication supports mode: "optional" - will fail wit
   const server = await helpers.getServer(cfg)
   const res = await server.inject(mockReq)
 
-  console.log(res)
-
   t.truthy(res)
   t.is(res.statusCode, 401)
 })
