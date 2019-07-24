@@ -4,18 +4,19 @@ const KeycloakToken = require('keycloak-connect/middleware/auth-utils/token')
 const apiKey = require('./apiKey')
 const cache = require('./cache')
 const token = require('./token')
-const { raiseUnauthorized, errorMessages, fakeToolkit, verify } = require('./utils')
+const { verifyStrategyOptions, verifyPluginOptions } = require('./utils')
+const { raiseUnauthorized, errorMessages, fakeToolkit } = require('./utils')
 const pkg = require('../package.json')
 
 /**
  * @type {Object}
  * @private
  *
- * The plugin related options and instances.
+ * The plugin & strategy related options and instances.
  */
-let options
-let manager
-let store
+const options = {}
+const manager = {}
+const store = {}
 
 /**
  * @function
@@ -26,11 +27,13 @@ let store
  * Both are non-live. Resolve if the verification succeeded.
  *
  * @param {string} tkn The token to be validated
+ * @param {string} name The unique name of the strategy
  * @returns {Promise} The error-handled promise
  */
-async function verifySignedJwt (tkn) {
-  const kcTkn = new KeycloakToken(tkn, options.clientId)
-  await manager.validateToken(kcTkn, 'Bearer')
+async function verifySignedJwt (tkn, name) {
+  const { clientId } = options[name]
+  const kcTkn = new KeycloakToken(tkn, clientId)
+  await manager[name].validateToken(kcTkn, 'Bearer')
 
   return tkn
 }
@@ -44,13 +47,14 @@ async function verifySignedJwt (tkn) {
  * Resolve if the request succeeded and token is valid.
  *
  * @param {string} tkn The token to be validated
+ * @param {string} name The unique name of the strategy
  * @returns {Promise} The error-handled promise
  *
  * @throws {Error} If token is invalid or request failed
  */
-async function introspect (tkn) {
+async function introspect (tkn, name) {
   try {
-    const isValid = await manager.validateAccessToken(tkn)
+    const isValid = await manager[name].validateAccessToken(tkn)
     if (isValid === false) throw Error(errorMessages.invalid)
   } catch (err) {
     throw Error(errorMessages.invalid)
@@ -66,15 +70,17 @@ async function introspect (tkn) {
  * Retrieve the Requesting Party Token from the Keycloak Server.
  *
  * @param {string} tkn The token to be used for authentication
+ * @param {string} name The unique name of the strategy
  * @returns {Promise} The modified, non-error-handling promise
  *
  * @throws {Error} If token is invalid or request failed
  */
-async function getRpt (tkn) {
+async function getRpt (tkn, name) {
+  const { realmUrl, clientId } = options[name]
   let body = {}
 
   try {
-    ({ body } = await got.get(`${options.realmUrl}/authz/entitlement/${options.clientId}`, {
+    ({ body } = await got.get(`${realmUrl}/authz/entitlement/${clientId}`, {
       headers: { authorization: `bearer ${tkn}` }
     }))
   } catch (err) {
@@ -93,35 +99,37 @@ async function getRpt (tkn) {
  * If `entitlement` is truthy it retrieves the RPT.
  * Else perform a non-live validation with public keys.
  *
+ * @param {string} name The unique name of the strategy
  * @returns {Function} The related validation strategy
  */
-function getValidateFn () {
-  return options.secret ? introspect : options.entitlement ? getRpt : verifySignedJwt
+function getValidateFn (name) {
+  const { secret, entitlement } = options[name]
+  return secret ? introspect : entitlement ? getRpt : verifySignedJwt
 }
 
 /**
  * @function
  * @public
  *
- * Validate a token either with the help of Keycloak
- * or a related public key. Store the user data in
- * cache if enabled.
+ * Validate a token either with the help of Keycloak or a
+ * related public key. Store the user data in cache if enabled.
  *
  * @param {string} tkn The token to be validated
+ * @param {string} name The unique name of the strategy
  * @param {Function} h The toolkit
  *
  * @throws {Boom.unauthorized} If previous validation fails
  */
-async function handleKeycloakValidation (tkn, h) {
+async function handleKeycloakValidation (tkn, name, h) {
   try {
-    const info = await getValidateFn()(tkn)
-    const { expiresIn, credentials } = token.getData(info || tkn, options)
+    const info = await getValidateFn(name)(tkn, name)
+    const { expiresIn, credentials } = token.getData(info || tkn, options[name])
     const userData = { credentials }
 
-    await cache.set(store, tkn, userData, expiresIn)
+    await cache.set(store[name], tkn, userData, expiresIn)
     return h.authenticated(userData)
   } catch (err) {
-    throw raiseUnauthorized(errorMessages.invalid, err.message)
+    throw raiseUnauthorized(errorMessages.invalid, err.message, name)
   }
 }
 
@@ -129,29 +137,35 @@ async function handleKeycloakValidation (tkn, h) {
  * @function
  * @public
  *
- * Check if token is already cached in memory.
- * If yes, return cached user data. Otherwise
- * handle validation with help of Keycloak.
+ * Expect `Authorization: bearer x.y.z` as header.
+ * If the token was sent before and is still cached,
+ * return the cached user data as credentials.
+ * Otherwise handle validation with help of Keycloak.
  *
  * @param {string} field The authorization field, e.g. the value of `Authorization`
- * @param {Object} h The reply toolkit
+ * @param {string} name The unique name of the strategy
+ * @param {Object} [h = (data)  => data] The reply toolkit
  *
  * @throws {Boom.unauthorized} If header is missing or has an invalid format
  */
-async function validate (field, h = (data) => data) {
+async function validate (field, name, h = (data) => data) {
+  if (!name || !(name in options)) {
+    throw raiseUnauthorized(errorMessages.missingName)
+  }
+
   if (!field) {
-    throw raiseUnauthorized(errorMessages.missing, null)
+    throw raiseUnauthorized(errorMessages.missing, null, name)
   }
 
   const tkn = token.create(field)
   const reply = fakeToolkit(h)
 
   if (!tkn) {
-    throw raiseUnauthorized(errorMessages.invalid, null)
+    throw raiseUnauthorized(errorMessages.invalid, null, name)
   }
 
-  const cached = await cache.get(store, tkn)
-  return cached ? reply.authenticated(cached) : handleKeycloakValidation(tkn, reply)
+  const cached = await cache.get(store[name], tkn)
+  return cached ? reply.authenticated(cached) : handleKeycloakValidation(tkn, name, reply)
 }
 
 /**
@@ -159,17 +173,26 @@ async function validate (field, h = (data) => data) {
  * @private
  *
  * The authentication strategy based on keycloak.
- * Expect `Authorization: bearer x.y.z` as header.
- * If the token was sent before and is still cached,
- * return the cached user data as credentials.
+ * Initialize memory cache, grant manager for keycloak.
  *
  * @param {Hapi.Server} server The created server instance
+ * @param {Object} opts The strategy related options
  * @returns {Object} The authentication scheme
  */
 function strategy (server, opts) {
+  opts = verifyStrategyOptions(opts)
+
+  if (process.env.NODE_ENV !== 'test' && opts.name in options) {
+    throw Error(`The passed name '${opts.name}' already exists.`)
+  }
+
+  options[opts.name] = opts
+  manager[opts.name] = new GrantManager(opts)
+  store[opts.name] = cache.create(server, opts.cache)
+
   return {
     authenticate (request, h) {
-      return validate(request.raw.req.headers.authorization, h)
+      return validate(request.raw.req.headers.authorization, opts.name, h)
     }
   }
 }
@@ -179,17 +202,13 @@ function strategy (server, opts) {
  * @public
  *
  * The authentication plugin handler.
- * Initialize memory cache, grant manager for
- * Keycloak and register Basic Auth.
+ * Initialize api key handler and register auth schemes.
  *
  * @param {Hapi.Server} server The created server instance
  * @param {Object} opts The plugin related options
  */
 function register (server, opts) {
-  options = verify(opts)
-  manager = new GrantManager(options)
-  store = cache.create(server, options.cache)
-
+  const options = verifyPluginOptions(opts)
   apiKey.init(server, options)
 
   server.auth.scheme('keycloak-jwt', strategy)
