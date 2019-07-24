@@ -13,7 +13,28 @@ test('server method – throw error because of missing name', async (t) => {
   helpers.mockIntrospect(200, fixtures.content.current)
 
   const server = await helpers.getServer(cfg)
-  await t.throwsAsync(server.kjwt.validate(`bearer ${fixtures.composeJwt('current')}`))
+  const err = await t.throwsAsync(server.kjwt.validate(`bearer ${fixtures.composeJwt('current')}`))
+
+  t.truthy(err)
+  t.truthy(err.isBoom)
+  t.is(err.output.statusCode, 401)
+  t.is(err.output.headers['WWW-Authenticate'], 'Bearer strategy="keycloak-jwt", error="Missing or non-existent strategy name"')
+})
+
+test('server method – throw error because of wrong name', async (t) => {
+  helpers.mockIntrospect(200, fixtures.content.current)
+
+  const server = await helpers.getServer(cfg)
+  await t.throwsAsync(server.kjwt.validate(`bearer ${fixtures.composeJwt('current')}`, 'pointless'))
+})
+
+test('server method — throw no error because of missing name — just one strategy', async (t) => {
+  helpers.mockIntrospect(200, fixtures.content.current)
+
+  const server = await helpers.getServer(cfg)
+  server.kjwt.resetOptions()
+  server.auth.strategy('keycloak-jwt3', 'keycloak-jwt', cfg)
+  await t.notThrowsAsync(server.kjwt.validate(`bearer ${fixtures.composeJwt('current')}`))
 })
 
 test('server method – authentication does succeed', async (t) => {

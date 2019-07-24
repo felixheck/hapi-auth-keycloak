@@ -243,6 +243,7 @@ async function registerPlugin (server, strategyOpts = {}, skipRoutes = false) {
 
   await server.register({ plugin: authKeycloak })
   server.auth.strategy('keycloak-jwt', 'keycloak-jwt', strategyOptions)
+
   server.auth.strategy('keycloak-jwt2', 'keycloak-jwt', {
     ...strategyOptions,
     name: 'CuApps',

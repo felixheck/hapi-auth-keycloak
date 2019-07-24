@@ -261,13 +261,21 @@ process.on('SIGINT', async () => {
 
 ## Migration Guides
 #### `v4.x` to `v5.x`
+**Features**
+- It's now possible to register multiple strategies with the same scheme `keycloak-jwt`
+
+**Breaking Changes**
+- `apiKey.url` not longer accepts placeholders
+
+**Changes**
+- `name` is a new unique strategy-related option. There's a default, so it's only required in case of multiple registered strategies.
+- All plugin-related options are used as defaults for strategy-related options. In case of multiple registered strategies, use at least a different `name` option in each strategy. `apiKey` options cannot be overridden.
+- `server.kjwt.validate` requires `name` as second argument in case of multiple registered strategies
+
+
 - [Options](#api) changed
   - Only the `apiKey` options remain as plugin-related options
-  - `apiKey.url` not longer accepts placeholders
   - All the other options are now [strategy-related options][strategy-options]
-  - `name` is a new unique strategy-related option
-- `server.kjwt.validate` requires `name` as second argument
-- It's now possible to register multiple strategies with the same scheme `keycloak-jwt`
 
 ## Developing and Testing
 First you have to install all dependencies:

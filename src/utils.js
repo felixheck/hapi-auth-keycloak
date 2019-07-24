@@ -35,7 +35,7 @@ const pluginScheme = joi.object({
   .required()
 
 const strategyScheme = joi.object({
-  name: joi.string().min(1).required()
+  name: joi.string().min(1).default('default')
     .description('Descriptive unique name of the strategy')
     .example('BizApps'),
   realmUrl: joi.string().uri().required()
@@ -72,7 +72,7 @@ const strategyScheme = joi.object({
   .without('entitlement', ['secret', 'publicKey'])
   .without('secret', ['entitlement', 'publicKey'])
   .without('publicKey', ['entitlement', 'secret'])
-  .unknown(true)
+  .unknown(false)
   .required()
 
 /**

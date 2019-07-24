@@ -80,7 +80,6 @@ test('throw error if options are invalid – realmUrl', (t) => {
 test('throw error if options are invalid – name', (t) => {
   const invalids = [
     null,
-    undefined,
     NaN,
     '',
     42,

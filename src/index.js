@@ -14,9 +14,10 @@ const pkg = require('../package.json')
  *
  * The plugin & strategy related options and instances.
  */
-const options = {}
 const manager = {}
 const store = {}
+let options = {}
+let pluginOptions
 
 /**
  * @function
@@ -149,8 +150,12 @@ async function handleKeycloakValidation (tkn, name, h) {
  * @throws {Boom.unauthorized} If header is missing or has an invalid format
  */
 async function validate (field, name, h = (data) => data) {
-  if (!name || !(name in options)) {
+  if ((!!name && !(name in options)) || (Object.keys(options).length > 1 && !name)) {
     throw raiseUnauthorized(errorMessages.missingName)
+  }
+
+  if (Object.keys(options).length === 1 && !name) {
+    name = Object.keys(options)[0]
   }
 
   if (!field) {
@@ -176,11 +181,14 @@ async function validate (field, name, h = (data) => data) {
  * Initialize memory cache, grant manager for keycloak.
  *
  * @param {Hapi.Server} server The created server instance
- * @param {Object} opts The strategy related options
+ * @param {Object} strategyOptions The strategy related options
  * @returns {Object} The authentication scheme
  */
-function strategy (server, opts) {
-  opts = verifyStrategyOptions(opts)
+function strategy (server, strategyOptions) {
+  const mergedOptions = { ...pluginOptions, ...strategyOptions }
+  delete mergedOptions.apiKey
+
+  const opts = verifyStrategyOptions(mergedOptions)
 
   if (process.env.NODE_ENV !== 'test' && opts.name in options) {
     throw Error(`The passed name '${opts.name}' already exists.`)
@@ -208,11 +216,15 @@ function strategy (server, opts) {
  * @param {Object} opts The plugin related options
  */
 function register (server, opts) {
-  const options = verifyPluginOptions(opts)
-  apiKey.init(server, options)
+  pluginOptions = verifyPluginOptions(opts)
+  apiKey.init(server, pluginOptions)
 
   server.auth.scheme('keycloak-jwt', strategy)
-  server.decorate('server', 'kjwt', { validate })
+  server.decorate('server', 'kjwt', {
+    validate,
+    getOptions: () => options,
+    resetOptions: () => { options = {} }
+  })
 }
 
 module.exports = { register, pkg }
