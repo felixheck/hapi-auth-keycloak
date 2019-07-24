@@ -123,6 +123,8 @@ Optional. Default: `undefined`.
   Optional. Default: `{}`
 
 #### Plugin + Strategy Options
+These options can be set in both ways: strategy-specific and as default for all strategies via plugin-specific options. When defining just one strategy, it's totally fine to set the whole option object as plugin options. Keep in mind that `name` needs to be unique for each strategy, default is `default`.
+
 > By default, the Keycloak server has built-in [two ways to authenticate][client-auth] the client: client ID and client secret **(1)**, or with a signed JWT **(2)**. This plugin supports both. If a non-live strategy is used, ensure that the identifier of the related realm key is included in their header as `kid`. Check the description of `secret`/`publicKey`/`entitlement` and the [terminology][rpt-terms] for further information.
 >
 > | Strategies | Online* | Live** |[Scopes][rpt]  | Truthy Option | Note         |
