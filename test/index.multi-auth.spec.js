@@ -35,7 +35,7 @@ test('authentication does succeed – first succeeds, second errors', async (t) 
   t.is(res.statusCode, 200)
 })
 
-test.skip('authentication does succeed – first fails, second succeeds', async (t) => {
+test('authentication does fail – first fails, second succeeds', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`, '/multi')
 
   helpers.mockEntitlement(400, fixtures.content.rpt, true)
@@ -45,10 +45,10 @@ test.skip('authentication does succeed – first fails, second succeeds', async 
   const res = await server.inject(mockReq)
 
   t.truthy(res)
-  t.is(res.statusCode, 200)
+  t.is(res.statusCode, 401)
 })
 
-test.skip('authentication does succeed – first errors, second succeeds', async (t) => {
+test('authentication does fail – first errors, second succeeds', async (t) => {
   const mockReq = helpers.mockRequest(`bearer ${fixtures.composeJwt('rpt')}`, '/multi')
 
   helpers.mockEntitlement(200, fixtures.content.rpt, true)
@@ -58,7 +58,7 @@ test.skip('authentication does succeed – first errors, second succeeds', async
   const res = await server.inject(mockReq)
 
   t.truthy(res)
-  t.is(res.statusCode, 200)
+  t.is(res.statusCode, 401)
 })
 
 test('authentication does fail – both errors', async (t) => {
