@@ -8,7 +8,36 @@ const jwkToPem = require('jwk-to-pem')
  *
  * The plugin options scheme
  */
-const scheme = joi.object({
+const pluginScheme = joi.object({
+  apiKey: joi.object({
+    in: joi.string().valid('headers', 'query').default('headers')
+      .description('Whether the api key is placed in the headers or query')
+      .example('query'),
+    name: joi.string().min(1).default('authorization')
+      .description('The name of the related headers field or query key')
+      .example('x-api-key'),
+    prefix: joi.string().min(1).default('Api-Key ')
+      .description('An optional prefix of the related api key value')
+      .example('Apikey '),
+    url: joi.string().min(1).required()
+      .description('The absolute url to be requested')
+      .example('https://foobar.com/api'),
+    request: joi.object().default({})
+      .description('The detailed request options for `got`')
+      .example({ retries: 2 }),
+    tokenPath: joi.string().min(1).default('access_token')
+      .description('The path to the access token in the response its body as dot notation')
+      .example('foo.bar')
+  }).unknown(false)
+    .description('The configuration of an optional api key strategy interaction with another service')
+})
+  .unknown(true)
+  .required()
+
+const strategyScheme = joi.object({
+  name: joi.string().min(1).required()
+    .description('Descriptive unique name of the strategy')
+    .example('BizApps'),
   realmUrl: joi.string().uri().required()
     .description('The absolute uri of the Keycloak realm')
     .example('https://localhost:8080/auth/realms/testme'),
@@ -38,33 +67,12 @@ const scheme = joi.object({
     .example('true'),
   userInfo: joi.array().items(joi.string().min(1))
     .description('List of properties which should be included in the `request.auth.credentials` object')
-    .example([['name', 'email']]),
-  apiKey: joi.object({
-    in: joi.string().valid('headers', 'query').default('headers')
-      .description('Whether the api key is placed in the headers or query')
-      .example('query'),
-    name: joi.string().min(1).default('authorization')
-      .description('The name of the related headers field or query key')
-      .example('x-api-key'),
-    prefix: joi.string().min(1).default('Api-Key ')
-      .description('An optional prefix of the related api key value')
-      .example('Apikey '),
-    url: joi.string().min(1).required()
-      .description('The absolute url to be requested')
-      .example('https://foobar.com/api'),
-    request: joi.object().default({})
-      .description('The detailed request options for `got`')
-      .example({ retries: 2 }),
-    tokenPath: joi.string().min(1).default('access_token')
-      .description('The path to the access token in the response its body as dot notation')
-      .example('foo.bar')
-  }).unknown(false)
-    .description('The configuration of an optional api key strategy interaction with another service')
+    .example([['name', 'email']])
 })
   .without('entitlement', ['secret', 'publicKey'])
   .without('secret', ['entitlement', 'publicKey'])
   .without('publicKey', ['entitlement', 'secret'])
-  .unknown(false)
+  .unknown(true)
   .required()
 
 /**
@@ -85,6 +93,21 @@ function isJwk (key) {
  * @public
  *
  * Validate the plugin related options.
+ *
+ * @param {Object} opts The plugin related options
+ * @returns {Object} The validated options
+ *
+ * @throws {Error} If options are invalid
+ */
+function verifyPluginOptions (opts) {
+  return joi.attempt(opts, pluginScheme)
+}
+
+/**
+ * @function
+ * @public
+ *
+ * Validate the strategy related options.
  * If `publicKey` is JWK transform to PEM.
  *
  * @param {Object} opts The plugin related options
@@ -94,12 +117,12 @@ function isJwk (key) {
  * @throws {Error} If JWK has an unsupported key type
  * @throws {Error} If options are invalid
  */
-function verify (opts) {
+function verifyStrategyOptions (opts) {
   if (isJwk(opts.publicKey)) {
     opts.publicKey = jwkToPem(opts.publicKey)
   }
 
-  return joi.attempt(opts, scheme)
+  return joi.attempt(opts, strategyScheme)
 }
 
 /**
@@ -113,15 +136,16 @@ function verify (opts) {
  * @param {Error|null|undefined} err The error object
  * @param {string} message The error message
  * @param {string} reason The reason for the thrown error
+ * @param {string} name The strategy name
  * @param {string} [scheme = 'Bearer'] The related scheme
  * @returns {Boom.unauthorized} The created `Boom` error
  */
-function raiseUnauthorized (error, reason, scheme = 'Bearer') {
+function raiseUnauthorized (error, reason, name, scheme = 'Bearer') {
   return boom.unauthorized(
     error !== errorMessages.missing ? error : null,
     scheme,
     {
-      strategy: 'keycloak-jwt',
+      strategy: name ? `keycloak-jwt (${name})` : 'keycloak-jwt',
       ...(error === errorMessages.missing ? { error } : {}),
       ...(reason && error !== reason ? { reason } : {})
     }
@@ -137,6 +161,7 @@ function raiseUnauthorized (error, reason, scheme = 'Bearer') {
 const errorMessages = {
   invalid: 'Invalid credentials',
   missing: 'Missing authorization header',
+  missingName: 'Missing or non-existent strategy name',
   rpt: 'Retrieving the RPT failed',
   apiKey: 'Retrieving the token with the api key failed'
 }
@@ -163,5 +188,6 @@ module.exports = {
   raiseUnauthorized,
   errorMessages,
   fakeToolkit,
-  verify
+  verifyPluginOptions,
+  verifyStrategyOptions
 }
