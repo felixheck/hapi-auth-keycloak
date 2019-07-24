@@ -9,8 +9,9 @@
 3. [Usage](#usage)
 4. [API](#api)
 5. [Example](#example)
-6. [Developing and Testing](#developing-and-testing)
-7. [Contribution](#contribution)
+6. [Migration Guides](#migration)
+7. [Developing and Testing](#developing-and-testing)
+8. [Contribution](#contribution)
 
 ---
 
@@ -257,6 +258,14 @@ process.on('SIGINT', async () => {
   }
 })();
 ```
+
+## Migration
+#### `v4.x` to `v5.x`
+- Only the `apiKey` options remain as plugin-related options
+- All the other options are now strategy-related options
+- `name` is a new unique strategy-related option
+- `server.kjwt.validate` requires `name` as second argument
+- It's now possible to register multiple strategies with the same scheme `keycloak-jwt`
 
 ## Developing and Testing
 First you have to install all dependencies:
