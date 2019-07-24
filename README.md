@@ -263,6 +263,7 @@ process.on('SIGINT', async () => {
 #### `v4.x` to `v5.x`
 - [Options](#api) changed
   - Only the `apiKey` options remain as plugin-related options
+  - `apiKey.url` not longer accepts placeholders
   - All the other options are now [strategy-related options][strategy-options]
   - `name` is a new unique strategy-related option
 - `server.kjwt.validate` requires `name` as second argument
