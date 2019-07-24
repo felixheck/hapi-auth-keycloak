@@ -121,7 +121,7 @@ async function handleKeycloakValidation (tkn, h) {
     await cache.set(store, tkn, userData, expiresIn)
     return h.authenticated(userData)
   } catch (err) {
-    throw raiseUnauthorized(errorMessages.invalid, err.message, options.schemeName)
+    throw raiseUnauthorized(errorMessages.invalid, err.message)
   }
 }
 
@@ -140,14 +140,14 @@ async function handleKeycloakValidation (tkn, h) {
  */
 async function validate (field, h = (data) => data) {
   if (!field) {
-    throw raiseUnauthorized(errorMessages.missing, null, options.schemeName)
+    throw raiseUnauthorized(errorMessages.missing, null)
   }
 
   const tkn = token.create(field)
   const reply = fakeToolkit(h)
 
   if (!tkn) {
-    throw raiseUnauthorized(errorMessages.invalid, null, options.schemeName)
+    throw raiseUnauthorized(errorMessages.invalid, null)
   }
 
   const cached = await cache.get(store, tkn)
@@ -166,7 +166,7 @@ async function validate (field, h = (data) => data) {
  * @param {Hapi.Server} server The created server instance
  * @returns {Object} The authentication scheme
  */
-function strategy (server) {
+function strategy (server, opts) {
   return {
     authenticate (request, h) {
       return validate(request.raw.req.headers.authorization, h)
@@ -192,16 +192,8 @@ function register (server, opts) {
 
   apiKey.init(server, options)
 
-  if (options.schemeName in server.auth._schemes) {
-    throw Error(`Authentication strategy named ${options.schemeName} already exists.`)
-  }
-
-  if (options.decoratorName in server._core._decorations['server']) {
-    throw Error(`Server decorator named ${options.decoratorName} already exists.`)
-  }
-
-  server.auth.scheme(options.schemeName, strategy)
-  server.decorate('server', options.decoratorName, { validate })
+  server.auth.scheme('keycloak-jwt', strategy)
+  server.decorate('server', 'kjwt', { validate })
 }
 
-module.exports = { register, pkg, multiple: true }
+module.exports = { register, pkg }

@@ -9,10 +9,6 @@ const jwkToPem = require('jwk-to-pem')
  * The plugin options scheme
  */
 const scheme = joi.object({
-  schemeName: joi.string().empty(['']).default('keycloak-jwt')
-    .description('The name for the auth scheme for the hapi server'),
-  decoratorName: joi.string().empty(['']).default('kjwt')
-    .description('The name for the server decorator to validate tokens'),
   realmUrl: joi.string().uri().required()
     .description('The absolute uri of the Keycloak realm')
     .example('https://localhost:8080/auth/realms/testme'),
@@ -117,16 +113,15 @@ function verify (opts) {
  * @param {Error|null|undefined} err The error object
  * @param {string} message The error message
  * @param {string} reason The reason for the thrown error
- * @param {string} strategy The strategy name
  * @param {string} [scheme = 'Bearer'] The related scheme
  * @returns {Boom.unauthorized} The created `Boom` error
  */
-function raiseUnauthorized (error, reason, strategy, scheme = 'Bearer') {
+function raiseUnauthorized (error, reason, scheme = 'Bearer') {
   return boom.unauthorized(
     error !== errorMessages.missing ? error : null,
-    `${scheme} (${strategy})`,
+    scheme,
     {
-      strategy,
+      strategy: 'keycloak-jwt',
       ...(error === errorMessages.missing ? { error } : {}),
       ...(reason && error !== reason ? { reason } : {})
     }

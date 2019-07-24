@@ -10,8 +10,6 @@ const fixtures = require('./fixtures')
  * The default plugin configuration
  */
 const defaults = {
-  schemeName: 'keycloak-jwt',
-  decoratorName: 'kjwt',
   realmUrl: fixtures.common.realmUrl,
   clientId: fixtures.common.clientId
 }
@@ -234,7 +232,7 @@ async function registerPlugin (server, opts = {}, skipRoutes = false) {
     options
   })
 
-  server.auth.strategy(options.schemeName, options.schemeName)
+  server.auth.strategy('keycloak-jwt', 'keycloak-jwt')
 
   if (!skipRoutes) {
     registerRoutes(server)
