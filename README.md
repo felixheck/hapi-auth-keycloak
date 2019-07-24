@@ -9,7 +9,7 @@
 3. [Usage](#usage)
 4. [API](#api)
 5. [Example](#example)
-6. [Migration Guides](#migration)
+6. [Migration Guides](#migration-guides)
 7. [Developing and Testing](#developing-and-testing)
 8. [Contribution](#contribution)
 
@@ -259,11 +259,12 @@ process.on('SIGINT', async () => {
 })();
 ```
 
-## Migration
+## Migration Guides
 #### `v4.x` to `v5.x`
-- Only the `apiKey` options remain as plugin-related options
-- All the other options are now strategy-related options
-- `name` is a new unique strategy-related option
+- [Options](#api) changed
+  - Only the `apiKey` options remain as plugin-related options
+  - All the other options are now [strategy-related options][strategy-options]
+  - `name` is a new unique strategy-related option
 - `server.kjwt.validate` requires `name` as second argument
 - It's now possible to register multiple strategies with the same scheme `keycloak-jwt`
 
@@ -313,4 +314,4 @@ For further information read the [contributing guideline](CONTRIBUTING.md).
 [rpt]: https://www.keycloak.org/docs/3.2/authorization_services/topics/service/entitlement/entitlement-api-aapi.html
 [rpt-terms]: https://www.keycloak.org/docs/3.2/authorization_services/topics/overview/terminology.html
 [got]: https://github.com/sindresorhus/got
-[pupa]: https://github.com/sindresorhus/pupa
+[strategy-options]: https://hapijs.com/api#-serverauthstrategyname-scheme-options
