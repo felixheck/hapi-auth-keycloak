@@ -3,7 +3,7 @@ const test = require('ava')
 const helpers = require('./_helpers')
 const fixtures = require('./fixtures')
 
-const cfg = helpers.getOptions({ entitlement: true })
+const cfg = helpers.getStrategyOptions({ entitlement: true })
 const targetScope = [...fixtures.targetScope, 'scope:foo.READ', 'scope:foo.WRITE']
 
 test.afterEach.always('reset instances and prototypes', () => {
@@ -84,7 +84,7 @@ test('authentication does fail – invalid token', async (t) => {
 
   t.truthy(res)
   t.is(res.statusCode, 401)
-  t.is(res.headers['www-authenticate'], 'Bearer strategy="keycloak-jwt", reason="Retrieving the RPT failed", error="Invalid credentials"')
+  t.is(res.headers['www-authenticate'], 'Bearer strategy="keycloak-jwt (BizApps)", reason="Retrieving the RPT failed", error="Invalid credentials"')
 })
 
 test('authentication does fail – invalid header', async (t) => {
@@ -95,5 +95,5 @@ test('authentication does fail – invalid header', async (t) => {
 
   t.truthy(res)
   t.is(res.statusCode, 401)
-  t.is(res.headers['www-authenticate'], 'Bearer strategy="keycloak-jwt", error="Invalid credentials"')
+  t.is(res.headers['www-authenticate'], 'Bearer strategy="keycloak-jwt (BizApps)", error="Invalid credentials"')
 })

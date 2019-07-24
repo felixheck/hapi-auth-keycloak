@@ -3,35 +3,35 @@ const test = require('ava')
 const utils = require('../src/utils')
 
 test('get boom error with default message', (t) => {
-  const result = utils.raiseUnauthorized()
+  const result = utils.raiseUnauthorized(null, null, 'foo')
   t.truthy(result)
   t.deepEqual(result, boom.unauthorized(undefined, 'Bearer', {
-    strategy: 'keycloak-jwt'
+    strategy: 'keycloak-jwt (foo)'
   }))
 })
 
 test('get boom error with reason', (t) => {
-  const result = utils.raiseUnauthorized(null, 'foobar')
+  const result = utils.raiseUnauthorized(null, 'foobar', 'foo')
   t.truthy(result)
   t.deepEqual(result, boom.unauthorized(undefined, 'Bearer', {
-    strategy: 'keycloak-jwt',
+    strategy: 'keycloak-jwt (foo)',
     reason: 'foobar'
   }))
 })
 
 test('get boom error with custom scheme', (t) => {
-  const result = utils.raiseUnauthorized(null, null, 'custom')
+  const result = utils.raiseUnauthorized(null, null, 'foo', 'custom')
   t.truthy(result)
   t.deepEqual(result, boom.unauthorized(undefined, 'custom', {
-    strategy: 'keycloak-jwt'
+    strategy: 'keycloak-jwt (foo)'
   }))
 })
 
 test('get boom error with error message', (t) => {
-  const result = utils.raiseUnauthorized('foobar')
+  const result = utils.raiseUnauthorized('foobar', null, 'foo')
   t.truthy(result)
   t.deepEqual(result, boom.unauthorized('foobar', 'Bearer', {
-    strategy: 'keycloak-jwt'
+    strategy: 'keycloak-jwt (foo)'
   }))
 })
 
