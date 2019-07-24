@@ -25,8 +25,21 @@ test('server method – authentication supports mode: "optional" - will fail wit
   const server = await helpers.getServer(cfg)
   const res = await server.inject(mockReq)
 
+  console.log(res)
+
   t.truthy(res)
   t.is(res.statusCode, 401)
+})
+
+test('server method – authentication supports mode: "try" - will succeed without auth', async (t) => {
+  const server = await helpers.getServer(cfg)
+  const res = await server.inject({
+    method: 'GET',
+    url: '/mode-try'
+  })
+
+  t.truthy(res)
+  t.is(res.statusCode, 200)
 })
 
 test('server method – authentication supports mode: "try" - will succeed with invalid auth', async (t) => {

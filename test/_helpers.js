@@ -211,6 +211,19 @@ function registerRoutes (server) {
           }
         }
       }
+    },
+    {
+      method: 'GET',
+      path: '/multi',
+      options: {
+        auth: { strategies: ['keycloak-jwt', 'keycloak-jwt2'] },
+        handler (req) {
+          return {
+            headers: req.headers,
+            query: req.query
+          }
+        }
+      }
     }
   ])
 }
@@ -230,6 +243,11 @@ async function registerPlugin (server, strategyOpts = {}, skipRoutes = false) {
 
   await server.register({ plugin: authKeycloak })
   server.auth.strategy('keycloak-jwt', 'keycloak-jwt', strategyOptions)
+  server.auth.strategy('keycloak-jwt2', 'keycloak-jwt', {
+    ...strategyOptions,
+    name: 'CuApps',
+    cache: false
+  })
 
   if (!skipRoutes) {
     registerRoutes(server)

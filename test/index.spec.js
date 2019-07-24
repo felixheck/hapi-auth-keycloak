@@ -17,18 +17,18 @@ test('throw error if scheme is used twice with same name', async (t) => {
   })
 
   t.is(Object.keys(server.auth._schemes).length, 1)
-  t.is(Object.keys(server.auth._strategies).length, 1)
+  t.is(Object.keys(server.auth._strategies).length, 2)
 })
 
 test('throw no error if scheme is used twice', async (t) => {
   const server = await helpers.getServer(undefined)
 
   t.notThrows(() => {
-    server.auth.strategy('keycloak-jwt2', 'keycloak-jwt', helpers.getStrategyOptions({
+    server.auth.strategy('keycloak-jwt3', 'keycloak-jwt', helpers.getStrategyOptions({
       name: 'Foobar'
     }))
   })
 
   t.is(Object.keys(server.auth._schemes).length, 1)
-  t.is(Object.keys(server.auth._strategies).length, 2)
+  t.is(Object.keys(server.auth._strategies).length, 3)
 })
