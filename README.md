@@ -16,7 +16,7 @@
 ---
 
 ## Introduction
-**hapi-auth-keycloak** is a plugin for [hapi.js][hapijs] which enables to protect your endpoints in a smart but professional manner using [Keycloak][keycloak] as authentication service. It is inspired by the related [express.js middleware][keycloak-node]. The plugin validates the passed [`Bearer` token][bearer] offline with a provided public key or online with help of the [Keycloak][keycloak] server. Optionally, the successfully validated tokens and the related user data get cached using [`catbox`][catbox]. The caching enables a fast processing even though the user data don't get changed until the token expires. Furthermore it is possible to enable an api key interceptor proxying the request to an api key service which returns the temporary bearer token. It plays well with the [hapi.js][hapijs]-integrated [authentication/authorization feature][hapi-route-options]. Besides the authentication strategy it is possible to validate tokens by yourself, e.g. to authenticate incoming websocket or queue messages.
+**hapi-auth-keycloak** is a plugin for [hapi.js][hapijs] which enables to protect your endpoints in a smart but professional manner using [Keycloak][keycloak] as authentication service. It is inspired by the related [express.js middleware][keycloak-node]. The plugin validates the passed [`Bearer` token][bearer] offline with a provided public key or online with help of the [Keycloak][keycloak] server. Optionally, the successfully validated tokens and the related user data get cached using [`catbox`][catbox]. The caching enables a fast processing even though the user data don't get changed until the token expires. Furthermore it is possible to enable an api key interceptor proxying the request to an api key service which returns the temporary bearer token. It plays well with the [hapi.js][hapijs]-integrated [authentication/authorization feature][hapi-route-options]. Besides the authentication strategy it is possible to validate tokens by yourself, e.g. to authenticate incoming websocket or queue messages, and to register/use multiple strategies via [jscheffner/hapi-auth-any](https://github.com/jscheffner/hapi-auth-any).
 
 The modules [`standard`][standardjs] and [`ava`][avajs] are used to grant a high quality implementation.
 
@@ -275,6 +275,10 @@ process.on('SIGINT', async () => {
 In case of multiple registered strategies for this scheme:
 - Use at least a different `name` option in each strategy.
 - `server.kjwt.validate` requires `name` as second argument
+
+**Attention**
+- Needs a custom scheme when multiple strategies are used on single routes. Check [jscheffner/hapi-auth-any](https://github.com/jscheffner/hapi-auth-any).
+
 
 ## Developing and Testing
 First you have to install all dependencies:
