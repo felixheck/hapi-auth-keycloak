@@ -268,7 +268,7 @@ process.on('SIGINT', async () => {
 
 **Changes**
 - `name` is a new unique strategy-related option.
-- `apiKey.url` not longer accepts placeholders
+- `apiKey.url` its placeholders are replaced with plugin-related options, not the unique strategy ones.
 - The [option](#api) setup changed. All plugin-related options are used as defaults for [strategy-related options][strategy-options].
 - Even though every strategy-related option can also set via the plugin options, `apiKey` can only be set once in the plugin options.
 

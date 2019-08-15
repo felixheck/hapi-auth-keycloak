@@ -30,7 +30,7 @@ test('Get endpoint url with replaced unknown placeholder', (t) => {
     apiKey: { url: 'http://barfoo.com/foo/{foobar}' },
     clientId: 'bar',
     realmUrl: 'http://foobar.com/foo/bar'
-  }), 'http://barfoo.com/foo/')
+  }), 'http://barfoo.com/foo/undefined')
 })
 
 test('Get no api key if there is neither header nor query', (t) => {
