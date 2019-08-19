@@ -4,6 +4,11 @@ node_js:
   - 10
   - lts/*
 
+cache:
+  npm: false
+  directories:
+    - $HOME/.npm
+
 before_script:
 - npm install
 
