@@ -3,12 +3,11 @@ language: node_js
 node_js:
   - 10
   - lts/*
-  - node
 
 cache:
-    npm: false
-    directories:
-        - $HOME/.npm
+  npm: false
+  directories:
+    - $HOME/.npm
 
 before_script:
 - npm install
