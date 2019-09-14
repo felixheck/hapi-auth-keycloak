@@ -49,7 +49,7 @@ const strategyScheme = joi.object({
     .example('1234-bar-4321-foo'),
   publicKey: joi.alternatives().try(
     joi.string().regex(/^-----BEGIN RSA PUBLIC KEY-----[\s\S]*-----END RSA PUBLIC KEY-----\s?$/im, 'PEM'),
-    joi.object().type(Buffer),
+    joi.object().instance(Buffer),
     joi.object({
       kty: joi.string().required()
     }).unknown(true)
