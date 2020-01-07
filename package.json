@@ -41,29 +41,29 @@
     "ci.coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "devDependencies": {
-    "@hapi/hapi": "^18.3.1",
-    "ava": "^2.2.0",
-    "coveralls": "^3.0.5",
-    "nock": "^11.3.2",
+    "@hapi/hapi": "^18.4.0",
+    "ava": "^2.4.0",
+    "coveralls": "^3.0.9",
+    "nock": "^11.7.1",
     "nyc": "^15.0.0",
-    "standard": "^14.0.0"
+    "standard": "^14.3.1"
   },
   "dependencies": {
-    "@hapi/boom": "^8.0.1",
-    "@hapi/joi": "^16.0.1",
-    "got": "^10.2.0",
+    "@hapi/boom": "^9.0.0",
+    "@hapi/joi": "^17.0.0",
+    "got": "^10.2.1",
     "jsonwebtoken": "^8.5.1",
     "jwk-to-pem": "^1.2.6",
-    "keycloak-connect": "^8.0.0",
+    "keycloak-connect": "^8.0.1",
     "lodash": "^4.17.15",
     "pupa": "^2.0.1"
   },
   "peerDependencies": {
-    "@hapi/hapi": "^18.3.1"
+    "@hapi/hapi": "^18.4.0"
   },
   "engines": {
-    "node": ">=8",
-    "npm": ">=5"
+    "node": ">=12",
+    "npm": ">=6"
   },
   "files": [
     "src/"
