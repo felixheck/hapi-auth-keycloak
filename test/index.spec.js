@@ -4,7 +4,6 @@ const helpers = require('./_helpers')
 test('throw error if plugin gets registered twice', async (t) => {
   const server = await helpers.getServer(undefined)
   await t.throwsAsync(helpers.registerPlugin(server, undefined, true))
-  t.is(Object.keys(server.auth._schemes).length, 1)
 })
 
 test('throw error if scheme is used twice with same name', async (t) => {
@@ -15,9 +14,6 @@ test('throw error if scheme is used twice with same name', async (t) => {
       name: 'Foobar'
     }))
   })
-
-  t.is(Object.keys(server.auth._schemes).length, 1)
-  t.is(Object.keys(server.auth._strategies).length, 2)
 })
 
 test('throw no error if scheme is used twice', async (t) => {
@@ -28,7 +24,4 @@ test('throw no error if scheme is used twice', async (t) => {
       name: 'Foobar'
     }))
   })
-
-  t.is(Object.keys(server.auth._schemes).length, 1)
-  t.is(Object.keys(server.auth._strategies).length, 3)
 })

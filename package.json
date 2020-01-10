@@ -41,7 +41,7 @@
     "ci.coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "devDependencies": {
-    "@hapi/hapi": "^18.4.0",
+    "@hapi/hapi": ">=18.4",
     "ava": "^2.4.0",
     "coveralls": "^3.0.9",
     "nock": "^11.7.1",
@@ -59,7 +59,7 @@
     "pupa": "^2.0.1"
   },
   "peerDependencies": {
-    "@hapi/hapi": "^18.4.0"
+    "@hapi/hapi": ">=18.4.0"
   },
   "engines": {
     "node": ">=12",
