@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@hapi/hapi": ">=18.4",
-    "ava": "^2.4.0",
+    "ava": "^3.0.0",
     "coveralls": "^3.0.9",
     "nock": "^11.7.1",
     "nyc": "^15.0.0",
