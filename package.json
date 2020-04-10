@@ -54,7 +54,7 @@
     "got": "^10.2.1",
     "jsonwebtoken": "^8.5.1",
     "jwk-to-pem": "^1.2.6",
-    "keycloak-connect": "^8.0.1",
+    "keycloak-connect": "^9.0.2",
     "lodash": "^4.17.15",
     "pupa": "^2.0.1"
   },
