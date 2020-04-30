@@ -69,7 +69,25 @@ test('get user data of token – rpt', (t) => {
   t.truthy(_.inRange(-1 * data.expiresIn, Date.now()))
   t.is(data.credentials.sub, fixtures.content.rpt.sub)
   t.falsy(data.credentials.name)
-  t.deepEqual(data.credentials.scope.sort(), [...fixtures.targetScope, 'scope:foo.READ', 'scope:foo.WRITE'])
+  t.deepEqual(data.credentials.scope.sort(), [
+    ...fixtures.targetScope,
+    'scope:foo.READ',
+    'scope:foo.WRITE'
+  ])
+})
+
+test('get user data of token – clientscope', (t) => {
+  const tkn = fixtures.composeJwt('clientscope')
+  const data = token.getData(tkn, { clientId: fixtures.common.clientId })
+
+  t.truthy(tkn)
+  t.truthy(_.inRange(-1 * data.expiresIn, Date.now()))
+  t.is(data.credentials.sub, fixtures.content.rpt.sub)
+  t.falsy(data.credentials.name)
+  t.deepEqual(
+    data.credentials.scope.sort(),
+    ['clientscope:email', 'clientscope:profile', ...fixtures.targetScope].sort()
+  )
 })
 
 test('get user data of token – additional fields', (t) => {
