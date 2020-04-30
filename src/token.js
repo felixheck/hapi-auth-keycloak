@@ -12,7 +12,9 @@ const jwt = require('jsonwebtoken')
  * @returns {string} The extracted header
  */
 function getToken (field) {
-  return /^(?:bearer) ([a-zA-Z0-9\-_]+?\.[a-zA-Z0-9\-_]+?\.([a-zA-Z0-9\-_]+)?)$/i.exec(field)
+  return /^(?:bearer) ([a-zA-Z0-9\-_]+?\.[a-zA-Z0-9\-_]+?\.([a-zA-Z0-9\-_]+)?)$/i.exec(
+    field
+  )
 }
 
 /**
@@ -26,7 +28,7 @@ function getToken (field) {
  * @returns {Function} The composed prefixing function
  */
 function prefixRole (clientId, key) {
-  return (role) => clientId === key ? role : `${key}:${role}`
+  return (role) => (clientId === key ? role : `${key}:${role}`)
 }
 
 /**
@@ -44,17 +46,30 @@ function prefixRole (clientId, key) {
  * @param {Object} [auth={ permissions: [] }] The fine-grained access data
  * @returns {Array.<?string>} The list of roles
  */
-function getRoles (clientId, {
-  realm_access: realm = { roles: [] },
-  resource_access: resources = {},
-  authorization: auth = { permissions: [] }
-}) {
+function getRoles (
+  clientId,
+  {
+    realm_access: realm = { roles: [] },
+    resource_access: resources = {},
+    authorization: auth = { permissions: [] },
+    scope = ''
+  }
+) {
   const prefix = prefixRole.bind(undefined, clientId)
   const realmRoles = realm.roles.map(prefix('realm'))
-  const scopes = _.flatten(_.map(auth.permissions, 'scopes')).map(prefix('scope'))
-  const appRoles = Object.keys(resources).map((key) => resources[key].roles.map(prefix(key)))
+  const clientscopes = scope
+    .split(' ')
+    .filter(Boolean)
+    .map(prefix('clientscope'))
 
-  return _.flattenDepth([realmRoles, scopes, appRoles], 2)
+  const scopes = _.flatten(_.map(auth.permissions, 'scopes')).map(
+    prefix('scope')
+  )
+  const appRoles = Object.keys(resources).map((key) =>
+    resources[key].roles.map(prefix(key))
+  )
+
+  return _.flattenDepth([realmRoles, scopes, appRoles, clientscopes], 2)
 }
 
 /**
@@ -68,7 +83,7 @@ function getRoles (clientId, {
  * @returns {number} The expiration delta in milliseconds
  */
 function getExpiration ({ exp }) {
-  return exp ? (exp * 1000) - Date.now() : 60 * 1000
+  return exp ? exp * 1000 - Date.now() : 60 * 1000
 }
 
 /**

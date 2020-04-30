@@ -12,12 +12,13 @@ const jsonwebtoken = require('jsonwebtoken')
  * @param {Object} [customs] The custom data to be added
  * @returns {Object} The composed content object
  */
-const composeContent = (access, dates, customs = {}) => (
-  Object.assign(customs, contentBase,
+const composeContent = (access, dates, customs = {}) =>
+  Object.assign(
+    customs,
+    contentBase,
     access ? accessBase : {},
     dates ? { exp: 5, iat: 1 } : {}
   )
-)
 
 /**
  * @function
@@ -28,9 +29,12 @@ const composeContent = (access, dates, customs = {}) => (
  * @param {string} key The key of the `content` object to be signed
  * @returns {string} The composed JWT
  */
-const composeJwt = (key) => (
-  jsonwebtoken.sign(content[key], fs.readFileSync('./test/fixtures/private-rsa.pem'), { algorithm: 'RS256' })
-)
+const composeJwt = (key) =>
+  jsonwebtoken.sign(
+    content[key],
+    fs.readFileSync('./test/fixtures/private-rsa.pem'),
+    { algorithm: 'RS256' }
+  )
 
 /**
  * @type Object
@@ -52,12 +56,14 @@ const publicKey = fs.readFileSync('./test/fixtures/public.pem').toString()
 const publicKeyCert = fs.readFileSync('./test/fixtures/public.cert').toString()
 const publicKeyJwk = {
   kty: 'RSA',
-  n: 'ALq_ejKEGv25YOXiRapjf_1eKEIymgSZeihL1khgFYEZtj7JxSswiSvWia1IxE0uO9_8enwB18heUCrp-mrzcaVrNlc8JTuLfAYthKUltsNJXndjs0fzBQmFF9QYNNDly5nYdJL3pgAR10ji-GbOJzfea6--ybHRup7cpVprZ2ZaH8ksC4xa1wdiRabp5eJ-3he8vLw-GcsnL4vsZfjrjAOqqJi0JnyAxdKiYdEDLf8YeggeKKCuWhculRzkVOYEujKEoCe_GT4apimskXelNK4Qzqu21olcpJLUz3QdV_2JTG0B6J8qmdM9rIe3u6Ja6FHRNRbA4tEncVdmc733_CCD0hk--IELmlOG7qFVKTI0nVw3ycPZuIv5obGcF9fzFFPDqtQLAR3YE5DVWlcBXOmewKiUhlv5sTCkKrKTq_vwQDPKZ8OQQkf0Z2QSXzIwGIkoeq1WLhFlAQS4GViETQDMkcEvDrVsQA3zgbVcJ_H5sPLHIa6PVw9e1XKk3Y5UtTJK-92aA9RmoFmb7kjms9j9D4Z32qUVBdSpG44528sy6X0_DIKL78QUCQyHEWC-aHrV7v_1eazQK9J2uMzAZDzotwK6RafmeGCrpWJkhBv_9teqy5s45VihJB9Tit_Y3XQ6zE4nZcQymPkx4XskAT2eqRX2yhDOdvNYJWI5HkKR',
+  n:
+    'ALq_ejKEGv25YOXiRapjf_1eKEIymgSZeihL1khgFYEZtj7JxSswiSvWia1IxE0uO9_8enwB18heUCrp-mrzcaVrNlc8JTuLfAYthKUltsNJXndjs0fzBQmFF9QYNNDly5nYdJL3pgAR10ji-GbOJzfea6--ybHRup7cpVprZ2ZaH8ksC4xa1wdiRabp5eJ-3he8vLw-GcsnL4vsZfjrjAOqqJi0JnyAxdKiYdEDLf8YeggeKKCuWhculRzkVOYEujKEoCe_GT4apimskXelNK4Qzqu21olcpJLUz3QdV_2JTG0B6J8qmdM9rIe3u6Ja6FHRNRbA4tEncVdmc733_CCD0hk--IELmlOG7qFVKTI0nVw3ycPZuIv5obGcF9fzFFPDqtQLAR3YE5DVWlcBXOmewKiUhlv5sTCkKrKTq_vwQDPKZ8OQQkf0Z2QSXzIwGIkoeq1WLhFlAQS4GViETQDMkcEvDrVsQA3zgbVcJ_H5sPLHIa6PVw9e1XKk3Y5UtTJK-92aA9RmoFmb7kjms9j9D4Z32qUVBdSpG44528sy6X0_DIKL78QUCQyHEWC-aHrV7v_1eazQK9J2uMzAZDzotwK6RafmeGCrpWJkhBv_9teqy5s45VihJB9Tit_Y3XQ6zE4nZcQymPkx4XskAT2eqRX2yhDOdvNYJWI5HkKR',
   e: 'AQAB'
 }
 const invalidJwk = {
   kty: 'RS',
-  n: 'ALq_ejKEGv25YOXiRapjf_1eKEIymgSZeihL1khgFYEZtj7JxSswiSvWia1IxE0uO9_8enwB18heUCrp-mrzcaVrNlc8JTuLfAYthKUltsNJXndjs0fzBQmFF9QYNNDly5nYdJL3pgAR10ji-GbOJzfea6--ybHRup7cpVprZ2ZaH8ksC4xa1wdiRabp5eJ-3he8vLw-GcsnL4vsZfjrjAOqqJi0JnyAxdKiYdEDLf8YeggeKKCuWhculRzkVOYEujKEoCe_GT4apimskXelNK4Qzqu21olcpJLUz3QdV_2JTG0B6J8qmdM9rIe3u6Ja6FHRNRbA4tEncVdmc733_CCD0hk--IELmlOG7qFVKTI0nVw3ycPZuIv5obGcF9fzFFPDqtQLAR3YE5DVWlcBXOmewKiUhlv5sTCkKrKTq_vwQDPKZ8OQQkf0Z2QSXzIwGIkoeq1WLhFlAQS4GViETQDMkcEvDrVsQA3zgbVcJ_H5sPLHIa6PVw9e1XKk3Y5UtTJK-92aA9RmoFmb7kjms9j9D4Z32qUVBdSpG44528sy6X0_DIKL78QUCQyHEWC-aHrV7v_1eazQK9J2uMzAZDzotwK6RafmeGCrpWJkhBv_9teqy5s45VihJB9Tit_Y3XQ6zE4nZcQymPkx4XskAT2eqRX2yhDOdvNYJWI5HkKR',
+  n:
+    'ALq_ejKEGv25YOXiRapjf_1eKEIymgSZeihL1khgFYEZtj7JxSswiSvWia1IxE0uO9_8enwB18heUCrp-mrzcaVrNlc8JTuLfAYthKUltsNJXndjs0fzBQmFF9QYNNDly5nYdJL3pgAR10ji-GbOJzfea6--ybHRup7cpVprZ2ZaH8ksC4xa1wdiRabp5eJ-3he8vLw-GcsnL4vsZfjrjAOqqJi0JnyAxdKiYdEDLf8YeggeKKCuWhculRzkVOYEujKEoCe_GT4apimskXelNK4Qzqu21olcpJLUz3QdV_2JTG0B6J8qmdM9rIe3u6Ja6FHRNRbA4tEncVdmc733_CCD0hk--IELmlOG7qFVKTI0nVw3ycPZuIv5obGcF9fzFFPDqtQLAR3YE5DVWlcBXOmewKiUhlv5sTCkKrKTq_vwQDPKZ8OQQkf0Z2QSXzIwGIkoeq1WLhFlAQS4GViETQDMkcEvDrVsQA3zgbVcJ_H5sPLHIa6PVw9e1XKk3Y5UtTJK-92aA9RmoFmb7kjms9j9D4Z32qUVBdSpG44528sy6X0_DIKL78QUCQyHEWC-aHrV7v_1eazQK9J2uMzAZDzotwK6RafmeGCrpWJkhBv_9teqy5s45VihJB9Tit_Y3XQ6zE4nZcQymPkx4XskAT2eqRX2yhDOdvNYJWI5HkKR',
   e: 'AQAB'
 }
 
@@ -90,7 +96,12 @@ const common = {
  *
  * Scope list to be targeted
  */
-const targetScope = ['account:manage-account', 'editor', 'otherApp:creator', 'realm:admin']
+const targetScope = [
+  'account:manage-account',
+  'editor',
+  'otherApp:creator',
+  'realm:admin'
+]
 
 /**
  * @type Object
@@ -138,10 +149,15 @@ const content = {
   }),
   rpt: composeContent(true, true, {
     authorization: {
-      permissions: [{
-        scopes: ['foo.READ', 'foo.WRITE']
-      }]
+      permissions: [
+        {
+          scopes: ['foo.READ', 'foo.WRITE']
+        }
+      ]
     }
+  }),
+  clientscope: composeContent(true, true, {
+    scope: 'profile email'
   })
 }
 
