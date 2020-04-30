@@ -42,11 +42,11 @@
   },
   "devDependencies": {
     "@hapi/hapi": ">=18.4",
-    "ava": "^3.6.0",
-    "coveralls": "^3.0.9",
+    "ava": "^3.8.1",
+    "coveralls": "^3.1.0",
     "nock": "^12.0.3",
-    "nyc": "^15.0.0",
-    "standard": "^14.3.1"
+    "nyc": "^15.0.1",
+    "standard": "^14.3.3"
   },
   "dependencies": {
     "@hapi/boom": "^9.0.0",
