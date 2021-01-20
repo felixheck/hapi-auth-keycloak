@@ -1,5 +1,5 @@
 const boom = require('@hapi/boom')
-const joi = require('@hapi/joi')
+const joi = require('joi')
 const jwkToPem = require('jwk-to-pem')
 
 /**
