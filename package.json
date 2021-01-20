@@ -46,7 +46,7 @@
     "coveralls": "^3.1.0",
     "nock": "^13.0.5",
     "nyc": "^15.0.1",
-    "standard": "^14.3.3"
+    "standard": "^16.0.3"
   },
   "dependencies": {
     "@hapi/boom": "^9.0.0",
