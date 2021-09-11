@@ -2,7 +2,7 @@
 
 #### JSON Web Token based Authentication powered by Keycloak
 
-## [![Travis](https://img.shields.io/travis/felixheck/wurst.svg)](https://travis-ci.org/felixheck/hapi-auth-keycloak/builds/) ![node](https://img.shields.io/node/v/hapi-auth-keycloak.svg) ![npm](https://img.shields.io/npm/dt/hapi-auth-keycloak.svg) [![standard](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](http://standardjs.com/) ![npm](https://img.shields.io/npm/l/hapi-auth-keycloak.svg) [![Coverage Status](https://coveralls.io/repos/github/felixheck/hapi-auth-keycloak/badge.svg?branch=master)](https://coveralls.io/github/felixheck/hapi-auth-keycloak?branch=master)
+## [![Travis](https://img.shields.io/travis/felixheck/wurst.svg)](https://travis-ci.com/felixheck/hapi-auth-keycloak/builds/) ![node](https://img.shields.io/node/v/hapi-auth-keycloak.svg) ![npm](https://img.shields.io/npm/dt/hapi-auth-keycloak.svg) [![standard](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](http://standardjs.com/) ![npm](https://img.shields.io/npm/l/hapi-auth-keycloak.svg) [![Coverage Status](https://coveralls.io/repos/github/felixheck/hapi-auth-keycloak/badge.svg?branch=master)](https://coveralls.io/github/felixheck/hapi-auth-keycloak?branch=master)
 
 1. [Introduction](#introduction)
 2. [Installation](#installation)
