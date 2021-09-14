@@ -56,7 +56,7 @@
     "jwk-to-pem": "^1.2.6",
     "keycloak-connect": "^15.0.2",
     "lodash": "^4.17.21",
-    "pupa": "^2.1.1"
+    "pupa": "^3.1.0"
   },
   "peerDependencies": {
     "@hapi/hapi": ">=18.4.0"
