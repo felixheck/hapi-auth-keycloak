@@ -158,9 +158,9 @@ These options can be set in both ways: strategy-specific and as default for all 
 > | (1)        |    x     |    x     |               | `secret`      | accurate     |
 > | (1) + (2)  |    x     |    x     |       x       | `entitlement` | fine-grained |
 >
-> **\***: Plugin interacts with the Keycloak API<br/> > **\*\***: Plugin validates token with help of the Keycloak API<br/>
+> **\***: Plugin interacts with the Keycloak API<br/>**\*\***: Plugin validates token with help of the Keycloak API<br/>
 >
-> Please mind that the accurate strategy is 4-5x faster than the fine-grained one.<br/> > **Hint:** If you define neither `secret` nor `public` nor `entitlement`, the plugin retrieves the public key itself from `{realmUrl}/protocol/openid-connect/certs`.
+> Please mind that the accurate strategy is 4-5x faster than the fine-grained one.<br/>**Hint:** If you define neither `secret` nor `public` nor `entitlement`, the plugin retrieves the public key itself from `{realmUrl}/protocol/openid-connect/certs`.
 
 - `name {string}` – The unique name of the strategy<br/>
   Required. Example `BizApps`<br/>
