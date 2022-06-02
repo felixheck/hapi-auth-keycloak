@@ -154,8 +154,13 @@ async function validate (field, name, h = (data) => data) {
     throw raiseUnauthorized(errorMessages.missingName)
   }
 
-  if (Object.keys(options).length === 1 && !name) {
-    name = Object.keys(options)[0]
+  if (sharing) {
+    return h.authenticated({
+      credentials: {
+        isValid: true,
+        sharing
+      }
+    })
   }
 
   if (!field) {
