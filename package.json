@@ -49,7 +49,7 @@
     "standard": "^16.0.3"
   },
   "dependencies": {
-    "@hapi/boom": "^9.1.4",
+    "@hapi/boom": "^10.0.1",
     "joi": "^17.4.2",
     "got": "^11.8.2",
     "jsonwebtoken": "^8.5.1",
